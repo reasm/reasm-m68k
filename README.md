@@ -1,2 +1,1 @@
-This is a Java project template for the Luna version of Eclipse JDT and
-Eclipse m2e. It also enables the FindBugs builder.
+**reasm-m68k** is a Motorola 68000 Family assembler based on **reasm-core**.
