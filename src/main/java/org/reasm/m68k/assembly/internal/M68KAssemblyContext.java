@@ -13,11 +13,10 @@ import org.reasm.m68k.M68KArchitecture;
 import org.reasm.m68k.expressions.internal.Tokenizer;
 import org.reasm.m68k.messages.InvalidSizeAttributeErrorMessage;
 import org.reasm.m68k.messages.SizeAttributeNotAllowedErrorMessage;
-import org.reasm.m68k.source.BlockDirectiveLine;
 import org.reasm.m68k.source.LogicalLine;
+import org.reasm.m68k.source.SourceLocationUtils;
 import org.reasm.messages.WrongNumberOfOperandsErrorMessage;
 import org.reasm.source.SourceLocation;
-import org.reasm.source.SourceNode;
 
 import ca.fragag.Consumer;
 
@@ -461,17 +460,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         this.sourceLocation = step.getLocation().getSourceLocation();
         this.instructionSet = ((M68KArchitecture) this.sourceLocation.getArchitecture()).getInstructionSet();
 
-        final SourceNode sourceNode = this.sourceLocation.getSourceNode();
-        final LogicalLine logicalLine;
-
-        if (sourceNode instanceof LogicalLine) {
-            logicalLine = (LogicalLine) sourceNode;
-        } else if (sourceNode instanceof BlockDirectiveLine) {
-            logicalLine = ((BlockDirectiveLine) sourceNode).getLogicalLine();
-        } else {
-            logicalLine = null;
-        }
-
+        final LogicalLine logicalLine = SourceLocationUtils.getLogicalLine(this.sourceLocation);
         if (logicalLine != null) {
             this.logicalLine = logicalLine;
             this.numberOfLabels = this.logicalLine.getNumberOfLabels();
