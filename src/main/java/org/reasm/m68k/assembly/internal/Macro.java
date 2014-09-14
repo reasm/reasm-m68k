@@ -30,7 +30,7 @@ final class Macro {
 
     }
 
-    private static void findNamedSubstution(String[] operands, String name, int startPosition, int endPosition,
+    private static void findNamedSubstitution(String[] operands, String name, int startPosition, int endPosition,
             ArrayList<Substitution> substitutions) {
         if ("NARG".equalsIgnoreCase(name)) {
             substitutions.add(new Substitution(startPosition, endPosition - startPosition, Substitution.NARG));
@@ -93,7 +93,7 @@ final class Macro {
                             substitutions.add(new Substitution(startPosition, endPosition - startPosition, i - 1));
                         } else {
                             // Check if the text between the braces matches the name of an operand.
-                            findNamedSubstution(operands, name, startPosition, endPosition, substitutions);
+                            findNamedSubstitution(operands, name, startPosition, endPosition, substitutions);
                         }
                     }
 
@@ -148,7 +148,7 @@ final class Macro {
                             final String identifier = reader.readSubstring(endPosition - startPosition);
 
                             // Check if the identifier matches the name of an operand.
-                            findNamedSubstution(operands, identifier, startPosition, endPosition, substitutions);
+                            findNamedSubstitution(operands, identifier, startPosition, endPosition, substitutions);
                         }
 
                         continue;
