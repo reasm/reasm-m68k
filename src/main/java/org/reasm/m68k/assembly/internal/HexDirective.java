@@ -30,10 +30,7 @@ class HexDirective extends Mnemonic {
             for (int currentCodePoint; !reader.atEnd(); reader.advance()) {
                 reader.skipWhitespace();
                 currentCodePoint = reader.getCurrentCodePoint();
-                if (currentCodePoint == -1) {
-                    // Continue to next operand.
-                    break;
-                }
+                assert currentCodePoint != -1;
 
                 // Parse the first nybble of a nybble pair.
                 int hexCharValue = Character.digit(currentCodePoint, 16);

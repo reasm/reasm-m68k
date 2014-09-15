@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.INVALID_SIZE_ATTRIBUTE_EMPTY;
 import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.INVALID_SIZE_ATTRIBUTE_Z;
+import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.SIZE_ATTRIBUTE_NOT_ALLOWED;
 import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.UNDEFINED_SYMBOL;
 import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.WRONG_NUMBER_OF_OPERANDS;
 
@@ -25,9 +26,11 @@ import org.reasm.Configuration;
 import org.reasm.Environment;
 import org.reasm.m68k.M68KArchitecture;
 import org.reasm.m68k.messages.CountMustNotBeNegativeErrorMessage;
+import org.reasm.m68k.messages.InvalidCharacterInHexDirectiveErrorMessage;
 import org.reasm.m68k.messages.InvalidExpressionErrorMessage;
 import org.reasm.m68k.messages.StringTooLongErrorMessage;
 import org.reasm.m68k.messages.ValueOutOfRangeErrorMessage;
+import org.reasm.messages.OddNumberOfCharactersInHexDirectiveErrorMessage;
 import org.reasm.messages.OutOfMemoryErrorMessage;
 import org.reasm.source.SourceFile;
 import org.reasm.testhelpers.EquivalentAssemblyMessage;
@@ -199,6 +202,22 @@ public class OutputDirectivesTest {
         addDataItem(" DS.X 1", new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
         addDataItem(" DS.P 1", new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
         addDataItem(" DS.Z 1", new byte[] { 0, 0 }, INVALID_SIZE_ATTRIBUTE_Z);
+
+        // HEX
+        addDataItem(" HEX", NO_DATA);
+        addDataItem(" HEX !", NO_DATA, new InvalidCharacterInHexDirectiveErrorMessage('!'));
+        addDataItem(" HEX 0", NO_DATA, new OddNumberOfCharactersInHexDirectiveErrorMessage());
+        addDataItem(" HEX G", NO_DATA, new InvalidCharacterInHexDirectiveErrorMessage('G'));
+        addDataItem(" HEX 0!", NO_DATA, new InvalidCharacterInHexDirectiveErrorMessage('!'));
+        addDataItem(" HEX 00", new byte[] { 0x00 });
+        addDataItem(" HEX 123G45,67", new byte[] { 0x12, 0x67 }, new InvalidCharacterInHexDirectiveErrorMessage('G'));
+        addDataItem(" HEX 11", new byte[] { 0x11 });
+        addDataItem(" HEX FF", new byte[] { (byte) 0xFF });
+        addDataItem(" HEX 1122", new byte[] { 0x11, 0x22 });
+        addDataItem(" HEX 11,22", new byte[] { 0x11, 0x22 });
+        addDataItem(" HEX 01234567,89ABCDEF,fedcba", new byte[] { 0x01, 0x23, 0x45, 0x67, (byte) 0x89, (byte) 0xAB, (byte) 0xCD,
+                (byte) 0xEF, (byte) 0xFE, (byte) 0xDC, (byte) 0xBA });
+        addDataItem(" HEX.B", NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED);
     }
 
     /**

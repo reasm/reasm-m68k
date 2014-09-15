@@ -3,6 +3,7 @@ package org.reasm.m68k.assembly.internal;
 import org.reasm.AssemblyMessage;
 import org.reasm.m68k.messages.InvalidSizeAttributeErrorMessage;
 import org.reasm.m68k.messages.NotSupportedOnArchitectureErrorMessage;
+import org.reasm.m68k.messages.SizeAttributeNotAllowedErrorMessage;
 import org.reasm.messages.UnresolvedSymbolReferenceErrorMessage;
 import org.reasm.messages.WrongNumberOfOperandsErrorMessage;
 
@@ -15,6 +16,7 @@ final class CommonExpectedMessages {
     static final AssemblyMessage INVALID_SIZE_ATTRIBUTE_W = new InvalidSizeAttributeErrorMessage("W");
     static final AssemblyMessage INVALID_SIZE_ATTRIBUTE_L = new InvalidSizeAttributeErrorMessage("L");
     static final AssemblyMessage INVALID_SIZE_ATTRIBUTE_Z = new InvalidSizeAttributeErrorMessage("Z");
+    static final AssemblyMessage SIZE_ATTRIBUTE_NOT_ALLOWED = new SizeAttributeNotAllowedErrorMessage();
     static final AssemblyMessage UNDEFINED_SYMBOL = new UnresolvedSymbolReferenceErrorMessage("UNDEFINED");
 
 }
