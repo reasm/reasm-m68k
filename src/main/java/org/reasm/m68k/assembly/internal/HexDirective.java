@@ -27,7 +27,7 @@ class HexDirective extends Mnemonic {
         final int numberOfOperands = context.numberOfOperands;
         for (int i = 0; i < numberOfOperands; i++) {
             context.prepareOperandReader(i);
-            for (int currentCodePoint; reader.getCurrentCodePoint() != -1; reader.advance()) {
+            for (int currentCodePoint; !reader.atEnd(); reader.advance()) {
                 reader.skipWhitespace();
                 currentCodePoint = reader.getCurrentCodePoint();
                 if (currentCodePoint == -1) {
