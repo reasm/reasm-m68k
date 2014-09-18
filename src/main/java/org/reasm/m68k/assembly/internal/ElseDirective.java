@@ -21,7 +21,13 @@ class ElseDirective extends Mnemonic {
         context.sizeNotAllowed();
         context.requireNumberOfOperands(0);
 
-        if (!(context.getParentBlock() instanceof IfBlockState)) {
+        final Object block = context.getParentBlock();
+        if (block instanceof IfBlockState) {
+            final IfBlockState ifBlockState = (IfBlockState) block;
+
+            // Process the block body, then stop.
+            ifBlockState.iterator.stopAfterNext();
+        } else {
             context.addMessage(new ElseWithoutIfErrorMessage());
         }
     }
