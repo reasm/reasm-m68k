@@ -140,6 +140,14 @@ public final class Parser {
                 if (mnemonic.startsWith("!")) {
                     mnemonic = mnemonic.substring(1);
                 }
+
+                // If the mnemonic has a size attribute, remove it.
+                // If someone writes something silly like "IF.W", we'll still open an IF block
+                // because the IF directive expects to be in an IF block.
+                final int indexOfPeriod = mnemonic.indexOf('.');
+                if (indexOfPeriod != -1) {
+                    mnemonic = mnemonic.substring(0, indexOfPeriod);
+                }
             } finally {
                 // Restore the reader's position.
                 reader.setCurrentPosition(backupPosition);

@@ -76,6 +76,24 @@ public class ParserTest {
     }
 
     /**
+     * Asserts that {@link Parser#parse(Document)} returns a {@link Block} with a single {@link WhileBlock} child node when the
+     * document contains a <code>WHILE</code> block, even if the <code>WHILE</code> directive has a size attribute.
+     */
+    @Test
+    public void parseBlockSizeAttribute() {
+        final SourceNode block = Parser.parse(new Document(" WHILE.W 1\n NOP\n ENDW"));
+        assertThat(block.getLength(), is(21));
+        assertThat(block.getParseError(), is(nullValue()));
+        assertThat(block, is(instanceOf(Block.class)));
+        final List<SourceNode> childNodes = ((Block) block).getChildNodes();
+        assertThat(childNodes.size(), is(1));
+        final SourceNode node = childNodes.get(0);
+        assertThat(node.getLength(), is(21));
+        assertThat(node.getParseError(), is(nullValue()));
+        assertThat(node, is(instanceOf(WhileBlock.class)));
+    }
+
+    /**
      * Asserts that {@link Parser#parse(Document)} returns a {@link Block} with no child nodes when the document is empty.
      */
     @Test
