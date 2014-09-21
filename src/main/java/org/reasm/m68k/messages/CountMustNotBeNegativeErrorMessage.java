@@ -3,8 +3,8 @@ package org.reasm.m68k.messages;
 import org.reasm.AssemblyErrorMessage;
 
 /**
- * An error message that is generated during an assembly when the count operand of a <code>DCB</code>, <code>DS</code> or
- * <code>RS</code> directive is negative.
+ * An error message that is generated during an assembly when the count operand of a <code>DCB</code>, <code>DS</code>,
+ * <code>REPT</code> or <code>RS</code> directive is negative.
  *
  * @author Francis Gagné
  */

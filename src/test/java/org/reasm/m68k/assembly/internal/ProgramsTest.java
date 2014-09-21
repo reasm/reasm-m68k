@@ -24,15 +24,7 @@ import org.reasm.AssemblyMessage;
 import org.reasm.Configuration;
 import org.reasm.Environment;
 import org.reasm.m68k.M68KArchitecture;
-import org.reasm.m68k.messages.AlignmentMustNotBeZeroOrNegativeErrorMessage;
-import org.reasm.m68k.messages.ElseWithoutIfErrorMessage;
-import org.reasm.m68k.messages.ElseifWithoutIfErrorMessage;
-import org.reasm.m68k.messages.EndifWithoutIfErrorMessage;
-import org.reasm.m68k.messages.EndwWithoutWhileErrorMessage;
-import org.reasm.m68k.messages.InvalidExpressionErrorMessage;
-import org.reasm.m68k.messages.NextWithoutForErrorMessage;
-import org.reasm.m68k.messages.OffsetMustNotBeNegativeErrorMessage;
-import org.reasm.m68k.messages.UntilWithoutDoErrorMessage;
+import org.reasm.m68k.messages.*;
 import org.reasm.source.SourceFile;
 import org.reasm.testhelpers.EquivalentAssemblyMessage;
 
@@ -118,6 +110,12 @@ public class ProgramsTest {
         addDataItem(" ENDIF 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, endifWithoutIf);
         addDataItem(" ENDIF.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, endifWithoutIf);
 
+        // ENDR
+        final EndrWithoutReptErrorMessage endrWithoutRept = new EndrWithoutReptErrorMessage();
+        addDataItem(" ENDR", 2, NO_DATA, endrWithoutRept);
+        addDataItem(" ENDR 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, endrWithoutRept);
+        addDataItem(" ENDR.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, endrWithoutRept);
+
         // ENDW
         final EndwWithoutWhileErrorMessage endwWithoutWhile = new EndwWithoutWhileErrorMessage();
         addDataItem(" ENDW", 2, NO_DATA, endwWithoutWhile);
@@ -165,6 +163,13 @@ public class ProgramsTest {
         addDataItem(" NEXT", 2, NO_DATA, nextWithoutFor);
         addDataItem(" NEXT 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, nextWithoutFor);
         addDataItem(" NEXT.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, nextWithoutFor);
+
+        // REPT
+        addDataItem(" REPT\n DC.W $1234\n ENDR", 5, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" REPT -1\n DC.W $1234\n ENDR", 5, NO_DATA, new CountMustNotBeNegativeErrorMessage());
+        addDataItem(" REPT 0\n DC.W $1234\n ENDR", 5, NO_DATA);
+        addDataItem(" REPT.W 0\n DC.W $1234\n ENDR", 5, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED);
+        addDataItem(" REPT 5\n DC.W $1234\n ENDR", 10, new byte[] { 0x12, 0x34, 0x12, 0x34, 0x12, 0x34, 0x12, 0x34, 0x12, 0x34 });
 
         // UNTIL
         final UntilWithoutDoErrorMessage untilWithoutDo = new UntilWithoutDoErrorMessage();
