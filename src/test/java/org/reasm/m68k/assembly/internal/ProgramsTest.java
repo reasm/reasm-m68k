@@ -32,6 +32,7 @@ import org.reasm.m68k.messages.EndwWithoutWhileErrorMessage;
 import org.reasm.m68k.messages.InvalidExpressionErrorMessage;
 import org.reasm.m68k.messages.NextWithoutForErrorMessage;
 import org.reasm.m68k.messages.OffsetMustNotBeNegativeErrorMessage;
+import org.reasm.m68k.messages.UntilWithoutDoErrorMessage;
 import org.reasm.source.SourceFile;
 import org.reasm.testhelpers.EquivalentAssemblyMessage;
 
@@ -90,6 +91,15 @@ public class ProgramsTest {
                 -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0x77 });
         addDataItem(" DCB.B 20,$FF\n CNOP 2,16\n DC.B $77", 4, new byte[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
                 -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x77 });
+
+        // DO
+        addDataItem(" DO\n DC.W $1234\n UNTIL", 6, new byte[] { 0x12, 0x34 }, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" DO\n DC.W $1234\n UNTIL 1", 6, new byte[] { 0x12, 0x34 });
+        addDataItem(" DO\n DC.W $1234\n UNTIL 1,1", 6, new byte[] { 0x12, 0x34 }, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" DO 1\n DC.W $1234\n UNTIL 1", 6, new byte[] { 0x12, 0x34 }, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" DO.W\n DC.W $1234\n UNTIL 1", 6, new byte[] { 0x12, 0x34 }, SIZE_ATTRIBUTE_NOT_ALLOWED);
+        addDataItem("I SET 0\n DO\n DC.W $1234\nI SET I + 1\n UNTIL I = 5", 28, new byte[] { 0x12, 0x34, 0x12, 0x34, 0x12, 0x34,
+                0x12, 0x34, 0x12, 0x34 });
 
         // ELSE
         final ElseWithoutIfErrorMessage elseWithoutIf = new ElseWithoutIfErrorMessage();
@@ -155,6 +165,11 @@ public class ProgramsTest {
         addDataItem(" NEXT", 2, NO_DATA, nextWithoutFor);
         addDataItem(" NEXT 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, nextWithoutFor);
         addDataItem(" NEXT.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, nextWithoutFor);
+
+        // UNTIL
+        final UntilWithoutDoErrorMessage untilWithoutDo = new UntilWithoutDoErrorMessage();
+        addDataItem(" UNTIL", 2, NO_DATA, untilWithoutDo);
+        addDataItem(" UNTIL.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, untilWithoutDo);
 
         // WHILE
         addDataItem(" WHILE\n DC.W $1234\n ENDW", 4, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
