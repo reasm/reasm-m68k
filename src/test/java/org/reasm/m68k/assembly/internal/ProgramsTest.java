@@ -28,6 +28,7 @@ import org.reasm.m68k.messages.AlignmentMustNotBeZeroOrNegativeErrorMessage;
 import org.reasm.m68k.messages.ElseWithoutIfErrorMessage;
 import org.reasm.m68k.messages.ElseifWithoutIfErrorMessage;
 import org.reasm.m68k.messages.EndifWithoutIfErrorMessage;
+import org.reasm.m68k.messages.EndwWithoutWhileErrorMessage;
 import org.reasm.m68k.messages.InvalidExpressionErrorMessage;
 import org.reasm.m68k.messages.OffsetMustNotBeNegativeErrorMessage;
 import org.reasm.source.SourceFile;
@@ -103,6 +104,12 @@ public class ProgramsTest {
         // ENDIF
         addDataItem(" ENDIF", 2, NO_DATA, new EndifWithoutIfErrorMessage());
 
+        // ENDW
+        final EndwWithoutWhileErrorMessage endwWithoutWhile = new EndwWithoutWhileErrorMessage();
+        addDataItem(" ENDW", 2, NO_DATA, endwWithoutWhile);
+        addDataItem(" ENDW 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, endwWithoutWhile);
+        addDataItem(" ENDW.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, endwWithoutWhile);
+
         // IF
         addDataItem(" IF\n DC.W $1234\n ENDIF", 4, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
         addDataItem(" IF 0\n DC.W $1234\n ENDIF", 4, NO_DATA);
@@ -124,6 +131,16 @@ public class ProgramsTest {
         addDataItem(" IF 0\n DC.W $1234\n ELSEIF 1\n DC.W $2345\n ELSE\n DC.W $3456\n ENDIF", 6, new byte[] { 0x23, 0x45 });
         addDataItem(" IF 1\n DC.W $1234\n ELSEIF 0\n DC.W $2345\n ELSE\n DC.W $3456\n ENDIF", 5, new byte[] { 0x12, 0x34 });
         addDataItem(" IF 1\n DC.W $1234\n ELSEIF 1\n DC.W $2345\n ELSE\n DC.W $3456\n ENDIF", 5, new byte[] { 0x12, 0x34 });
+
+        // WHILE
+        addDataItem(" WHILE\n DC.W $1234\n ENDW", 4, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" WHILE 0\n DC.W $1234\n ENDW", 4, NO_DATA);
+        addDataItem(" WHILE.W 0\n DC.W $1234\n ENDW", 4, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED);
+        addDataItem("I SET 0\n WHILE I < 5\n DC.W $1234\nI SET I + 1\n ENDW", 30, new byte[] { 0x12, 0x34, 0x12, 0x34, 0x12, 0x34,
+                0x12, 0x34, 0x12, 0x34 });
+        addDataItem("I SET 0\n WHILE I < 5, I > 2\n DC.W $1234\nI SET I + 1\n ENDW", 30, new byte[] { 0x12, 0x34, 0x12, 0x34, 0x12,
+                0x34, 0x12, 0x34, 0x12, 0x34 }, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" WHILE UNDEFINED\n DC.W $1234\n ENDW", 4, NO_DATA, UNDEFINED_SYMBOL);
     }
 
     /**
