@@ -30,6 +30,7 @@ import org.reasm.m68k.messages.ElseifWithoutIfErrorMessage;
 import org.reasm.m68k.messages.EndifWithoutIfErrorMessage;
 import org.reasm.m68k.messages.EndwWithoutWhileErrorMessage;
 import org.reasm.m68k.messages.InvalidExpressionErrorMessage;
+import org.reasm.m68k.messages.NextWithoutForErrorMessage;
 import org.reasm.m68k.messages.OffsetMustNotBeNegativeErrorMessage;
 import org.reasm.source.SourceFile;
 import org.reasm.testhelpers.EquivalentAssemblyMessage;
@@ -113,6 +114,20 @@ public class ProgramsTest {
         addDataItem(" ENDW 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, endwWithoutWhile);
         addDataItem(" ENDW.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, endwWithoutWhile);
 
+        // FOR
+        addDataItem(" FOR\n DC.W $1234\n NEXT", 4, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" FOR 1\n DC.W $1234\n NEXT", 4, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" FOR 1,5\n DC.W $1234\n NEXT", 24, new byte[] { 0x12, 0x34, 0x12, 0x34, 0x12, 0x34, 0x12, 0x34, 0x12, 0x34 });
+        addDataItem(" FOR 1,5,2\n DC.W $1234\n NEXT", 16, new byte[] { 0x12, 0x34, 0x12, 0x34, 0x12, 0x34 });
+        addDataItem(" FOR 1,5,2,3\n DC.W $1234\n NEXT", 16, new byte[] { 0x12, 0x34, 0x12, 0x34, 0x12, 0x34 },
+                WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" FOR 5,1,-2\n DC.W $1234\n NEXT", 16, new byte[] { 0x12, 0x34, 0x12, 0x34, 0x12, 0x34 });
+        addDataItem(" FOR UNDEFINED,5\n DC.W $1234\n NEXT", 4, NO_DATA, UNDEFINED_SYMBOL);
+        addDataItem(" FOR 1,UNDEFINED\n DC.W $1234\n NEXT", 4, NO_DATA, UNDEFINED_SYMBOL);
+        addDataItem(" FOR 1,5,UNDEFINED\n DC.W $1234\n NEXT", 8, new byte[] { 0x12, 0x34 }, UNDEFINED_SYMBOL);
+        addDataItem("I FOR 11,15\n DC.B I\n NEXT", 24, new byte[] { 11, 12, 13, 14, 15 });
+        addDataItem("I: J: FOR 11,15\n DC.B I+J\n NEXT", 24, new byte[] { 22, 24, 26, 28, 30 });
+
         // IF
         addDataItem(" IF\n DC.W $1234\n ENDIF", 4, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
         addDataItem(" IF 0\n DC.W $1234\n ENDIF", 4, NO_DATA);
@@ -134,6 +149,12 @@ public class ProgramsTest {
         addDataItem(" IF 0\n DC.W $1234\n ELSEIF 1\n DC.W $2345\n ELSE\n DC.W $3456\n ENDIF", 6, new byte[] { 0x23, 0x45 });
         addDataItem(" IF 1\n DC.W $1234\n ELSEIF 0\n DC.W $2345\n ELSE\n DC.W $3456\n ENDIF", 5, new byte[] { 0x12, 0x34 });
         addDataItem(" IF 1\n DC.W $1234\n ELSEIF 1\n DC.W $2345\n ELSE\n DC.W $3456\n ENDIF", 5, new byte[] { 0x12, 0x34 });
+
+        // NEXT
+        final NextWithoutForErrorMessage nextWithoutFor = new NextWithoutForErrorMessage();
+        addDataItem(" NEXT", 2, NO_DATA, nextWithoutFor);
+        addDataItem(" NEXT 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, nextWithoutFor);
+        addDataItem(" NEXT.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, nextWithoutFor);
 
         // WHILE
         addDataItem(" WHILE\n DC.W $1234\n ENDW", 4, NO_DATA, WRONG_NUMBER_OF_OPERANDS);

@@ -41,7 +41,7 @@ final class ForDirective extends Mnemonic {
 
         // The FOR directive is assembled on every iteration.
         // On the first iteration, evaluate the operands and store information to use on subsequent iterations.
-        if (forBlockState.counter == null) {
+        if (!forBlockState.parsed) {
             if (context.numberOfLabels == 0) {
                 forBlockState.labels = null;
             } else if (context.numberOfLabels == 1) {
@@ -77,6 +77,8 @@ final class ForDirective extends Mnemonic {
                     }
                 }
             }
+
+            forBlockState.parsed = true;
         }
 
         if (forBlockState.labels != null) {

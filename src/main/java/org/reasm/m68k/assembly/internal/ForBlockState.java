@@ -7,6 +7,7 @@ final class ForBlockState implements AssemblyStepIterationController {
 
     DynamicSourceLocationIterator iterator;
     boolean hasNextIteration = true;
+    boolean parsed;
     Object labels; // null (no labels), String (one label) or String[] (many labels)
     Value counter, to, step;
     boolean stepIsNegative;
