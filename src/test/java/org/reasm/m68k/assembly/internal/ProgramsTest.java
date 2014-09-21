@@ -102,7 +102,10 @@ public class ProgramsTest {
         addDataItem(" ELSEIF.W 1", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, elseifWithoutIf);
 
         // ENDIF
-        addDataItem(" ENDIF", 2, NO_DATA, new EndifWithoutIfErrorMessage());
+        final EndifWithoutIfErrorMessage endifWithoutIf = new EndifWithoutIfErrorMessage();
+        addDataItem(" ENDIF", 2, NO_DATA, endifWithoutIf);
+        addDataItem(" ENDIF 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, endifWithoutIf);
+        addDataItem(" ENDIF.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, endifWithoutIf);
 
         // ENDW
         final EndwWithoutWhileErrorMessage endwWithoutWhile = new EndwWithoutWhileErrorMessage();
