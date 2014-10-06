@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import org.reasm.AssemblyBuilder;
 import org.reasm.AssemblyStepLocation;
+import org.reasm.BlockEvents;
 import org.reasm.Symbol;
 import org.reasm.m68k.source.SourceLocationUtils;
 import org.reasm.messages.UnknownMnemonicErrorMessage;
@@ -65,7 +66,7 @@ public final class SourceNodesImpl {
             }
         };
 
-        builder.enterChildContext(sourceLocations, doBlockState, false);
+        builder.enterBlock(sourceLocations, doBlockState, false, null);
     }
 
     /**
@@ -92,7 +93,7 @@ public final class SourceNodesImpl {
             }
         };
 
-        builder.enterChildContext(sourceLocations, forBlockState, false);
+        builder.enterBlock(sourceLocations, forBlockState, false, null);
     }
 
     /**
@@ -116,7 +117,8 @@ public final class SourceNodesImpl {
                 return iterator;
             }
         };
-        builder.enterChildContext(sourceLocations, null, true);
+
+        builder.enterBlock(sourceLocations, null, false, null);
     }
 
     /**
@@ -128,17 +130,6 @@ public final class SourceNodesImpl {
     public static void assembleImplicitNext(AssemblyBuilder builder) {
         final M68KAssemblyContext context = M68KAssemblyContext.getAssemblyContext(builder);
         NextDirective.assembleCore(context);
-    }
-
-    /**
-     * Assembles an implicit <code>OBJEND</code> or <code>DEPHASE</code> directive.
-     *
-     * @param builder
-     *            an assembly builder
-     */
-    public static void assembleImplicitObjend(AssemblyBuilder builder) {
-        final M68KAssemblyContext context = M68KAssemblyContext.getAssemblyContext(builder);
-        ObjendDirective.OBJEND.assembleCore(context);
     }
 
     /**
@@ -196,7 +187,22 @@ public final class SourceNodesImpl {
             }
         };
 
-        builder.enterChildContext(sourceLocations, null, true);
+        builder.enterBlock(sourceLocations, null, true, null);
+    }
+
+    /**
+     * Assembles a <code>NAMESPACE</code> block.
+     *
+     * @param builder
+     *            an assembly builder
+     */
+    public static void assembleNamespaceBlock(final AssemblyBuilder builder) {
+        builder.enterComposite(true, new ScopedEffectBlockEvents() {
+            @Override
+            protected void cancelEffect() {
+                builder.exitNamespace();
+            }
+        });
     }
 
     /**
@@ -211,9 +217,18 @@ public final class SourceNodesImpl {
         // Get our assembly context for this assembly.
         final M68KAssemblyContext context = M68KAssemblyContext.getAssemblyContext(builder);
 
-        context.blockStateMap.put(stepLocation, new ObjBlockState());
+        final ObjBlockState objBlockState = new ObjBlockState();
+        context.blockStateMap.put(stepLocation, objBlockState);
 
-        builder.enterChildContext(stepLocation.getSourceLocation().getChildSourceLocations(), null, true);
+        builder.enterBlock(stepLocation.getSourceLocation().getChildSourceLocations(), null, true, new BlockEvents() {
+            @Override
+            public void exitBlock() {
+                if (objBlockState.programCounterOffset != 0) {
+                    context.builder.setProgramCounter(context.builder.getAssembly().getProgramCounter()
+                            + objBlockState.programCounterOffset);
+                }
+            }
+        });
     }
 
     /**
@@ -230,7 +245,7 @@ public final class SourceNodesImpl {
 
         context.blockStateMap.put(stepLocation, new ReptBlockState());
 
-        builder.enterChildContext(stepLocation.getSourceLocation().getChildSourceLocations(), null, true);
+        builder.enterBlock(stepLocation.getSourceLocation().getChildSourceLocations(), null, true, null);
     }
 
     /**
@@ -248,8 +263,23 @@ public final class SourceNodesImpl {
             throw new AssertionError();
         }
 
-        builder.enterChildContext(builder.getStep().getLocation().getSourceLocation().getChildSourceLocations(),
-                (ReptBlockState) blockState, false);
+        builder.enterBlock(builder.getStep().getLocation().getSourceLocation().getChildSourceLocations(),
+                (ReptBlockState) blockState, false, null);
+    }
+
+    /**
+     * Assembles a <code>TRANSFORM</code> block.
+     *
+     * @param builder
+     *            an assembly builder
+     */
+    public static void assembleTransformBlock(final AssemblyBuilder builder) {
+        builder.enterComposite(true, new ScopedEffectBlockEvents() {
+            @Override
+            protected void cancelEffect() throws IOException {
+                builder.exitTransformationBlock();
+            }
+        });
     }
 
     /**
@@ -276,7 +306,7 @@ public final class SourceNodesImpl {
             }
         };
 
-        builder.enterChildContext(sourceLocations, whileBlockState, false);
+        builder.enterBlock(sourceLocations, whileBlockState, false, null);
     }
 
     private static void assembleMnemonic(final M68KAssemblyContext context, final Symbol mnemonicSymbol,

@@ -53,7 +53,7 @@ class IncludeDirective extends Mnemonic {
                 }
             }
 
-            context.builder.enterChildFile(sourceFile, architecture);
+            context.builder.enterFile(sourceFile, architecture);
         }
     }
 

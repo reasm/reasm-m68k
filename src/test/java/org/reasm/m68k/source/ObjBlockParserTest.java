@@ -1,8 +1,6 @@
 package org.reasm.m68k.source;
 
 import static ca.fragag.testhelpers.HasType.hasType;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
 import static org.reasm.m68k.source.BlockParserTestsCommon.COMPLETE_BLOCK;
 import static org.reasm.m68k.source.BlockParserTestsCommon.INCOMPLETE_BLOCK;
 import static org.reasm.m68k.source.BlockParserTestsCommon.parseBasicBlock;
@@ -51,7 +49,7 @@ public class ObjBlockParserTest {
      */
     @Test
     public void parseIncompleteObjBlock() {
-        parseObjBlock(" OBJ\n NOP", INCOMPLETE_BLOCK, is(sameInstance((SourceNode) ImplicitObjendNode.INSTANCE)));
+        parseObjBlock(" OBJ\n NOP", INCOMPLETE_BLOCK, null);
     }
 
     /**
@@ -60,7 +58,7 @@ public class ObjBlockParserTest {
      */
     @Test
     public void parseIncompletePhaseBlock() {
-        parseObjBlock(" PHASE\n NOP", INCOMPLETE_BLOCK, is(sameInstance((SourceNode) ImplicitObjendNode.INSTANCE)));
+        parseObjBlock(" PHASE\n NOP", INCOMPLETE_BLOCK, null);
     }
 
     /**
@@ -68,7 +66,7 @@ public class ObjBlockParserTest {
      */
     @Test
     public void parseObjDephaseBlock() {
-        parseObjBlock(" OBJ\n NOP\n DEPHASE", INCOMPLETE_BLOCK, is(sameInstance((SourceNode) ImplicitObjendNode.INSTANCE)));
+        parseObjBlock(" OBJ\n NOP\n DEPHASE", INCOMPLETE_BLOCK, null);
     }
 
     /**
@@ -76,7 +74,7 @@ public class ObjBlockParserTest {
      */
     @Test
     public void parsePhaseObjendBlock() {
-        parseObjBlock(" PHASE\n NOP\n OBJEND", INCOMPLETE_BLOCK, is(sameInstance((SourceNode) ImplicitObjendNode.INSTANCE)));
+        parseObjBlock(" PHASE\n NOP\n OBJEND", INCOMPLETE_BLOCK, null);
     }
 
 }

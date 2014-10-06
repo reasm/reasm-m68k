@@ -26,7 +26,7 @@ final class MacroInvocation extends Mnemonic {
     @Override
     void assemble(M68KAssemblyContext context) throws IOException {
         final MacroInstantiation macroInstantiation = this.macro.substituteMacroOperands(context);
-        context.builder.enterChildFile(macroInstantiation, this.macro.getArchitecture());
+        context.builder.enterFile(macroInstantiation, this.macro.getArchitecture());
     }
 
     @Override

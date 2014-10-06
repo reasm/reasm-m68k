@@ -54,11 +54,6 @@ public class BasicBlockParserTest {
         BlockParserTestsCommon.parseBasicBlock(code, blockType, bodyType, blockParseErrorMatcher, thirdChildNodeMatcher);
     }
 
-    private static void parseBasicBlock(String code, Matcher<? super ParseError> blockParseErrorMatcher,
-            Matcher<? super SourceNode> thirdChildNodeMatcher) {
-        parseBasicBlock(code, Block.class, SimpleCompositeSourceNode.class, blockParseErrorMatcher, thirdChildNodeMatcher);
-    }
-
     private static List<SourceNode> parseBlock(String code, Matcher<? super ParseError> blockParseErrorMatcher) {
         final DocumentReader reader = new DocumentReader(new Document(code), 7);
         final LogicalLine firstLine = new LogicalLine(7, null, new SubstringBounds[0], new SubstringBounds(1, 6),
@@ -118,9 +113,19 @@ public class BasicBlockParserTest {
         parseBasicBlock(code, MacroBlock.class, MacroBody.class, blockParseErrorMatcher, thirdChildNodeMatcher);
     }
 
+    private static void parseNamespaceBlock(String code, Matcher<? super ParseError> blockParseErrorMatcher,
+            Matcher<? super SourceNode> thirdChildNodeMatcher) {
+        parseBasicBlock(code, NamespaceBlock.class, SimpleCompositeSourceNode.class, blockParseErrorMatcher, thirdChildNodeMatcher);
+    }
+
     private static void parseReptBlock(String code, Matcher<? super ParseError> blockParseErrorMatcher,
             Matcher<? super SourceNode> thirdChildNodeMatcher) {
         parseBasicBlock(code, ReptBlock.class, ReptBody.class, blockParseErrorMatcher, thirdChildNodeMatcher);
+    }
+
+    private static void parseTransformBlock(String code, Matcher<? super ParseError> blockParseErrorMatcher,
+            Matcher<? super SourceNode> thirdChildNodeMatcher) {
+        parseBasicBlock(code, TransformBlock.class, SimpleCompositeSourceNode.class, blockParseErrorMatcher, thirdChildNodeMatcher);
     }
 
     private static void parseWhileBlock(String code, Matcher<? super ParseError> blockParseErrorMatcher,
@@ -254,7 +259,7 @@ public class BasicBlockParserTest {
      */
     @Test
     public void parseCompleteNamespaceBlock() {
-        parseBasicBlock(" NAMESPACE\n NOP\n ENDNS", COMPLETE_BLOCK, hasType(BlockDirectiveLine.class));
+        parseNamespaceBlock(" NAMESPACE\n NOP\n ENDNS", COMPLETE_BLOCK, hasType(BlockDirectiveLine.class));
     }
 
     /**
@@ -272,7 +277,7 @@ public class BasicBlockParserTest {
      */
     @Test
     public void parseCompleteTransformBlock() {
-        parseBasicBlock(" TRANSFORM\n NOP\n ENDTRANSFORM", COMPLETE_BLOCK, hasType(BlockDirectiveLine.class));
+        parseTransformBlock(" TRANSFORM\n NOP\n ENDTRANSFORM", COMPLETE_BLOCK, hasType(BlockDirectiveLine.class));
     }
 
     /**
@@ -308,7 +313,7 @@ public class BasicBlockParserTest {
      */
     @Test
     public void parseIncompleteNamespaceBlock() {
-        parseBasicBlock(" NAMESPACE\n NOP", INCOMPLETE_BLOCK, hasType(ImplicitExitNamespaceNode.class));
+        parseNamespaceBlock(" NAMESPACE\n NOP", INCOMPLETE_BLOCK, null);
     }
 
     /**
@@ -326,7 +331,7 @@ public class BasicBlockParserTest {
      */
     @Test
     public void parseIncompleteTransformBlock() {
-        parseBasicBlock(" TRANSFORM\n NOP", INCOMPLETE_BLOCK, hasType(ImplicitExitTransformationBlockNode.class));
+        parseTransformBlock(" TRANSFORM\n NOP", INCOMPLETE_BLOCK, null);
     }
 
     /**

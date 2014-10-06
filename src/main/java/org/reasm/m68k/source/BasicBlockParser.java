@@ -45,8 +45,8 @@ class BasicBlockParser implements BlockParser {
 
     static final BasicBlockParser NAMESPACE = new BasicBlockParser(Mnemonics.ENDNS) {
         @Override
-        void missingEndDirective(ArrayList<SourceNode> nodes) {
-            nodes.add(ImplicitExitNamespaceNode.INSTANCE);
+        SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
+            return new NamespaceBlock(childNodes, parseError);
         }
     };
 
@@ -64,9 +64,9 @@ class BasicBlockParser implements BlockParser {
 
     static final BasicBlockParser TRANSFORM = new BasicBlockParser(Mnemonics.ENDTRANSFORM) {
         @Override
-        void missingEndDirective(ArrayList<SourceNode> nodes) {
-            nodes.add(ImplicitExitTransformationBlockNode.INSTANCE);
-        };
+        SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
+            return new TransformBlock(childNodes, parseError);
+        }
     };
 
     static final BasicBlockParser WHILE = new BasicBlockParser(Mnemonics.ENDW) {

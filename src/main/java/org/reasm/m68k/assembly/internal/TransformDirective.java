@@ -3,7 +3,6 @@ package org.reasm.m68k.assembly.internal;
 import java.io.IOException;
 
 import org.reasm.Environment;
-import org.reasm.IdentityTransformation;
 import org.reasm.OutputTransformation;
 import org.reasm.OutputTransformationFactory;
 import org.reasm.messages.InvalidTransformationArgumentsErrorMessage;
@@ -20,7 +19,8 @@ final class TransformDirective extends Mnemonic {
     void assemble(M68KAssemblyContext context) throws IOException {
         context.sizeNotAllowed();
 
-        OutputTransformation actualTransformation = IdentityTransformation.INSTANCE;
+        final ScopedEffectBlockEvents blockEvents = this.getScopedEffectBlockEvents(context);
+
         if (context.numberOfOperands >= 1) {
             // The first operand is the name of an output transformation factory.
             final Environment environment = context.builder.getAssembly().getConfiguration().getEnvironment();
@@ -35,7 +35,8 @@ final class TransformDirective extends Mnemonic {
 
                 final OutputTransformation userTransformation = factory.create(transformationArguments, context);
                 if (userTransformation != null) {
-                    actualTransformation = userTransformation;
+                    context.builder.enterTransformationBlock(userTransformation);
+                    blockEvents.effectApplied();
                 } else {
                     context.addMessage(new InvalidTransformationArgumentsErrorMessage(transformationName, transformationArguments));
                 }
@@ -45,11 +46,6 @@ final class TransformDirective extends Mnemonic {
         } else {
             context.addWrongNumberOfOperandsErrorMessage();
         }
-
-        // Always enter a transformation block,
-        // so that the ENDTRANSFORM directive
-        // doesn't exit an arbitrary or missing transformation block.
-        context.builder.enterTransformationBlock(actualTransformation);
     }
 
 }

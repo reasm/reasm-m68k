@@ -23,7 +23,7 @@ public final class MacroBody extends CompositeSourceNode {
 
     @Override
     protected void assembleCore(AssemblyBuilder builder) {
-        builder.enterComposite(false);
+        builder.enterComposite(false, null);
     }
 
 }

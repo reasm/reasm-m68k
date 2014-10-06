@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.reasm.Block;
+import org.reasm.BlockEvents;
 import org.reasm.Function;
 import org.reasm.Symbol;
 import org.reasm.Value;
@@ -308,6 +310,20 @@ abstract class Mnemonic {
 
     void defineLabels(M68KAssemblyContext context) {
         context.defineLabels();
+    }
+
+    ScopedEffectBlockEvents getScopedEffectBlockEvents(M68KAssemblyContext context) {
+        final Block block = context.builder.getCurrentBlock();
+        if (block == null) {
+            throw new AssertionError();
+        }
+
+        final BlockEvents blockEvents = block.getEvents();
+        if (blockEvents == null || !(blockEvents instanceof ScopedEffectBlockEvents)) {
+            throw new AssertionError();
+        }
+
+        return (ScopedEffectBlockEvents) blockEvents;
     }
 
 }

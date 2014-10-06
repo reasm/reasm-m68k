@@ -26,7 +26,7 @@ public final class Block extends CompositeSourceNode {
 
     @Override
     protected void assembleCore(AssemblyBuilder builder) {
-        builder.enterComposite(true);
+        builder.enterComposite(true, null);
     }
 
 }

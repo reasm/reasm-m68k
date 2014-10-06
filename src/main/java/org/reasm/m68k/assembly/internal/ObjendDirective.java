@@ -29,18 +29,9 @@ abstract class ObjendDirective extends Mnemonic {
     protected void assemble(M68KAssemblyContext context) {
         context.sizeNotAllowed();
         context.requireNumberOfOperands(0);
-        this.assembleCore(context);
-    }
 
-    void assembleCore(M68KAssemblyContext context) {
         final Object block = context.getParentBlock();
-        if (block instanceof ObjBlockState) {
-            final ObjBlockState objBlockState = (ObjBlockState) block;
-            if (objBlockState.programCounterOffset != 0) {
-                context.builder.setProgramCounter(context.builder.getAssembly().getProgramCounter()
-                        + objBlockState.programCounterOffset);
-            }
-        } else {
+        if (!(block instanceof ObjBlockState)) {
             context.addMessage(this.createWrongContextErrorMessage());
         }
     }

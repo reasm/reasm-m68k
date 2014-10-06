@@ -1,7 +1,5 @@
 package org.reasm.m68k.source;
 
-import java.util.ArrayList;
-
 import org.reasm.m68k.assembly.internal.Mnemonics;
 import org.reasm.source.ParseError;
 import org.reasm.source.SourceNode;
@@ -18,11 +16,6 @@ final class ObjBlockParser extends BasicBlockParser {
     @Override
     SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
         return new ObjBlock(childNodes, parseError);
-    }
-
-    @Override
-    void missingEndDirective(ArrayList<SourceNode> nodes) {
-        nodes.add(ImplicitObjendNode.INSTANCE);
     }
 
 }

@@ -19,6 +19,8 @@ class NamespaceDirective extends Mnemonic {
         context.sizeNotAllowed();
         context.requireNumberOfOperands(0);
 
+        final ScopedEffectBlockEvents blockEvents = this.getScopedEffectBlockEvents(context);
+
         final String name;
         if (context.numberOfLabels < 1) {
             context.addMessage(new DirectiveRequiresLabelErrorMessage(Mnemonics.NAMESPACE));
@@ -28,6 +30,7 @@ class NamespaceDirective extends Mnemonic {
         }
 
         context.builder.enterNamespace(name);
+        blockEvents.effectApplied();
     }
 
     @Override
