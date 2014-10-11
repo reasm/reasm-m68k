@@ -17,6 +17,7 @@ import org.reasm.m68k.source.LogicalLine;
 import org.reasm.m68k.source.SourceLocationUtils;
 import org.reasm.messages.WrongNumberOfOperandsErrorMessage;
 import org.reasm.source.SourceLocation;
+import org.reasm.source.SourceNode;
 
 import ca.fragag.Consumer;
 
@@ -297,6 +298,12 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
 
     Object getParentBlock() {
         return this.blockStateMap.get(this.step.getLocation().getParent());
+    }
+
+    SourceNode getParentNode() {
+        final AssemblyStepLocation parent = this.step.getLocation().getParent();
+        assert parent != null;
+        return parent.getSourceLocation().getSourceNode();
     }
 
     @Override
