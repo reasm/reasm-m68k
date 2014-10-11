@@ -11,7 +11,6 @@ final class EndtransformDirective extends Mnemonic {
 
     @Override
     void assemble(M68KAssemblyContext context) throws IOException {
-        context.builder.exitTransformationBlock();
         context.sizeNotAllowed();
         context.requireNumberOfOperands(0);
     }

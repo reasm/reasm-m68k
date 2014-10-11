@@ -14,7 +14,6 @@ class EndnsDirective extends Mnemonic {
 
     @Override
     protected void assemble(M68KAssemblyContext context) {
-        context.builder.exitNamespace();
         context.sizeNotAllowed();
         context.requireNumberOfOperands(0);
     }
