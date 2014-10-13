@@ -112,6 +112,12 @@ public class ProgramsTest {
         addDataItem(" ELSEIF 1", 2, NO_DATA, elseifWithoutIf);
         addDataItem(" ELSEIF.W 1", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, elseifWithoutIf);
 
+        // END
+        addDataItem(" END", 2, NO_DATA);
+        addDataItem(" END 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" END.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED);
+        addDataItem(" DC.B 1\n END\n DC.B 2", 3, new byte[] { 1 });
+
         // ENDIF
         final EndifWithoutIfErrorMessage endifWithoutIf = new EndifWithoutIfErrorMessage();
         addDataItem(" ENDIF", 2, NO_DATA, endifWithoutIf);
