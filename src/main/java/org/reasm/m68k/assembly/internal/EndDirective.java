@@ -1,5 +1,7 @@
 package org.reasm.m68k.assembly.internal;
 
+import java.io.IOException;
+
 /**
  * The <code>END</code> directive.
  *
@@ -13,10 +15,10 @@ class EndDirective extends Mnemonic {
     }
 
     @Override
-    protected void assemble(M68KAssemblyContext context) {
-        context.builder.endPass();
+    protected void assemble(M68KAssemblyContext context) throws IOException {
         context.sizeNotAllowed();
         context.requireNumberOfOperands(0);
+        context.builder.endPass();
     }
 
 }
