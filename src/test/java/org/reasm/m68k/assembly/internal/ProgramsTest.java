@@ -12,6 +12,7 @@ import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.WRONG_NUMB
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -23,10 +24,17 @@ import org.reasm.AssemblyCompletionStatus;
 import org.reasm.AssemblyMessage;
 import org.reasm.Configuration;
 import org.reasm.Environment;
+import org.reasm.IdentityTransformation;
+import org.reasm.OutputTransformation;
+import org.reasm.OutputTransformationFactory;
 import org.reasm.m68k.M68KArchitecture;
 import org.reasm.m68k.messages.*;
+import org.reasm.messages.InvalidTransformationArgumentsErrorMessage;
+import org.reasm.messages.UnknownTransformationMethodErrorMessage;
 import org.reasm.source.SourceFile;
 import org.reasm.testhelpers.EquivalentAssemblyMessage;
+
+import ca.fragag.Consumer;
 
 /**
  * Test class for short M68000 programs.
@@ -122,6 +130,12 @@ public class ProgramsTest {
         addDataItem(" ENDR 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, endrWithoutRept);
         addDataItem(" ENDR.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, endrWithoutRept);
 
+        // ENDTRANSFORM
+        final EndtransformWithoutTransformErrorMessage endtransformWithoutTransform = new EndtransformWithoutTransformErrorMessage();
+        addDataItem(" ENDTRANSFORM", 2, NO_DATA, endtransformWithoutTransform);
+        addDataItem(" ENDTRANSFORM 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, endtransformWithoutTransform);
+        addDataItem(" ENDTRANSFORM.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, endtransformWithoutTransform);
+
         // ENDW
         final EndwWithoutWhileErrorMessage endwWithoutWhile = new EndwWithoutWhileErrorMessage();
         addDataItem(" ENDW", 2, NO_DATA, endwWithoutWhile);
@@ -176,6 +190,14 @@ public class ProgramsTest {
         addDataItem(" REPT 0\n DC.W $1234\n ENDR", 5, NO_DATA);
         addDataItem(" REPT.W 0\n DC.W $1234\n ENDR", 5, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED);
         addDataItem(" REPT 5\n DC.W $1234\n ENDR", 10, new byte[] { 0x12, 0x34, 0x12, 0x34, 0x12, 0x34, 0x12, 0x34, 0x12, 0x34 });
+
+        // TRANSFORM
+        addDataItem(" TRANSFORM\n ENDTRANSFORM", 5, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" TRANSFORM UNKNOWN\n ENDTRANSFORM", 5, NO_DATA, new UnknownTransformationMethodErrorMessage("UNKNOWN"));
+        addDataItem(" TRANSFORM REVERSE\n ENDTRANSFORM", 5, NO_DATA);
+        addDataItem(" TRANSFORM TEST1\n ENDTRANSFORM", 5, NO_DATA, new InvalidTransformationArgumentsErrorMessage("TEST1",
+                new String[0]));
+        addDataItem(" TRANSFORM TEST1,0,0\n ENDTRANSFORM", 5, NO_DATA);
 
         // UNTIL
         final UntilWithoutDoErrorMessage untilWithoutDo = new UntilWithoutDoErrorMessage();
@@ -252,7 +274,28 @@ public class ProgramsTest {
     @Test
     public void assemble() throws IOException {
         try {
-            final Environment environment = Environment.DEFAULT;
+            final OutputTransformationFactory reverseOutputTransformationFactory = new OutputTransformationFactory(
+                    Collections.singleton("REVERSE")) {
+                @Override
+                public OutputTransformation create(String[] arguments, Consumer<AssemblyMessage> assemblyMessageConsumer) {
+                    return org.reasm.testhelpers.ReverseTransformation.INSTANCE;
+                }
+            };
+
+            final OutputTransformationFactory test1OutputTransformationFactory = new OutputTransformationFactory(
+                    Collections.singleton("TEST1")) {
+                @Override
+                public OutputTransformation create(String[] arguments, Consumer<AssemblyMessage> assemblyMessageConsumer) {
+                    if (arguments.length == 2 && "0".equals(arguments[0]) && "0".equals(arguments[1])) {
+                        return IdentityTransformation.INSTANCE;
+                    }
+
+                    return null;
+                }
+            };
+
+            final Environment environment = Environment.DEFAULT.addOutputTransformationFactory(reverseOutputTransformationFactory)
+                    .addOutputTransformationFactory(test1OutputTransformationFactory);
             final SourceFile mainSourceFile = new SourceFile(this.code, null);
             final Configuration configuration = new Configuration(environment, mainSourceFile, M68KArchitecture.MC68000);
             final Assembly assembly = new Assembly(configuration);
