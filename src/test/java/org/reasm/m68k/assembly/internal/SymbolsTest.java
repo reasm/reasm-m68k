@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.INVALID_SIZE_ATTRIBUTE_EMPTY;
 import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.INVALID_SIZE_ATTRIBUTE_Z;
+import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.SIZE_ATTRIBUTE_NOT_ALLOWED;
 import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.UNDEFINED_SYMBOL;
 import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.WRONG_NUMBER_OF_OPERANDS;
 
@@ -47,7 +48,7 @@ public class SymbolsTest {
     private static final UserSymbolMatcher<Value> FOO_CONSTANT_UINT_0 = new UserSymbolMatcher<>(SymbolContext.VALUE, "foo",
             SymbolType.CONSTANT, UINT_0);
 
-    private static UserSymbolMatcher<?>[] NO_SYMBOLS = new UserSymbolMatcher[0];
+    private static final UserSymbolMatcher<?>[] NO_SYMBOLS = new UserSymbolMatcher[0];
 
     private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
@@ -80,6 +81,22 @@ public class SymbolsTest {
                         new UserSymbolMatcher<>(M68KAssemblyContext.REGISTER_ALIAS, "bar", SymbolType.CONSTANT,
                                 GeneralPurposeRegister.D0) });
         addDataItem("foo EQUR 0", 2, NO_SYMBOLS, new RegisterExpectedErrorMessage());
+
+        // NAMESPACE
+        addDataItem(" NAMESPACE\n ENDNS", 5, NO_SYMBOLS, new DirectiveRequiresLabelErrorMessage("NAMESPACE"));
+        addDataItem("A NAMESPACE\n ENDNS", 5, NO_SYMBOLS);
+        addDataItem("A NAMESPACE.W\n ENDNS", 5, NO_SYMBOLS, SIZE_ATTRIBUTE_NOT_ALLOWED);
+        addDataItem("A NAMESPACE 1\n ENDNS", 5, NO_SYMBOLS, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem("A NAMESPACE\nB EQU 1\n ENDNS", 6, new UserSymbolMatcher[] { new UserSymbolMatcher<>(SymbolContext.VALUE,
+                "A.B", SymbolType.CONSTANT, UINT_1) });
+        addDataItem("A NAMESPACE\nB EQU 1\n ENDNS\nC EQU 1", 7, new UserSymbolMatcher[] {
+                new UserSymbolMatcher<>(SymbolContext.VALUE, "A.B", SymbolType.CONSTANT, UINT_1),
+                new UserSymbolMatcher<>(SymbolContext.VALUE, "C", SymbolType.CONSTANT, UINT_1) });
+        addDataItem("A: B: NAMESPACE\nC EQU 1\n ENDNS", 6, new UserSymbolMatcher[] {
+                new UserSymbolMatcher<>(SymbolContext.VALUE, "A", SymbolType.CONSTANT, UINT_0),
+                new UserSymbolMatcher<>(SymbolContext.VALUE, "B.C", SymbolType.CONSTANT, UINT_1) });
+        addDataItem(" NAMESPACE\nA EQU 1\n ENDNS", 6, new UserSymbolMatcher[] { new UserSymbolMatcher<>(SymbolContext.VALUE, "A",
+                SymbolType.CONSTANT, UINT_1) }, new DirectiveRequiresLabelErrorMessage("NAMESPACE"));
 
         // REG
         addDataItem(" REG", 2, NO_SYMBOLS, new DirectiveRequiresLabelErrorMessage("REG"));

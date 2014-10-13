@@ -110,6 +110,12 @@ public class ProgramsTest {
         addDataItem(" ENDIF 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, endifWithoutIf);
         addDataItem(" ENDIF.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, endifWithoutIf);
 
+        // ENDNS
+        final EndnsWithoutNamespaceErrorMessage endnsWithoutNamespace = new EndnsWithoutNamespaceErrorMessage();
+        addDataItem(" ENDNS", 2, NO_DATA, endnsWithoutNamespace);
+        addDataItem(" ENDNS 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, endnsWithoutNamespace);
+        addDataItem(" ENDNS.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, endnsWithoutNamespace);
+
         // ENDR
         final EndrWithoutReptErrorMessage endrWithoutRept = new EndrWithoutReptErrorMessage();
         addDataItem(" ENDR", 2, NO_DATA, endrWithoutRept);
