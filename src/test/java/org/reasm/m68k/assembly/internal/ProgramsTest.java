@@ -148,6 +148,13 @@ public class ProgramsTest {
         addDataItem(" ENDW 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, endwWithoutWhile);
         addDataItem(" ENDW.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, endwWithoutWhile);
 
+        // EVEN
+        addDataItem(" EVEN", 2, NO_DATA);
+        addDataItem(" EVEN 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" EVEN.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED);
+        addDataItem(" DC.B 1, 2\n EVEN\n DC.B 3", 4, new byte[] { 1, 2, 3 });
+        addDataItem(" DC.B 1\n EVEN\n DC.B 2", 4, new byte[] { 1, 0, 2 });
+
         // FOR
         addDataItem(" FOR\n DC.W $1234\n NEXT", 4, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
         addDataItem(" FOR 1\n DC.W $1234\n NEXT", 4, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
