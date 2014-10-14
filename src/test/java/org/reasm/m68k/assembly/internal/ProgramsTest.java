@@ -1,40 +1,14 @@
 package org.reasm.m68k.assembly.internal;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.SIZE_ATTRIBUTE_NOT_ALLOWED;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.UNDEFINED_SYMBOL;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.WRONG_NUMBER_OF_OPERANDS;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.reasm.Assembly;
-import org.reasm.AssemblyCompletionStatus;
 import org.reasm.AssemblyMessage;
-import org.reasm.Configuration;
-import org.reasm.Environment;
-import org.reasm.IdentityTransformation;
-import org.reasm.OutputTransformation;
-import org.reasm.OutputTransformationFactory;
 import org.reasm.m68k.M68KArchitecture;
 import org.reasm.m68k.messages.*;
-import org.reasm.messages.InvalidTransformationArgumentsErrorMessage;
-import org.reasm.messages.UnknownTransformationMethodErrorMessage;
-import org.reasm.source.SourceFile;
-import org.reasm.testhelpers.EquivalentAssemblyMessage;
-
-import ca.fragag.Consumer;
 
 /**
  * Test class for short M68000 programs.
@@ -42,9 +16,7 @@ import ca.fragag.Consumer;
  * @author Francis Gagné
  */
 @RunWith(Parameterized.class)
-public class ProgramsTest {
-
-    static final byte[] NO_DATA = new byte[0];
+public class ProgramsTest extends BaseProgramsTest {
 
     private static final AssemblyMessage ALIGNMENT_MUST_NOT_BE_ZERO_OR_NEGATIVE = new AlignmentMustNotBeZeroOrNegativeErrorMessage();
 
@@ -204,14 +176,6 @@ public class ProgramsTest {
         addDataItem(" REPT.W 0\n DC.W $1234\n ENDR", 5, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED);
         addDataItem(" REPT 5\n DC.W $1234\n ENDR", 10, new byte[] { 0x12, 0x34, 0x12, 0x34, 0x12, 0x34, 0x12, 0x34, 0x12, 0x34 });
 
-        // TRANSFORM
-        addDataItem(" TRANSFORM\n ENDTRANSFORM", 5, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
-        addDataItem(" TRANSFORM UNKNOWN\n ENDTRANSFORM", 5, NO_DATA, new UnknownTransformationMethodErrorMessage("UNKNOWN"));
-        addDataItem(" TRANSFORM REVERSE\n ENDTRANSFORM", 5, NO_DATA);
-        addDataItem(" TRANSFORM TEST1\n ENDTRANSFORM", 5, NO_DATA, new InvalidTransformationArgumentsErrorMessage("TEST1",
-                new String[0]));
-        addDataItem(" TRANSFORM TEST1,0,0\n ENDTRANSFORM", 5, NO_DATA);
-
         // UNTIL
         final UntilWithoutDoErrorMessage untilWithoutDo = new UntilWithoutDoErrorMessage();
         addDataItem(" UNTIL", 2, NO_DATA, untilWithoutDo);
@@ -250,12 +214,6 @@ public class ProgramsTest {
         TEST_DATA.add(new Object[] { code, steps, output, null, expectedMessages });
     }
 
-    private final String code;
-    private final int steps;
-    private final byte[] output;
-    private final AssemblyMessage expectedMessage;
-    private final AssemblyMessage[] expectedMessages;
-
     /**
      * Initializes a new ProgramsTest.
      *
@@ -270,84 +228,8 @@ public class ProgramsTest {
      * @param expectedMessages
      *            the {@link AssemblyMessage}s that are expected to be generated while assembling the code
      */
-    public ProgramsTest(String code, int steps, byte[] output, AssemblyMessage expectedMessage, AssemblyMessage... expectedMessages) {
-        this.code = code;
-        this.steps = steps;
-        this.output = output;
-        this.expectedMessage = expectedMessage;
-        this.expectedMessages = expectedMessages;
-    }
-
-    /**
-     * Asserts that a program assembles correctly.
-     *
-     * @throws IOException
-     *             an I/O exception occurred
-     */
-    @Test
-    public void assemble() throws IOException {
-        try {
-            final OutputTransformationFactory reverseOutputTransformationFactory = new OutputTransformationFactory(
-                    Collections.singleton("REVERSE")) {
-                @Override
-                public OutputTransformation create(String[] arguments, Consumer<AssemblyMessage> assemblyMessageConsumer) {
-                    return org.reasm.testhelpers.ReverseTransformation.INSTANCE;
-                }
-            };
-
-            final OutputTransformationFactory test1OutputTransformationFactory = new OutputTransformationFactory(
-                    Collections.singleton("TEST1")) {
-                @Override
-                public OutputTransformation create(String[] arguments, Consumer<AssemblyMessage> assemblyMessageConsumer) {
-                    if (arguments.length == 2 && "0".equals(arguments[0]) && "0".equals(arguments[1])) {
-                        return IdentityTransformation.INSTANCE;
-                    }
-
-                    return null;
-                }
-            };
-
-            final Environment environment = Environment.DEFAULT.addOutputTransformationFactory(reverseOutputTransformationFactory)
-                    .addOutputTransformationFactory(test1OutputTransformationFactory);
-            final SourceFile mainSourceFile = new SourceFile(this.code, null);
-            final Configuration configuration = new Configuration(environment, mainSourceFile, M68KArchitecture.MC68000);
-            final Assembly assembly = new Assembly(configuration);
-
-            int steps = this.steps;
-            AssemblyCompletionStatus status;
-            do {
-                assertThat("The assembly is performing more steps than expected (expecting " + this.steps + " steps).", steps,
-                        is(not(0)));
-
-                status = assembly.step();
-                --steps;
-            } while (status != AssemblyCompletionStatus.COMPLETE);
-
-            assertThat("The assembly is performing fewer steps than expected (expecting " + this.steps + " steps).", steps, is(0));
-
-            if (this.expectedMessages != null) {
-                EquivalentAssemblyMessage[] matchers = new EquivalentAssemblyMessage[this.expectedMessages.length];
-                for (int i = 0; i < this.expectedMessages.length; i++) {
-                    matchers[i] = new EquivalentAssemblyMessage(this.expectedMessages[i]);
-                }
-
-                assertThat(assembly.getMessages(), contains(matchers));
-            } else if (this.expectedMessage != null) {
-                assertThat(assembly.getMessages(), contains(new EquivalentAssemblyMessage(this.expectedMessage)));
-            } else {
-                assertThat(assembly.getMessages(), is(empty()));
-            }
-
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            assembly.writeAssembledDataTo(out);
-            final byte[] outputBytes = out.toByteArray();
-            assertThat(outputBytes.length, is(this.output.length));
-            for (int i = 0; i < this.output.length; i++) {
-                assertThat(outputBytes[i], is(this.output[i]));
-            }
-        } catch (AssertionError e) {
-            throw new AssertionError(this.code + "\n" + e.getMessage(), e);
-        }
+    public ProgramsTest(String code, int steps, byte[] output, AssemblyMessage expectedMessage, AssemblyMessage[] expectedMessages) {
+        super(code, steps, output, M68KArchitecture.MC68000, expectedMessage, expectedMessages, null);
     }
 
 }

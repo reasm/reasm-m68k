@@ -1,14 +1,5 @@
 package org.reasm.m68k.assembly.internal;
 
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.INVALID_SIZE_ATTRIBUTE_B;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.INVALID_SIZE_ATTRIBUTE_EMPTY;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.INVALID_SIZE_ATTRIBUTE_L;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.INVALID_SIZE_ATTRIBUTE_W;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.INVALID_SIZE_ATTRIBUTE_Z;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.NOT_SUPPORTED_ON_ARCHITECTURE;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.UNDEFINED_SYMBOL;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.WRONG_NUMBER_OF_OPERANDS;
-
 import java.util.ArrayList;
 import java.util.List;
 

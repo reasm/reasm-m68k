@@ -1,29 +1,12 @@
 package org.reasm.m68k.assembly.internal;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.INVALID_SIZE_ATTRIBUTE_EMPTY;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.INVALID_SIZE_ATTRIBUTE_Z;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.SIZE_ATTRIBUTE_NOT_ALLOWED;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.UNDEFINED_SYMBOL;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.WRONG_NUMBER_OF_OPERANDS;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.reasm.Assembly;
-import org.reasm.AssemblyCompletionStatus;
 import org.reasm.AssemblyMessage;
-import org.reasm.Configuration;
-import org.reasm.Environment;
 import org.reasm.m68k.M68KArchitecture;
 import org.reasm.m68k.messages.CountMustNotBeNegativeErrorMessage;
 import org.reasm.m68k.messages.InvalidCharacterInHexDirectiveErrorMessage;
@@ -32,8 +15,6 @@ import org.reasm.m68k.messages.StringTooLongErrorMessage;
 import org.reasm.m68k.messages.ValueOutOfRangeErrorMessage;
 import org.reasm.messages.OddNumberOfCharactersInHexDirectiveErrorMessage;
 import org.reasm.messages.OutOfMemoryErrorMessage;
-import org.reasm.source.SourceFile;
-import org.reasm.testhelpers.EquivalentAssemblyMessage;
 
 /**
  * Test class for directives whose main purpose is outputting data (e.g. <code>DC</code>).
@@ -41,11 +22,9 @@ import org.reasm.testhelpers.EquivalentAssemblyMessage;
  * @author Francis Gagné
  */
 @RunWith(Parameterized.class)
-public class OutputDirectivesTest {
+public class OutputDirectivesTest extends BaseProgramsTest {
 
     private static final List<Object[]> TEST_DATA = new ArrayList<>();
-
-    private static final byte[] NO_DATA = new byte[0];
 
     static {
         // DC
@@ -238,10 +217,6 @@ public class OutputDirectivesTest {
         TEST_DATA.add(new Object[] { code, output, expectedMessage });
     }
 
-    private final String code;
-    private final byte[] output;
-    private final AssemblyMessage expectedMessage;
-
     /**
      * Initializes a new OutputDirectivesTest.
      *
@@ -254,45 +229,7 @@ public class OutputDirectivesTest {
      *            <code>null</code> if no message is expected
      */
     public OutputDirectivesTest(String code, byte[] output, AssemblyMessage expectedMessage) {
-        this.code = code;
-        this.output = output;
-        this.expectedMessage = expectedMessage;
-    }
-
-    /**
-     * Asserts that a directive whose primary function is to emit data assembles correctly.
-     *
-     * @throws IOException
-     *             an I/O exception occurred
-     */
-    @Test
-    public void assemble() throws IOException {
-        try {
-            Environment environment = Environment.DEFAULT;
-            SourceFile mainSourceFile = new SourceFile(this.code, null);
-            Configuration configuration = new Configuration(environment, mainSourceFile, M68KArchitecture.MC68000);
-            Assembly assembly = new Assembly(configuration);
-
-            // The code should contain only one instruction.
-            assertThat(assembly.step(), is(AssemblyCompletionStatus.PENDING));
-            assertThat(assembly.step(), is(AssemblyCompletionStatus.COMPLETE));
-
-            if (this.expectedMessage != null) {
-                assertThat(assembly.getMessages(), contains(new EquivalentAssemblyMessage(this.expectedMessage)));
-            } else {
-                assertThat(assembly.getMessages(), is(empty()));
-            }
-
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            assembly.writeAssembledDataTo(out);
-            final byte[] outputBytes = out.toByteArray();
-            assertThat(outputBytes.length, is(this.output.length));
-            for (int i = 0; i < this.output.length; i++) {
-                assertThat(outputBytes[i], is(this.output[i]));
-            }
-        } catch (AssertionError ex) {
-            throw new AssertionError(this.code + ex.getMessage(), ex);
-        }
+        super(code, 2, output, M68KArchitecture.MC68000, expectedMessage, null, null);
     }
 
 }

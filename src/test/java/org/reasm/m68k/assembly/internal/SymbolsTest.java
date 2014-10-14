@@ -1,36 +1,24 @@
 package org.reasm.m68k.assembly.internal;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.INVALID_SIZE_ATTRIBUTE_EMPTY;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.INVALID_SIZE_ATTRIBUTE_Z;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.SIZE_ATTRIBUTE_NOT_ALLOWED;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.UNDEFINED_SYMBOL;
-import static org.reasm.m68k.assembly.internal.CommonExpectedMessages.WRONG_NUMBER_OF_OPERANDS;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.reasm.*;
+import org.reasm.AssemblyMessage;
+import org.reasm.SignedIntValue;
+import org.reasm.SymbolContext;
+import org.reasm.SymbolType;
+import org.reasm.UnsignedIntValue;
+import org.reasm.Value;
 import org.reasm.m68k.M68KArchitecture;
 import org.reasm.m68k.messages.CountMustNotBeNegativeErrorMessage;
 import org.reasm.m68k.messages.InvalidExpressionErrorMessage;
 import org.reasm.m68k.messages.RegisterExpectedErrorMessage;
 import org.reasm.m68k.messages.RegisterListExpectedErrorMessage;
 import org.reasm.messages.DirectiveRequiresLabelErrorMessage;
-import org.reasm.source.SourceFile;
-import org.reasm.testhelpers.EquivalentAssemblyMessage;
 import org.reasm.testhelpers.UserSymbolMatcher;
 
 /**
@@ -39,7 +27,7 @@ import org.reasm.testhelpers.UserSymbolMatcher;
  * @author Francis Gagné
  */
 @RunWith(Parameterized.class)
-public class SymbolsTest {
+public class SymbolsTest extends BaseProgramsTest {
 
     private static final UnsignedIntValue UINT_0 = new UnsignedIntValue(0);
     private static final UnsignedIntValue UINT_1 = new UnsignedIntValue(1);
@@ -47,8 +35,6 @@ public class SymbolsTest {
 
     private static final UserSymbolMatcher<Value> FOO_CONSTANT_UINT_0 = new UserSymbolMatcher<>(SymbolContext.VALUE, "foo",
             SymbolType.CONSTANT, UINT_0);
-
-    private static final UserSymbolMatcher<?>[] NO_SYMBOLS = new UserSymbolMatcher[0];
 
     private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
@@ -223,12 +209,6 @@ public class SymbolsTest {
         TEST_DATA.add(new Object[] { code, steps, symbols, null, expectedMessages });
     }
 
-    private final String code;
-    private final int steps;
-    private final UserSymbolMatcher<?>[] symbolMatchers;
-    private final AssemblyMessage expectedMessage;
-    private final AssemblyMessage[] expectedMessages;
-
     /**
      * Initializes a new SymbolsTest.
      *
@@ -244,61 +224,8 @@ public class SymbolsTest {
      *            an array of {@link AssemblyMessage} that is expected to be generated while assembling the code
      */
     public SymbolsTest(String code, int steps, UserSymbolMatcher<?>[] symbolMatchers, AssemblyMessage expectedMessage,
-            AssemblyMessage... expectedMessages) {
-        this.code = code;
-        this.steps = steps;
-        this.symbolMatchers = symbolMatchers;
-        this.expectedMessage = expectedMessage;
-        this.expectedMessages = expectedMessages;
-    }
-
-    /**
-     * Asserts that a program defines the expected symbols.
-     *
-     * @throws IOException
-     *             an I/O exception occurred
-     */
-    @Test
-    public void assemble() throws IOException {
-        try {
-            final Environment environment = Environment.DEFAULT;
-            final SourceFile mainSourceFile = new SourceFile(this.code, null);
-            final Configuration configuration = new Configuration(environment, mainSourceFile, M68KArchitecture.MC68000);
-            final Assembly assembly = new Assembly(configuration);
-
-            int steps = this.steps;
-            AssemblyCompletionStatus status;
-            do {
-                assertThat("The assembly is performing more steps than expected (expecting " + this.steps + " steps).", steps,
-                        is(not(0)));
-
-                status = assembly.step();
-                --steps;
-            } while (status != AssemblyCompletionStatus.COMPLETE);
-
-            assertThat("The assembly is performing fewer steps than expected (expecting " + this.steps + " steps).", steps, is(0));
-
-            if (this.expectedMessages != null) {
-                final EquivalentAssemblyMessage[] matchers = new EquivalentAssemblyMessage[this.expectedMessages.length];
-                for (int i = 0; i < this.expectedMessages.length; i++) {
-                    matchers[i] = new EquivalentAssemblyMessage(this.expectedMessages[i]);
-                }
-
-                assertThat(assembly.getMessages(), contains(matchers));
-            } else if (this.expectedMessage != null) {
-                assertThat(assembly.getMessages(), contains(new EquivalentAssemblyMessage(this.expectedMessage)));
-            } else {
-                assertThat(assembly.getMessages(), is(empty()));
-            }
-
-            assertThat(assembly.getSymbols(), containsInAnyOrder(this.symbolMatchers));
-
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            assembly.writeAssembledDataTo(out);
-            assertThat(out.size(), is(0));
-        } catch (AssertionError e) {
-            throw new AssertionError(this.code + e.getMessage(), e);
-        }
+            AssemblyMessage[] expectedMessages) {
+        super(code, steps, NO_DATA, M68KArchitecture.MC68000, expectedMessage, expectedMessages, symbolMatchers);
     }
 
 }
