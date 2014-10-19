@@ -93,7 +93,9 @@ final class UserFunction implements Function, SymbolLookup {
         if (expressionClass == IdentifierExpression.class) {
             final String identifier = ((IdentifierExpression) expression).getIdentifier();
             for (int i = 0; i < this.parameterNames.length; i++) {
-                if (this.parameterNames[i].equalsIgnoreCase(identifier)) {
+                final String parameterName = this.parameterNames[i];
+
+                if (parameterName.equalsIgnoreCase(identifier)) {
                     if (i < arguments.length) {
                         // Wrap the argument in an ExpressionWithOverriddenSymbolLookup,
                         // so that identifiers in the arguments are looked up in the context of the function call,
@@ -102,6 +104,25 @@ final class UserFunction implements Function, SymbolLookup {
                     }
 
                     return ValueExpression.UNDETERMINED;
+                }
+
+                // Break identifiers of the form 'X.Y' into a PeriodExpression
+                // if 'X' is the name of one of the function's parameters.
+                // Test for the '.' character before calling substring() to avoid unnecessary allocations.
+                if (identifier.startsWith(".", parameterName.length())
+                        && parameterName.equalsIgnoreCase(identifier.substring(0, parameterName.length()))) {
+                    final Expression leftExpression;
+                    if (i < arguments.length) {
+                        // Wrap the argument in an ExpressionWithOverriddenSymbolLookup,
+                        // so that identifiers in the arguments are looked up in the context of the function call,
+                        // rather than in the context of the function definition.
+                        leftExpression = new ExpressionWithOverriddenSymbolLookup(arguments[i], originalSymbolLookup);
+                    } else {
+                        leftExpression = ValueExpression.UNDETERMINED;
+                    }
+
+                    final Expression rightExpression = new IdentifierExpression(identifier.substring(parameterName.length() + 1));
+                    return new PeriodExpression(leftExpression, rightExpression);
                 }
             }
         } else if (expressionClass == GroupingExpression.class) {
