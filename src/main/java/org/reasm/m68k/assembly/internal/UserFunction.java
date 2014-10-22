@@ -89,6 +89,7 @@ final class UserFunction implements Function, SymbolLookup {
         return result;
     }
 
+    @Nonnull
     private final Expression replaceArguments(@Nonnull Expression expression, @Nonnull Expression[] arguments,
             @CheckForNull SymbolLookup originalSymbolLookup) {
         final Class<? extends Expression> expressionClass = expression.getClass();
