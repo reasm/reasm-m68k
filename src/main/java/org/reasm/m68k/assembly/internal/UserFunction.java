@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 
 import org.reasm.Function;
 import org.reasm.Symbol;
@@ -13,6 +14,7 @@ import org.reasm.expressions.*;
 import org.reasm.m68k.M68KArchitecture;
 import org.reasm.messages.WrongNumberOfArgumentsErrorMessage;
 
+@Immutable
 final class UserFunction implements Function, SymbolLookup {
 
     @Nonnull
