@@ -221,8 +221,7 @@ public class LogicalLineParserTest {
     }
 
     /**
-     * Asserts that {@link LogicalLineParser#parse(LogicalLineParserResult, CharSequenceReader)} parses a {@link LogicalLine} with
-     * the correct attributes.
+     * Asserts that {@link LogicalLineParser#parse(CharSequenceReader)} parses a {@link LogicalLine} with the correct attributes.
      */
     @Test
     public void parse() {
