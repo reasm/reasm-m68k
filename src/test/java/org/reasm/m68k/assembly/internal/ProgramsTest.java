@@ -9,6 +9,9 @@ import org.junit.runners.Parameterized.Parameters;
 import org.reasm.AssemblyMessage;
 import org.reasm.m68k.M68KArchitecture;
 import org.reasm.m68k.messages.*;
+import org.reasm.messages.DirectiveRequiresLabelErrorMessage;
+import org.reasm.messages.UnresolvedSymbolReferenceErrorMessage;
+import org.reasm.messages.WrongNumberOfArgumentsErrorMessage;
 
 /**
  * Test class for short M68000 programs.
@@ -19,6 +22,7 @@ import org.reasm.m68k.messages.*;
 public class ProgramsTest extends BaseProgramsTest {
 
     private static final AssemblyMessage ALIGNMENT_MUST_NOT_BE_ZERO_OR_NEGATIVE = new AlignmentMustNotBeZeroOrNegativeErrorMessage();
+    private static final AssemblyMessage WRONG_NUMBER_OF_ARGUMENTS = new WrongNumberOfArgumentsErrorMessage();
 
     private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
@@ -141,6 +145,18 @@ public class ProgramsTest extends BaseProgramsTest {
         addDataItem("I FOR 11,15\n DC.B I\n NEXT", 24, new byte[] { 11, 12, 13, 14, 15 });
         addDataItem("I: J: FOR 11,15\n DC.B I+J\n NEXT", 24, new byte[] { 22, 24, 26, 28, 30 });
 
+        // FUNCTION
+        addDataItem(" FUNCTION", 2, NO_DATA, new DirectiveRequiresLabelErrorMessage("FUNCTION"));
+        addDataItem("F FUNCTION\n DC.B F()", 3, new byte[] { 0 }, WRONG_NUMBER_OF_OPERANDS,
+                new UnresolvedSymbolReferenceErrorMessage("F"));
+        addDataItem("F FUNCTION 2+3\n DC.B F()", 3, new byte[] { 5 });
+        addDataItem("F FUNCTION <\n DC.B F()", 3, new byte[] { 0 }, new InvalidExpressionErrorMessage("<"));
+        addDataItem("F FUNCTION A,A+3\n DC.B F(2)", 3, new byte[] { 5 });
+        addDataItem("F FUNCTION A,B,A+B\n DC.B F(2,3)", 3, new byte[] { 5 });
+        addDataItem("F FUNCTION 2,2+3\n DC.B F()", 3, new byte[] { 0 }, new FunctionParameterIsNotSimpleIdentifierErrorMessage("2"));
+        addDataItem("F FUNCTION A!,2+3\n DC.B F()", 3, new byte[] { 0 }, new FunctionParameterIsNotSimpleIdentifierErrorMessage(
+                "A!"));
+
         // IF
         addDataItem(" IF\n DC.W $1234\n ENDIF", 4, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
         addDataItem(" IF 0\n DC.W $1234\n ENDIF", 4, NO_DATA);
@@ -190,6 +206,28 @@ public class ProgramsTest extends BaseProgramsTest {
         addDataItem("I SET 0\n WHILE I < 5, I > 2\n DC.W $1234\nI SET I + 1\n ENDW", 30, new byte[] { 0x12, 0x34, 0x12, 0x34, 0x12,
                 0x34, 0x12, 0x34, 0x12, 0x34 }, WRONG_NUMBER_OF_OPERANDS);
         addDataItem(" WHILE UNDEFINED\n DC.W $1234\n ENDW", 4, NO_DATA, UNDEFINED_SYMBOL);
+
+        // UserFunction class
+        addDataItem("F FUNCTION A,B,A+B\n DC.B F()", 3, new byte[] { 0 }, WRONG_NUMBER_OF_ARGUMENTS);
+        addDataItem("Z EQU 7\nF FUNCTION A,Z*A\n DC.B F(3)", 4, new byte[] { 21 });
+        addDataItem("Z.Y EQU 7\nX.W EQU 5\nF FUNCTION A,X.W*A.Y\n DC.B F()", 5, new byte[] { 0 }, WRONG_NUMBER_OF_ARGUMENTS);
+        addDataItem("Z.Y EQU 7\nX.W EQU 5\nF FUNCTION A,X.W*A.Y\n DC.B F(Z)", 5, new byte[] { 35 });
+        addDataItem("Z EQU 7\nF FUNCTION A,(Z)*(A)\n DC.B F(3)", 4, new byte[] { 21 });
+        addDataItem("Z EQU 7\nF FUNCTION A,+Z*+A\n DC.B F(3)", 4, new byte[] { 21 });
+        addDataItem("Z.Y EQU 7\nX.W EQU 5\nV.U EQU 3\nF FUNCTION A,B,Z . Y * A . W * V . B\n DC.B F(X, U)", 6, new byte[] { 105 });
+        addDataItem("Z[0] EQU 7\nZ[1] EQU 5\nZ[2] EQU 3\nF FUNCTION A,B,Z[0] * Z[A] * B[2]\n DC.B F(1,Z)", 6, new byte[] { 105 });
+        addDataItem("Z EQU 7\nF FUNCTION A,(Z*1)*(A*1)\n DC.B F(3)", 4, new byte[] { 21 });
+        addDataItem("F FUNCTION 1?2:3\n DC.B F()", 3, new byte[] { 2 });
+        addDataItem("F FUNCTION A,A?2:3\n DC.B F(1)", 3, new byte[] { 2 });
+        addDataItem("F FUNCTION A,1?A:3\n DC.B F(2)", 3, new byte[] { 2 });
+        addDataItem("F FUNCTION A,1?2:A\n DC.B F(3)", 3, new byte[] { 2 });
+        addDataItem("G FUNCTION 1\nF FUNCTION G()\n DC.B F()", 4, new byte[] { 1 });
+        addDataItem("G FUNCTION 1\nF FUNCTION A,A()\n DC.B F(G)", 4, new byte[] { 1 });
+        addDataItem("G FUNCTION A,B,A*B\nF FUNCTION A,G(A,3)\n DC.B F(2)", 4, new byte[] { 6 });
+        addDataItem("Z EQU 5\nN1 NAMESPACE\nZ EQU 7\nF FUNCTION Z\n ENDNS\n DC.B N1.F()", 9, new byte[] { 7 });
+        addDataItem("Z EQU 5\nN1 NAMESPACE\nZ EQU 7\nF FUNCTION A,Z*A\n ENDNS\n DC.B N1.F(3)", 9, new byte[] { 21 });
+        addDataItem("Z EQU 5\nF FUNCTION A,Z*A\nN1 NAMESPACE\nZ EQU 7\n DC.B F(Z)\n ENDNS", 9, new byte[] { 35 });
+        addDataItem("Z.Y EQU 5\nF FUNCTION A,Z.Y*A.Y\nN1 NAMESPACE\nZ.Y EQU 7\n DC.B F(Z)\n ENDNS", 9, new byte[] { 35 });
     }
 
     /**
