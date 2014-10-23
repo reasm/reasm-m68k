@@ -50,6 +50,10 @@ final class UserFunction implements Function {
         }
 
         UserFunction other = (UserFunction) obj;
+        if (!this.context.equals(other.context)) {
+            return false;
+        }
+
         if (!this.functionExpression.equals(other.functionExpression)) {
             return false;
         }
@@ -65,6 +69,7 @@ final class UserFunction implements Function {
     public final int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + this.context.hashCode();
         result = prime * result + this.functionExpression.hashCode();
         result = prime * result + Arrays.hashCode(this.parameterNames);
         return result;
