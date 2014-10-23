@@ -541,10 +541,11 @@ final class EffectiveAddress {
         }
     }
 
-    static void getEffectiveAddress(@Nonnull Tokenizer tokenizer, @Nonnull Set<AddressingMode> validAddressingModes,
-            boolean expectBitFieldSpecificationAtEnd, @Nonnull InstructionSize instructionSize, int offsetToExtensionWords,
-            @Nonnull EvaluationContext evaluationContext, @Nonnull M68KBasicAssemblyContext context,
-            @Nonnull Consumer<AssemblyMessage> assemblyMessageConsumer, @Nonnull EffectiveAddress result) {
+    static void getEffectiveAddress(@Nonnull Tokenizer tokenizer, @CheckForNull SymbolLookup symbolLookup,
+            @Nonnull Set<AddressingMode> validAddressingModes, boolean expectBitFieldSpecificationAtEnd,
+            @Nonnull InstructionSize instructionSize, int offsetToExtensionWords, @Nonnull EvaluationContext evaluationContext,
+            @Nonnull M68KBasicAssemblyContext context, @Nonnull Consumer<AssemblyMessage> assemblyMessageConsumer,
+            @Nonnull EffectiveAddress result) {
         // Clear the result.
         result.numberOfWords = 0;
         result.word0 = 0;
@@ -583,7 +584,7 @@ final class EffectiveAddress {
                 result.word0 = EA_IMMEDIATE_DATA;
 
                 tokenizer.advance();
-                final Expression expression = ExpressionParser.parse(tokenizer, assemblyMessageConsumer);
+                final Expression expression = ExpressionParser.parse(tokenizer, symbolLookup, assemblyMessageConsumer);
                 if (expression == null) {
                     assemblyMessageConsumer.accept(new ExpressionExpectedErrorMessage());
                     return;
@@ -610,18 +611,18 @@ final class EffectiveAddress {
 
                 validateAddressingMode(validAddressingModes, AddressingMode.IMMEDIATE_DATA, assemblyMessageConsumer);
             } else {
-                final Expression expression = ExpressionParser.parse(tokenizer, assemblyMessageConsumer);
+                final Expression expression = ExpressionParser.parse(tokenizer, symbolLookup, assemblyMessageConsumer);
                 if (expression == null) {
                     if (tokenizer.getTokenType() == TokenType.OPENING_PARENTHESIS) {
-                        parseQuad(tokenizer, expectBitFieldSpecificationAtEnd, null, validAddressingModes, offsetToExtensionWords,
-                                evaluationContext, context, assemblyMessageConsumer, result);
+                        parseQuad(tokenizer, symbolLookup, expectBitFieldSpecificationAtEnd, null, validAddressingModes,
+                                offsetToExtensionWords, evaluationContext, context, assemblyMessageConsumer, result);
                     }
                 } else {
                     // If the token following the expression is a (, parse a quad using the expression as the base displacement.
                     // Otherwise, analyze the expression and turn it into an effective address.
 
                     if (tokenizer.getTokenType() == TokenType.OPENING_PARENTHESIS) {
-                        parseQuad(tokenizer, expectBitFieldSpecificationAtEnd, expression, validAddressingModes,
+                        parseQuad(tokenizer, symbolLookup, expectBitFieldSpecificationAtEnd, expression, validAddressingModes,
                                 offsetToExtensionWords, evaluationContext, context, assemblyMessageConsumer, result);
                     } else if (tokenizer.tokenEqualsString("+")) {
                         if (expression instanceof GroupingExpression) {
@@ -641,7 +642,8 @@ final class EffectiveAddress {
                         // Analyze the expression to see if it matches an effective address.
                         if (expression instanceof IdentifierExpression) {
                             // Check if the identifier matches a register name.
-                            final String identifier = ((IdentifierExpression) expression).getIdentifier();
+                            final IdentifierExpression identifierExpression = (IdentifierExpression) expression;
+                            final String identifier = identifierExpression.getIdentifier();
                             final short reg = identifyDataOrAddressRegister(identifier, false, context);
                             if (reg != -1) {
                                 result.numberOfWords = 1;
@@ -654,8 +656,8 @@ final class EffectiveAddress {
 
                             final int absoluteAddressingSize = parseIndexRegisterOrAbsoluteAddressingSize(identifier);
                             if (absoluteAddressingSize != -1) {
-                                encodeAbsoluteAddressing(
-                                        new IdentifierExpression(identifier.substring(0, identifier.length() - 2)),
+                                encodeAbsoluteAddressing(new IdentifierExpression(identifier.substring(0, identifier.length() - 2),
+                                        identifierExpression.getSymbolLookup()),
                                         absoluteAddressingSize == 0 ? AbsoluteAddressingSize.WORD : AbsoluteAddressingSize.LONG,
                                         validAddressingModes, evaluationContext, assemblyMessageConsumer, result,
                                         offsetToExtensionWords, context);
@@ -1044,9 +1046,10 @@ final class EffectiveAddress {
         return -1;
     }
 
-    private static void parseQuad(@Nonnull Tokenizer tokenizer, boolean expectBitFieldSpecificationAtEnd,
-            @CheckForNull Expression baseDisplacementExpression, @Nonnull Set<AddressingMode> validAddressingModes,
-            int offsetToExtensionWords, @Nonnull EvaluationContext evaluationContext, @Nonnull M68KBasicAssemblyContext context,
+    private static void parseQuad(@Nonnull Tokenizer tokenizer, @CheckForNull SymbolLookup symbolLookup,
+            boolean expectBitFieldSpecificationAtEnd, @CheckForNull Expression baseDisplacementExpression,
+            @Nonnull Set<AddressingMode> validAddressingModes, int offsetToExtensionWords,
+            @Nonnull EvaluationContext evaluationContext, @Nonnull M68KBasicAssemblyContext context,
             @Nonnull Consumer<AssemblyMessage> assemblyMessageConsumer, @Nonnull EffectiveAddress result)
             throws InvalidTokenException {
         QuadParser quad = new QuadParser();
@@ -1095,7 +1098,7 @@ final class EffectiveAddress {
                     }
                 }
 
-                final Expression expression = ExpressionParser.parse(tokenizer, assemblyMessageConsumer);
+                final Expression expression = ExpressionParser.parse(tokenizer, symbolLookup, assemblyMessageConsumer);
                 if (expression == null) {
                     return;
                 }

@@ -25,6 +25,7 @@ import org.reasm.expressions.*;
 import org.reasm.m68k.ParserReader;
 import org.reasm.m68k.messages.UnrecognizedEscapeSequenceWarningMessage;
 import org.reasm.messages.OverflowInLiteralWarningMessage;
+import org.reasm.testhelpers.DummySymbolLookup;
 import org.reasm.testhelpers.EquivalentAssemblyMessage;
 
 import ca.fragag.Consumer;
@@ -107,12 +108,12 @@ public class ExpressionParserTest {
     private static final ValueExpression VALUE_STRING_ABCDEF = new ValueExpression(new StringValue("abcdef"));
     private static final ValueExpression VALUE_STRING_BACKSLASH = new ValueExpression(new StringValue("\\"));
 
-    private static final IdentifierExpression IDENTIFIER_A = new IdentifierExpression("a");
-    private static final IdentifierExpression IDENTIFIER_B = new IdentifierExpression("b");
-    private static final IdentifierExpression IDENTIFIER_C = new IdentifierExpression("c");
-    private static final IdentifierExpression IDENTIFIER_D = new IdentifierExpression("d");
-    private static final IdentifierExpression IDENTIFIER_E = new IdentifierExpression("e");
-    private static final IdentifierExpression IDENTIFIER_FOO = new IdentifierExpression("foo");
+    private static final IdentifierExpression IDENTIFIER_A = new IdentifierExpression("a", DummySymbolLookup.DEFAULT);
+    private static final IdentifierExpression IDENTIFIER_B = new IdentifierExpression("b", DummySymbolLookup.DEFAULT);
+    private static final IdentifierExpression IDENTIFIER_C = new IdentifierExpression("c", DummySymbolLookup.DEFAULT);
+    private static final IdentifierExpression IDENTIFIER_D = new IdentifierExpression("d", DummySymbolLookup.DEFAULT);
+    private static final IdentifierExpression IDENTIFIER_E = new IdentifierExpression("e", DummySymbolLookup.DEFAULT);
+    private static final IdentifierExpression IDENTIFIER_FOO = new IdentifierExpression("foo", DummySymbolLookup.DEFAULT);
 
     private static final AssemblyMessage[] DONT_CHECK_ASSEMBLY_MESSAGES = null;
 
@@ -127,13 +128,13 @@ public class ExpressionParserTest {
             { new DataItem(" ", 1, null) },
 
             // An anonymous symbol
-            { new DataItem("+++", 3, new IdentifierExpression("+++")) },
+            { new DataItem("+++", 3, new IdentifierExpression("+++", DummySymbolLookup.DEFAULT)) },
 
             // An anonymous symbol
-            { new DataItem("-----", 5, new IdentifierExpression("-----")) },
+            { new DataItem("-----", 5, new IdentifierExpression("-----", DummySymbolLookup.DEFAULT)) },
 
             // An anonymous symbol followed by a closing parenthesis
-            { new DataItem("+)", 1, new IdentifierExpression("+")) },
+            { new DataItem("+)", 1, new IdentifierExpression("+", DummySymbolLookup.DEFAULT)) },
 
             // A short decimal integer literal
             { new DataItem("0", 1, VALUE_UINT_0) },
@@ -353,13 +354,13 @@ public class ExpressionParserTest {
             { new DataItem("a", 1, IDENTIFIER_A) },
 
             // A long identifier
-            { new DataItem("abcdef", 6, new IdentifierExpression("abcdef")) },
+            { new DataItem("abcdef", 6, new IdentifierExpression("abcdef", DummySymbolLookup.DEFAULT)) },
 
             // A long identifier followed by a closing parenthesis
-            { new DataItem("abcdef)", 6, new IdentifierExpression("abcdef")) },
+            { new DataItem("abcdef)", 6, new IdentifierExpression("abcdef", DummySymbolLookup.DEFAULT)) },
 
             // An identifier containing a period
-            { new DataItem("abc.def", 7, new IdentifierExpression("abc.def")) },
+            { new DataItem("abc.def", 7, new IdentifierExpression("abc.def", DummySymbolLookup.DEFAULT)) },
 
             // The unary plus operator
             { new DataItem("+a", 2, new UnaryOperatorExpression(UnaryOperator.UNARY_PLUS, IDENTIFIER_A)) },
@@ -438,11 +439,11 @@ public class ExpressionParserTest {
 
             // A function call with three arguments
             { new DataItem("foo(0,'a', i)", 13, new FunctionCallExpression(IDENTIFIER_FOO, VALUE_UINT_0, new ValueExpression(
-                    new StringValue("a")), new IdentifierExpression("i"))) },
+                    new StringValue("a")), new IdentifierExpression("i", DummySymbolLookup.DEFAULT))) },
 
             // A function call with three arguments and a bunch of spaces and tabs all around
             { new DataItem("foo \t( \t0 \t, \t'a' \t, \ti \t) \t", 28, new FunctionCallExpression(IDENTIFIER_FOO, VALUE_UINT_0,
-                    new ValueExpression(new StringValue("a")), new IdentifierExpression("i"))) },
+                    new ValueExpression(new StringValue("a")), new IdentifierExpression("i", DummySymbolLookup.DEFAULT))) },
 
             // A chained function call
             { new DataItem("foo(0)(0)", 9, new FunctionCallExpression(new FunctionCallExpression(IDENTIFIER_FOO, VALUE_UINT_0),
@@ -455,20 +456,21 @@ public class ExpressionParserTest {
             { new DataItem("a[b", 1, IDENTIFIER_A) },
 
             // The indexer operator
-            { new DataItem("a[b]", 4, new IndexerExpression(IDENTIFIER_A, IDENTIFIER_B)) },
+            { new DataItem("a[b]", 4, new IndexerExpression(IDENTIFIER_A, IDENTIFIER_B, DummySymbolLookup.DEFAULT)) },
 
             // The period operator
-            { new DataItem("3.a", 3, new PeriodExpression(VALUE_UINT_3, IDENTIFIER_A)) },
+            { new DataItem("3.a", 3, new PeriodExpression(VALUE_UINT_3, IDENTIFIER_A, DummySymbolLookup.DEFAULT)) },
 
             // An identifier followed by a period
             { new DataItem("a .", 2, IDENTIFIER_A) },
 
             // The period operator used twice
-            { new DataItem("a . b . c", 9, new PeriodExpression(new PeriodExpression(IDENTIFIER_A, IDENTIFIER_B), IDENTIFIER_C)) },
+            { new DataItem("a . b . c", 9, new PeriodExpression(new PeriodExpression(IDENTIFIER_A, IDENTIFIER_B,
+                    DummySymbolLookup.DEFAULT), IDENTIFIER_C, DummySymbolLookup.DEFAULT)) },
 
             // The period operator followed by a function call
-            { new DataItem("a . b ( c )", 11, new FunctionCallExpression(new PeriodExpression(IDENTIFIER_A, IDENTIFIER_B),
-                    IDENTIFIER_C)) },
+            { new DataItem("a . b ( c )", 11, new FunctionCallExpression(new PeriodExpression(IDENTIFIER_A, IDENTIFIER_B,
+                    DummySymbolLookup.DEFAULT), IDENTIFIER_C)) },
 
             // An integer literal followed by an asterisk
             { new DataItem("3*", 1, VALUE_UINT_3) },
@@ -570,7 +572,8 @@ public class ExpressionParserTest {
                     ProgramCounterExpression.INSTANCE)) },
 
             // The period operator with the program counter on both sides
-            { new DataItem("*.*", 3, new PeriodExpression(ProgramCounterExpression.INSTANCE, ProgramCounterExpression.INSTANCE)) },
+            { new DataItem("*.*", 3, new PeriodExpression(ProgramCounterExpression.INSTANCE, ProgramCounterExpression.INSTANCE,
+                    DummySymbolLookup.DEFAULT)) },
 
             // A binary integer literal modulo another binary integer literal
             { new DataItem("%11%%11", 7, new BinaryOperatorExpression(BinaryOperator.MODULUS, VALUE_UINT_3, VALUE_UINT_3)) },
@@ -583,7 +586,8 @@ public class ExpressionParserTest {
             { new DataItem("a . !b", 2, IDENTIFIER_A) },
 
             // Grouping parentheses after a period operator
-            { new DataItem("a . (b)", 7, new PeriodExpression(IDENTIFIER_A, new GroupingExpression(IDENTIFIER_B))) },
+            { new DataItem("a . (b)", 7, new PeriodExpression(IDENTIFIER_A, new GroupingExpression(IDENTIFIER_B),
+                    DummySymbolLookup.DEFAULT)) },
 
             // A conditional expression mixed with binary operators
             { new DataItem("a + b = c ? d : e", 17, new ConditionalExpression(new BinaryOperatorExpression(BinaryOperator.EQUAL_TO,
@@ -637,7 +641,7 @@ public class ExpressionParserTest {
 
             tokenizer.setCharSequence(this.data.expressionText);
             try {
-                expression = ExpressionParser.parse(tokenizer, assemblyMessageConsumer);
+                expression = ExpressionParser.parse(tokenizer, DummySymbolLookup.DEFAULT, assemblyMessageConsumer);
             } catch (InvalidTokenException e) {
                 assertThat(-1, is(this.data.finalPosition));
                 return;

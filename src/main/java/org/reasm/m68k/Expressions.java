@@ -4,7 +4,10 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.reasm.AssemblyMessage;
+import org.reasm.expressions.EvaluationContext;
 import org.reasm.expressions.Expression;
+import org.reasm.expressions.IdentifierExpression;
+import org.reasm.expressions.SymbolLookup;
 import org.reasm.m68k.expressions.internal.ExpressionParser;
 import org.reasm.m68k.expressions.internal.InvalidTokenException;
 import org.reasm.m68k.expressions.internal.TokenType;
@@ -24,12 +27,17 @@ public final class Expressions {
      *
      * @param expression
      *            the expression text
+     * @param symbolLookup
+     *            an object that looks up symbols by name, which will be used to look up the symbol for identifiers when the
+     *            identifier is {@linkplain IdentifierExpression#evaluate(EvaluationContext) evaluated}, or <code>null</code> to
+     *            consider all identifiers undefined
      * @param assemblyMessageConsumer
      *            a {@link Consumer} that will receive the assembly messages that were raised while evaluating the expression
      * @return an {@link Expression} corresponding to the expression text
      */
     @Nonnull
-    public static Expression parse(@Nonnull CharSequence expression, @CheckForNull Consumer<AssemblyMessage> assemblyMessageConsumer) {
+    public static Expression parse(@Nonnull CharSequence expression,
+            @CheckForNull SymbolLookup symbolLookup, @CheckForNull Consumer<AssemblyMessage> assemblyMessageConsumer) {
         if (expression == null) {
             throw new NullPointerException("expression");
         }
@@ -39,7 +47,7 @@ public final class Expressions {
 
         Expression result;
         try {
-            result = ExpressionParser.parse(tokenizer, assemblyMessageConsumer);
+            result = ExpressionParser.parse(tokenizer, symbolLookup, assemblyMessageConsumer);
         } catch (InvalidTokenException e) {
             throw new IllegalArgumentException("Not a valid expression: " + expression.toString());
         }
@@ -52,8 +60,8 @@ public final class Expressions {
     }
 
     /**
-     * Serializes a string such that it can be parsed by {@link Expressions#parse(CharSequence, Consumer)}. The string is surrounded
-     * with quotes and characters are escaped where necessary.
+     * Serializes a string such that it can be parsed by {@link Expressions#parse(CharSequence, SymbolLookup, Consumer)}. The string
+     * is surrounded with quotes and characters are escaped where necessary.
      *
      * @param string
      *            the string to serialize

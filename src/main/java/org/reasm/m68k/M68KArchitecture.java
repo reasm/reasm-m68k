@@ -111,9 +111,8 @@ public final class M68KArchitecture extends Architecture {
             }
         };
 
-        final EvaluationContext evaluationContext = new EvaluationContext(assembly, assembly.getProgramCounter(), symbolLookup,
-                assemblyMessageConsumer);
-        return Expressions.parse(expression, assemblyMessageConsumer).evaluate(evaluationContext);
+        final EvaluationContext evaluationContext = new EvaluationContext(assembly, assembly.getProgramCounter(), assemblyMessageConsumer);
+        return Expressions.parse(expression, symbolLookup, assemblyMessageConsumer).evaluate(evaluationContext);
     }
 
     /**

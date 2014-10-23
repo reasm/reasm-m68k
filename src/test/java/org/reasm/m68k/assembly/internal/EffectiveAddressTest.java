@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -32,6 +31,7 @@ import org.reasm.m68k.InstructionSet;
 import org.reasm.m68k.expressions.internal.Tokenizer;
 import org.reasm.m68k.messages.*;
 import org.reasm.testhelpers.AssemblyMessageCollector;
+import org.reasm.testhelpers.DummySymbolLookup;
 import org.reasm.testhelpers.EquivalentAssemblyMessage;
 import org.reasm.testhelpers.SingleSymbolLookup;
 
@@ -98,9 +98,9 @@ public class EffectiveAddressTest {
                 final ArrayList<AssemblyMessage> messages = new ArrayList<>();
                 tokenizer.setCharSequence(this.data.text);
                 this.data.context.instructionSet = this.data.instructionSet;
-                EffectiveAddress.getEffectiveAddress(tokenizer, this.data.validAddressingModes,
-                        this.data.expectBitFieldSpecification, this.data.instructionSize, 2, new EvaluationContext(null, 0,
-                                this.data.symbolLookup, null), this.data.context, new AssemblyMessageCollector(messages), ea);
+                EffectiveAddress.getEffectiveAddress(tokenizer, this.data.symbolLookup, this.data.validAddressingModes,
+                        this.data.expectBitFieldSpecification, this.data.instructionSize, 2, new EvaluationContext(null, 0, null),
+                        this.data.context, new AssemblyMessageCollector(messages), ea);
                 this.checkMessages(messages);
                 this.checkOutput(ea);
             } catch (AssertionError e) {
@@ -567,7 +567,7 @@ public class EffectiveAddressTest {
         private static void addDataItem(String text, InstructionSize instructionSize, InstructionSet instructionSet,
                 M68KTestAssemblyContext context, short[] words) {
             TEST_DATA.add(new Object[] { new DataItem(text, AddressingModeCategory.ALL, false, instructionSize, instructionSet,
-                    FAIL_SYMBOL_LOOKUP, context, words) });
+                    DummySymbolLookup.DEFAULT, context, words) });
         }
 
         private static void addDataItem(String text, M68KTestAssemblyContext context, short[] words) {
@@ -771,7 +771,7 @@ public class EffectiveAddressTest {
         private static void addDataItem(String text, InstructionSize instructionSize, InstructionSet instructionSet,
                 M68KTestAssemblyContext context, short[] words) {
             TEST_DATA.add(new Object[] { new DataItem(text, AddressingModeCategory.ALL, false, instructionSize, instructionSet,
-                    FAIL_SYMBOL_LOOKUP, context, words) });
+                    DummySymbolLookup.DEFAULT, context, words) });
         }
 
         private static void addDataItem(String text, M68KTestAssemblyContext context, short[] words) {
@@ -1276,7 +1276,7 @@ public class EffectiveAddressTest {
         private static void addDataItem(String text, Set<AddressingMode> validAddressingModes, boolean expectBitFieldSpecification,
                 InstructionSize instructionSize, InstructionSet instructionSet, M68KTestAssemblyContext context, short[] words) {
             TEST_DATA.add(new Object[] { new DataItem(text, validAddressingModes, expectBitFieldSpecification, instructionSize,
-                    instructionSet, FAIL_SYMBOL_LOOKUP, context, words) });
+                    instructionSet, DummySymbolLookup.DEFAULT, context, words) });
         }
 
         private static void addDataItem(String text, Set<AddressingMode> validAddressingModes, M68KTestAssemblyContext context,
@@ -1485,19 +1485,6 @@ public class EffectiveAddressTest {
 
     }
 
-    private static final class FailSymbolLookup implements SymbolLookup {
-
-        FailSymbolLookup() {
-        }
-
-        @Override
-        public Symbol getSymbol(String name) {
-            fail("Symbol lookup shouldn't be invoked in this test");
-            return null; // unreachable
-        }
-
-    }
-
     static final UnsignedIntValue ONE_VALUE = new UnsignedIntValue(1);
     static final ValueExpression ONE_EXPRESSION = new ValueExpression(ONE_VALUE);
 
@@ -1509,7 +1496,5 @@ public class EffectiveAddressTest {
             return ONE_EXPRESSION;
         }
     }));
-
-    static final FailSymbolLookup FAIL_SYMBOL_LOOKUP = new FailSymbolLookup();
 
 }

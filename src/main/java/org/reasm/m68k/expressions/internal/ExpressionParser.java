@@ -56,16 +56,20 @@ public final class ExpressionParser {
      *
      * @param tokenizer
      *            the tokenizer to read tokens from
+     * @param symbolLookup
+     *            an object that looks up symbols by name, which will be used to look up the symbol for identifiers when the
+     *            identifier is {@linkplain IdentifierExpression#evaluate(EvaluationContext) evaluated}, or <code>null</code> to
+     *            consider all identifiers undefined
      * @param assemblyMessageConsumer
      *            a {@link Consumer} that will receive {@link AssemblyMessage}s generated while parsing the expression
      * @return the parsed {@link Expression}, or <code>null</code> if an expression could not be parsed
      * @throws InvalidTokenException
-     *             an {@link TokenType#INVALID invalid} token was emitted by the tokenizer
+     *             an {@linkplain TokenType#INVALID invalid} token was emitted by the tokenizer
      */
     @CheckForNull
-    public static Expression parse(@Nonnull Tokenizer tokenizer, @CheckForNull Consumer<AssemblyMessage> assemblyMessageConsumer)
-            throws InvalidTokenException {
-        Expression expression = parseLevel3(tokenizer, assemblyMessageConsumer);
+    public static Expression parse(@Nonnull Tokenizer tokenizer, @CheckForNull SymbolLookup symbolLookup,
+            @CheckForNull Consumer<AssemblyMessage> assemblyMessageConsumer) throws InvalidTokenException {
+        Expression expression = parseLevel3(tokenizer, symbolLookup, assemblyMessageConsumer);
         if (expression != null) {
             Tokenizer tokenizer1;
             for (;; tokenizer.copyFrom(tokenizer1)) {
@@ -74,7 +78,7 @@ public final class ExpressionParser {
                 }
 
                 tokenizer1 = tokenizer.duplicateAndAdvance();
-                Expression truePart = parse(tokenizer1, assemblyMessageConsumer);
+                Expression truePart = parse(tokenizer1, symbolLookup, assemblyMessageConsumer);
                 if (truePart == null) {
                     break;
                 }
@@ -84,7 +88,7 @@ public final class ExpressionParser {
                 }
 
                 tokenizer1.advance();
-                Expression falsePart = parse(tokenizer1, assemblyMessageConsumer);
+                Expression falsePart = parse(tokenizer1, symbolLookup, assemblyMessageConsumer);
                 if (falsePart == null) {
                     break;
                 }
@@ -227,7 +231,7 @@ public final class ExpressionParser {
     }
 
     @CheckForNull
-    private static Expression parseLevel0(@Nonnull Tokenizer tokenizer,
+    private static Expression parseLevel0(@Nonnull Tokenizer tokenizer, @CheckForNull SymbolLookup symbolLookup,
             @CheckForNull Consumer<AssemblyMessage> assemblyMessageConsumer) throws InvalidTokenException {
         if (tokenizer.tokenEqualsString("%")) {
             tokenizer.changeToBinaryInteger();
@@ -328,7 +332,7 @@ public final class ExpressionParser {
 
         case IDENTIFIER:
             final String identifier = tokenText.toString();
-            expression = new IdentifierExpression(identifier);
+            expression = new IdentifierExpression(identifier, symbolLookup);
             break;
 
         case OPERATOR:
@@ -340,7 +344,7 @@ public final class ExpressionParser {
 
         case OPENING_PARENTHESIS:
             Tokenizer tokenizer1 = tokenizer.duplicateAndAdvance();
-            Expression childExpression = parse(tokenizer1, assemblyMessageConsumer);
+            Expression childExpression = parse(tokenizer1, symbolLookup, assemblyMessageConsumer);
             if (childExpression == null) {
                 return null;
             }
@@ -365,7 +369,7 @@ public final class ExpressionParser {
     }
 
     @CheckForNull
-    private static Expression parseLevel1(@Nonnull Tokenizer tokenizer,
+    private static Expression parseLevel1(@Nonnull Tokenizer tokenizer, @CheckForNull SymbolLookup symbolLookup,
             @CheckForNull Consumer<AssemblyMessage> assemblyMessageConsumer) throws InvalidTokenException {
         if (tokenizer.getTokenType() == TokenType.PLUS_OR_MINUS_SEQUENCE) {
             tokenizer.breakSequence();
@@ -394,7 +398,7 @@ public final class ExpressionParser {
 
             if (operator != null) {
                 Tokenizer tokenizer1 = tokenizer.duplicateAndAdvance();
-                Expression expression1 = parseLevel1(tokenizer1, assemblyMessageConsumer);
+                Expression expression1 = parseLevel1(tokenizer1, symbolLookup, assemblyMessageConsumer);
                 if (expression1 != null) {
                     tokenizer.copyFrom(tokenizer1);
                     return new UnaryOperatorExpression(operator, expression1);
@@ -404,7 +408,7 @@ public final class ExpressionParser {
             }
         }
 
-        Expression expression = parseLevel0(tokenizer, assemblyMessageConsumer);
+        Expression expression = parseLevel0(tokenizer, symbolLookup, assemblyMessageConsumer);
         if (expression != null) {
             Tokenizer tokenizer1;
             outer: for (;; tokenizer.copyFrom(tokenizer1)) {
@@ -422,7 +426,7 @@ public final class ExpressionParser {
 
                     final ArrayList<Expression> arguments = new ArrayList<>();
                     for (; tokenizer1.getTokenType() != TokenType.END; tokenizer1.advance()) {
-                        final Expression argument = parse(tokenizer1, assemblyMessageConsumer);
+                        final Expression argument = parse(tokenizer1, symbolLookup, assemblyMessageConsumer);
 
                         // If we couldn't parse a valid argument, give up parsing the argument list.
                         if (argument == null) {
@@ -450,7 +454,7 @@ public final class ExpressionParser {
                     tokenizer1 = tokenizer.duplicateAndAdvance();
 
                     // Parse the index expression between the brackets.
-                    final Expression indexExpression = parse(tokenizer1, assemblyMessageConsumer);
+                    final Expression indexExpression = parse(tokenizer1, symbolLookup, assemblyMessageConsumer);
                     if (indexExpression == null) {
                         break outer;
                     }
@@ -460,18 +464,18 @@ public final class ExpressionParser {
                     }
 
                     tokenizer1.advance();
-                    expression = new IndexerExpression(expression, indexExpression);
+                    expression = new IndexerExpression(expression, indexExpression, symbolLookup);
                     break;
 
                 case PERIOD:
                     tokenizer1 = tokenizer.duplicateAndAdvance();
 
-                    final Expression rightOperand = parseLevel0(tokenizer1, assemblyMessageConsumer);
+                    final Expression rightOperand = parseLevel0(tokenizer1, symbolLookup, assemblyMessageConsumer);
                     if (rightOperand == null) {
                         break outer;
                     }
 
-                    expression = new PeriodExpression(expression, rightOperand);
+                    expression = new PeriodExpression(expression, rightOperand, symbolLookup);
                     break;
 
                 default:
@@ -484,9 +488,10 @@ public final class ExpressionParser {
     }
 
     @CheckForNull
-    private static Expression parseLevel2(@Nonnull Tokenizer tokenizer, @CheckForNull M68KBinaryOperator referenceOperator,
-            @CheckForNull Consumer<AssemblyMessage> assemblyMessageConsumer) throws InvalidTokenException {
-        Expression expression = parseLevel1(tokenizer, assemblyMessageConsumer);
+    private static Expression parseLevel2(@Nonnull Tokenizer tokenizer, @CheckForNull SymbolLookup symbolLookup,
+            @CheckForNull M68KBinaryOperator referenceOperator, @CheckForNull Consumer<AssemblyMessage> assemblyMessageConsumer)
+            throws InvalidTokenException {
+        Expression expression = parseLevel1(tokenizer, symbolLookup, assemblyMessageConsumer);
         if (expression != null) {
             Tokenizer tokenizer1;
             for (;; tokenizer.copyFrom(tokenizer1)) {
@@ -506,7 +511,7 @@ public final class ExpressionParser {
                     break;
                 }
 
-                final Expression rightOperand = parseLevel2(tokenizer1, operator, assemblyMessageConsumer);
+                final Expression rightOperand = parseLevel2(tokenizer1, symbolLookup, operator, assemblyMessageConsumer);
                 if (rightOperand == null) {
                     break;
                 }
@@ -519,7 +524,7 @@ public final class ExpressionParser {
     }
 
     @CheckForNull
-    private static Expression parseLevel3(@Nonnull Tokenizer tokenizer,
+    private static Expression parseLevel3(@Nonnull Tokenizer tokenizer, @CheckForNull SymbolLookup symbolLookup,
             @CheckForNull Consumer<AssemblyMessage> assemblyMessageConsumer) throws InvalidTokenException {
         // Anonymous symbols are only accepted when they stand alone in the expression, or if they appear alone within parentheses,
         // within brackets, in either part of a conditional expression or in an argument.
@@ -536,14 +541,14 @@ public final class ExpressionParser {
             case CONDITIONAL_OPERATOR_SECOND:
             case COMMA:
                 tokenizer.copyFrom(tokenizer1);
-                return new IdentifierExpression(tokenText.toString());
+                return new IdentifierExpression(tokenText.toString(), symbolLookup);
 
             default:
                 break;
             }
         }
 
-        return parseLevel2(tokenizer, null, assemblyMessageConsumer);
+        return parseLevel2(tokenizer, symbolLookup, null, assemblyMessageConsumer);
     }
 
     private static long parseUnsignedLongWithOverflow(@Nonnull CharSequence value, int radix,

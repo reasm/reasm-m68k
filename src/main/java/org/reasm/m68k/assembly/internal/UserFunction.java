@@ -7,20 +7,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
 import org.reasm.Function;
-import org.reasm.Symbol;
-import org.reasm.SymbolContext;
-import org.reasm.SymbolLookupContext;
 import org.reasm.expressions.*;
-import org.reasm.m68k.M68KArchitecture;
 import org.reasm.messages.WrongNumberOfArgumentsErrorMessage;
 
 @Immutable
-final class UserFunction implements Function, SymbolLookup {
+final class UserFunction implements Function {
 
     @Nonnull
     private final M68KAssemblyContext context;
-    @Nonnull
-    private final SymbolLookupContext lookupContext;
     @Nonnull
     private final Expression functionExpression;
     @Nonnull
@@ -28,7 +22,6 @@ final class UserFunction implements Function, SymbolLookup {
 
     UserFunction(@Nonnull M68KAssemblyContext context, @Nonnull Expression functionExpression, @Nonnull String[] parameterNames) {
         this.context = context;
-        this.lookupContext = context.builder.getAssembly().getCurrentSymbolLookupContext();
         this.functionExpression = functionExpression;
         this.parameterNames = parameterNames;
     }
@@ -39,13 +32,7 @@ final class UserFunction implements Function, SymbolLookup {
             evaluationContext.getAssemblyMessageConsumer().accept(new WrongNumberOfArgumentsErrorMessage());
         }
 
-        // Wrap the expression in an ExpressionWithOverriddenSymbolLookup
-        // so that identifiers that appear in the function expression
-        // (or identifiers that are produced using the period or indexer operators)
-        // are resolved in the context where the function is defined,
-        // rather than in the context where the function is called.
-        return new ExpressionWithOverriddenSymbolLookup(this.replaceArguments(this.functionExpression, arguments,
-                evaluationContext.getSymbolLookup()), this);
+        return this.replaceArguments(this.functionExpression, arguments);
     }
 
     @Override
@@ -75,12 +62,6 @@ final class UserFunction implements Function, SymbolLookup {
     }
 
     @Override
-    public final Symbol getSymbol(String name) {
-        return this.context.builder.resolveSymbolReference(SymbolContext.VALUE, name, M68KArchitecture.isLocalName(name), false,
-                this.lookupContext, this.context).getSymbol();
-    }
-
-    @Override
     public final int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -90,20 +71,17 @@ final class UserFunction implements Function, SymbolLookup {
     }
 
     @Nonnull
-    private final Expression replaceArguments(@Nonnull Expression expression, @Nonnull Expression[] arguments,
-            @CheckForNull SymbolLookup originalSymbolLookup) {
+    private final Expression replaceArguments(@Nonnull Expression expression, @Nonnull Expression[] arguments) {
         final Class<? extends Expression> expressionClass = expression.getClass();
         if (expressionClass == IdentifierExpression.class) {
-            final String identifier = ((IdentifierExpression) expression).getIdentifier();
+            final IdentifierExpression identifierExpression = (IdentifierExpression) expression;
+            final String identifier = identifierExpression.getIdentifier();
             for (int i = 0; i < this.parameterNames.length; i++) {
                 final String parameterName = this.parameterNames[i];
 
                 if (parameterName.equalsIgnoreCase(identifier)) {
                     if (i < arguments.length) {
-                        // Wrap the argument in an ExpressionWithOverriddenSymbolLookup,
-                        // so that identifiers in the arguments are looked up in the context of the function call,
-                        // rather than in the context of the function definition.
-                        return new ExpressionWithOverriddenSymbolLookup(arguments[i], originalSymbolLookup);
+                        return arguments[i];
                     }
 
                     return ValueExpression.UNDETERMINED;
@@ -116,28 +94,26 @@ final class UserFunction implements Function, SymbolLookup {
                         && parameterName.equalsIgnoreCase(identifier.substring(0, parameterName.length()))) {
                     final Expression leftExpression;
                     if (i < arguments.length) {
-                        // Wrap the argument in an ExpressionWithOverriddenSymbolLookup,
-                        // so that identifiers in the arguments are looked up in the context of the function call,
-                        // rather than in the context of the function definition.
-                        leftExpression = new ExpressionWithOverriddenSymbolLookup(arguments[i], originalSymbolLookup);
+                        leftExpression = arguments[i];
                     } else {
                         leftExpression = ValueExpression.UNDETERMINED;
                     }
 
-                    final Expression rightExpression = new IdentifierExpression(identifier.substring(parameterName.length() + 1));
-                    return new PeriodExpression(leftExpression, rightExpression);
+                    final Expression rightExpression = new IdentifierExpression(identifier.substring(parameterName.length() + 1),
+                            identifierExpression.getSymbolLookup());
+                    return new PeriodExpression(leftExpression, rightExpression, identifierExpression.getSymbolLookup());
                 }
             }
         } else if (expressionClass == GroupingExpression.class) {
             final Expression childExpression = ((GroupingExpression) expression).getChildExpression();
-            final Expression replacedExpression = this.replaceArguments(childExpression, arguments, originalSymbolLookup);
+            final Expression replacedExpression = this.replaceArguments(childExpression, arguments);
             if (replacedExpression != childExpression) {
                 return new GroupingExpression(replacedExpression);
             }
         } else if (expressionClass == UnaryOperatorExpression.class) {
             final UnaryOperatorExpression unaryOperatorExpression = (UnaryOperatorExpression) expression;
             final Expression operand = unaryOperatorExpression.getOperand();
-            final Expression replacedOperand = this.replaceArguments(operand, arguments, originalSymbolLookup);
+            final Expression replacedOperand = this.replaceArguments(operand, arguments);
             if (replacedOperand != operand) {
                 return new UnaryOperatorExpression(unaryOperatorExpression.getOperator(), replacedOperand);
             }
@@ -145,26 +121,28 @@ final class UserFunction implements Function, SymbolLookup {
             final PeriodExpression periodExpression = (PeriodExpression) expression;
             final Expression leftExpression = periodExpression.getLeftExpression();
             final Expression rightExpression = periodExpression.getRightExpression();
-            final Expression replacedLeftExpression = this.replaceArguments(leftExpression, arguments, originalSymbolLookup);
-            final Expression replacedRightExpression = this.replaceArguments(rightExpression, arguments, originalSymbolLookup);
+            final Expression replacedLeftExpression = this.replaceArguments(leftExpression, arguments);
+            final Expression replacedRightExpression = this.replaceArguments(rightExpression, arguments);
             if (replacedLeftExpression != leftExpression || replacedRightExpression != rightExpression) {
-                return new PeriodExpression(replacedLeftExpression, replacedRightExpression);
+                return new PeriodExpression(replacedLeftExpression, replacedRightExpression,
+                        periodExpression.getFallbackSymbolLookup());
             }
         } else if (expressionClass == IndexerExpression.class) {
             final IndexerExpression indexerExpression = (IndexerExpression) expression;
             final Expression subjectExpression = indexerExpression.getSubjectExpression();
             final Expression indexExpression = indexerExpression.getIndexExpression();
-            final Expression replacedSubjectExpression = this.replaceArguments(subjectExpression, arguments, originalSymbolLookup);
-            final Expression replacedIndexExpression = this.replaceArguments(indexExpression, arguments, originalSymbolLookup);
+            final Expression replacedSubjectExpression = this.replaceArguments(subjectExpression, arguments);
+            final Expression replacedIndexExpression = this.replaceArguments(indexExpression, arguments);
             if (replacedSubjectExpression != subjectExpression || replacedIndexExpression != indexExpression) {
-                return new IndexerExpression(replacedSubjectExpression, replacedIndexExpression);
+                return new IndexerExpression(replacedSubjectExpression, replacedIndexExpression,
+                        indexerExpression.getFallbackSymbolLookup());
             }
         } else if (expressionClass == BinaryOperatorExpression.class) {
             final BinaryOperatorExpression binaryOperatorExpression = (BinaryOperatorExpression) expression;
             final Expression operand1 = binaryOperatorExpression.getOperand1();
             final Expression operand2 = binaryOperatorExpression.getOperand2();
-            final Expression replacedOperand1 = this.replaceArguments(operand1, arguments, originalSymbolLookup);
-            final Expression replacedOperand2 = this.replaceArguments(operand2, arguments, originalSymbolLookup);
+            final Expression replacedOperand1 = this.replaceArguments(operand1, arguments);
+            final Expression replacedOperand2 = this.replaceArguments(operand2, arguments);
             if (replacedOperand1 != operand1 || replacedOperand2 != operand2) {
                 return new BinaryOperatorExpression(binaryOperatorExpression.getOperator(), replacedOperand1, replacedOperand2);
             }
@@ -173,22 +151,22 @@ final class UserFunction implements Function, SymbolLookup {
             final Expression condition = conditionalExpression.getCondition();
             final Expression truePart = conditionalExpression.getTruePart();
             final Expression falsePart = conditionalExpression.getFalsePart();
-            final Expression replacedCondition = this.replaceArguments(condition, arguments, originalSymbolLookup);
-            final Expression replacedTruePart = this.replaceArguments(truePart, arguments, originalSymbolLookup);
-            final Expression replacedFalsePart = this.replaceArguments(falsePart, arguments, originalSymbolLookup);
+            final Expression replacedCondition = this.replaceArguments(condition, arguments);
+            final Expression replacedTruePart = this.replaceArguments(truePart, arguments);
+            final Expression replacedFalsePart = this.replaceArguments(falsePart, arguments);
             if (replacedCondition != condition || replacedTruePart != truePart || replacedFalsePart != falsePart) {
                 return new ConditionalExpression(replacedCondition, replacedTruePart, replacedFalsePart);
             }
         } else if (expressionClass == FunctionCallExpression.class) {
             final FunctionCallExpression functionCallExpression = (FunctionCallExpression) expression;
             final Expression function = functionCallExpression.getFunction();
-            final Expression replacedFunction = this.replaceArguments(function, arguments, originalSymbolLookup);
+            final Expression replacedFunction = this.replaceArguments(function, arguments);
             boolean replacedSomething = function != replacedFunction;
 
             final Expression[] arguments2 = functionCallExpression.getArguments();
             final Expression[] replacedArguments = new Expression[arguments2.length];
             for (int i = 0; i < replacedArguments.length; i++) {
-                replacedArguments[i] = this.replaceArguments(arguments2[i], arguments, originalSymbolLookup);
+                replacedArguments[i] = this.replaceArguments(arguments2[i], arguments);
                 if (replacedArguments[i] != arguments2[i]) {
                     replacedSomething = true;
                 }

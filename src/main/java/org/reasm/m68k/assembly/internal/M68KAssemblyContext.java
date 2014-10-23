@@ -29,7 +29,7 @@ import com.google.common.collect.ImmutableList;
  * @author Francis Gagné
  */
 final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Consumer<AssemblyMessage>, CustomAssemblyData,
-        SymbolLookup, SymbolResolutionFallback {
+        SymbolResolutionFallback {
 
     static final Object KEY = new Object();
 
@@ -131,11 +131,6 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
     }
 
     @Override
-    public Symbol getSymbol(String name) {
-        return this.getSymbolByContextAndName(SymbolContext.VALUE, name, this);
-    }
-
-    @Override
     public Symbol resolve(SymbolReference symbolReference) {
         // TODO: built-in symbols (functions, etc.)
         return null;
@@ -206,6 +201,10 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         }
     }
 
+    SymbolLookup createSymbolLookup() {
+        return new M68KSymbolLookup(this, this.builder.getAssembly().getCurrentSymbolLookupContext());
+    }
+
     /**
      * Defines all the labels on the logical line of the current assembly step except the last one with the current program counter
      * as their value.
@@ -263,13 +262,13 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
     void getEffectiveAddress(String operand, Set<AddressingMode> validAddressingModes, InstructionSize size,
             int offsetToExtensionWords, EffectiveAddress ea) {
         this.tokenizer.setCharSequence(operand);
-        EffectiveAddress.getEffectiveAddress(this.tokenizer, validAddressingModes, false, size, offsetToExtensionWords,
-                this.getEvaluationContext(), this, this, ea);
+        EffectiveAddress.getEffectiveAddress(this.tokenizer, this.createSymbolLookup(), validAddressingModes, false, size,
+                offsetToExtensionWords, this.getEvaluationContext(), this, this, ea);
     }
 
     EvaluationContext getEvaluationContext() {
         if (this.evaluationContext == null) {
-            this.evaluationContext = new EvaluationContext(this.builder.getAssembly(), this.programCounter, this, this);
+            this.evaluationContext = new EvaluationContext(this.builder.getAssembly(), this.programCounter, this);
         }
 
         return this.evaluationContext;

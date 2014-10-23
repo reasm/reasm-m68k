@@ -111,7 +111,7 @@ abstract class Mnemonic {
 
         tokenizer.setCharSequence(operandText);
         try {
-            final Expression expression = ExpressionParser.parse(tokenizer, context);
+            final Expression expression = ExpressionParser.parse(tokenizer, context.createSymbolLookup(), context);
             if (tokenizer.getTokenType() == TokenType.END) {
                 return expression;
             }
