@@ -147,7 +147,7 @@ final class DcIntegerValueVisitor implements DcValueVisitor {
         switch (this.size) {
         case BYTE:
             if (this.signed) {
-                if (this.output < -0x80 || this.output > 0x7F) {
+                if (this.output < -0x80 || this.output > 0xFF) {
                     this.context.addTentativeMessage(new ValueOutOfRangeErrorMessage(this.output));
                 }
             } else {
@@ -162,7 +162,7 @@ final class DcIntegerValueVisitor implements DcValueVisitor {
         case DEFAULT:
         default:
             if (this.signed) {
-                if (this.output < -0x8000 || this.output > 0x7FFF) {
+                if (this.output < -0x8000 || this.output > 0xFFFF) {
                     this.context.addTentativeMessage(new ValueOutOfRangeErrorMessage(this.output));
                 }
             } else {
@@ -175,7 +175,7 @@ final class DcIntegerValueVisitor implements DcValueVisitor {
 
         case LONG:
             if (this.signed) {
-                if (this.output < -0x80000000 || this.output > 0x7FFFFFFF) {
+                if (this.output < -0x80000000L || this.output > 0xFFFFFFFFL) {
                     this.context.addTentativeMessage(new ValueOutOfRangeErrorMessage(this.output));
                 }
             } else {

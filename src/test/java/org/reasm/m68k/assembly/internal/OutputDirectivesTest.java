@@ -46,8 +46,8 @@ public class OutputDirectivesTest extends BaseProgramsTest {
         addDataItem(" DC.B $FFFFFFFFFFFFFFFF", new byte[] { -1 }, new ValueOutOfRangeErrorMessage(-1));
         addDataItem(" DC.B -$81", new byte[] { 0x7F }, new ValueOutOfRangeErrorMessage(-0x81));
         addDataItem(" DC.B -$80", new byte[] { -0x80 });
-        addDataItem(" DC.B +$7F", new byte[] { 0x7F });
-        addDataItem(" DC.B +$80", new byte[] { -0x80 }, new ValueOutOfRangeErrorMessage(0x80));
+        addDataItem(" DC.B +$FF", new byte[] { -1 });
+        addDataItem(" DC.B +$100", new byte[] { 0 }, new ValueOutOfRangeErrorMessage(0x100));
         addDataItem(" DC.B 'this string can be arbitrarily long'", new byte[] { 0x74, 0x68, 0x69, 0x73, 0x20, 0x73, 0x74, 0x72,
                 0x69, 0x6E, 0x67, 0x20, 0x63, 0x61, 0x6E, 0x20, 0x62, 0x65, 0x20, 0x61, 0x72, 0x62, 0x69, 0x74, 0x72, 0x61, 0x72,
                 0x69, 0x6C, 0x79, 0x20, 0x6C, 0x6F, 0x6E, 0x67 });
@@ -61,8 +61,8 @@ public class OutputDirectivesTest extends BaseProgramsTest {
         addDataItem(" DC.W $FFFFFFFFFFFFFFFF", new byte[] { -1, -1 }, new ValueOutOfRangeErrorMessage(-1));
         addDataItem(" DC.W -$8001", new byte[] { 0x7F, -1 }, new ValueOutOfRangeErrorMessage(-0x8001));
         addDataItem(" DC.W -$8000", new byte[] { -0x80, 0 });
-        addDataItem(" DC.W +$7FFF", new byte[] { 0x7F, -1 });
-        addDataItem(" DC.W +$8000", new byte[] { -0x80, 0 }, new ValueOutOfRangeErrorMessage(0x8000));
+        addDataItem(" DC.W +$FFFF", new byte[] { -1, -1 });
+        addDataItem(" DC.W +$10000", new byte[] { 0, 0 }, new ValueOutOfRangeErrorMessage(0x10000));
         addDataItem(" DC.W 'AB'", new byte[] { 0x41, 0x42 });
         addDataItem(" DC.W 0, 1, 2, 3", new byte[] { 0, 0, 0, 1, 0, 2, 0, 3 });
         addDataItem(" DC.L 0", new byte[] { 0, 0, 0, 0 });
@@ -75,8 +75,8 @@ public class OutputDirectivesTest extends BaseProgramsTest {
         addDataItem(" DC.L $FFFFFFFFFFFFFFFF", new byte[] { -1, -1, -1, -1 }, new ValueOutOfRangeErrorMessage(-1));
         addDataItem(" DC.L -$80000001", new byte[] { 0x7F, -1, -1, -1 }, new ValueOutOfRangeErrorMessage(-0x80000001L));
         addDataItem(" DC.L -$80000000", new byte[] { -0x80, 0, 0, 0 });
-        addDataItem(" DC.L +$7FFFFFFF", new byte[] { 0x7F, -1, -1, -1 });
-        addDataItem(" DC.L +$80000000", new byte[] { -0x80, 0, 0, 0 }, new ValueOutOfRangeErrorMessage(0x80000000L));
+        addDataItem(" DC.L +$FFFFFFFF", new byte[] { -1, -1, -1, -1 });
+        addDataItem(" DC.L +$100000000", new byte[] { 0, 0, 0, 0 }, new ValueOutOfRangeErrorMessage(0x100000000L));
         addDataItem(" DC.L 'ABCD'", new byte[] { 0x41, 0x42, 0x43, 0x44 });
         addDataItem(" DC.L 0, 1, 2, 3", new byte[] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3 });
         addDataItem(" DC.Q 0", new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
