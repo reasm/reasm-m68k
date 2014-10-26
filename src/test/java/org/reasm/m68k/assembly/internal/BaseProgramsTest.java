@@ -21,6 +21,7 @@ import org.reasm.AssemblyCompletionStatus;
 import org.reasm.AssemblyMessage;
 import org.reasm.Configuration;
 import org.reasm.Environment;
+import org.reasm.FileFetcher;
 import org.reasm.UserSymbol;
 import org.reasm.m68k.ConfigurationOptions;
 import org.reasm.m68k.ConfigurationOptionsTest;
@@ -106,8 +107,8 @@ public abstract class BaseProgramsTest {
         try {
             final Environment environment = this.getEnvironment();
             final SourceFile mainSourceFile = new SourceFile(this.code, null);
-            final Configuration configuration = new Configuration(environment, mainSourceFile, this.architecture)
-                    .setCustomConfigurationOptions(this.getCustomConfigurationOptions());
+            final Configuration configuration = new Configuration(environment, mainSourceFile, this.architecture).setFileFetcher(
+                    this.getFileFetcher()).setCustomConfigurationOptions(this.getCustomConfigurationOptions());
             final Assembly assembly = new Assembly(configuration);
 
             int steps = this.steps;
@@ -176,6 +177,16 @@ public abstract class BaseProgramsTest {
     @Nonnull
     protected Environment getEnvironment() {
         return Environment.DEFAULT;
+    }
+
+    /**
+     * Gets the {@link FileFetcher} to pass to {@link Configuration#setFileFetcher(FileFetcher)}.
+     *
+     * @return the {@link FileFetcher}
+     */
+    @CheckForNull
+    protected FileFetcher getFileFetcher() {
+        return null;
     }
 
     /**
