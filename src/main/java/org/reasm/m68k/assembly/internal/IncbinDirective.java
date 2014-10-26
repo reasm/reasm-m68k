@@ -60,21 +60,26 @@ class IncbinDirective extends Mnemonic {
                 final CardinalValueVisitor startVisitor = context.cardinalValueVisitor;
                 startVisitor.reset(start, START_NEGATIVE_VALUE_ERROR_FACTORY);
                 Value.accept(startOperand, startVisitor);
-                final long startLong = startVisitor.getValue();
-                if (startLong < 0 || startLong > Integer.MAX_VALUE) {
-                    new ValueOutOfRangeErrorMessage(startLong);
+
+                long startLong = startVisitor.getValue();
+                if (startLong > data.length) {
+                    context.addTentativeMessage(new ValueOutOfRangeErrorMessage(startLong));
+                    startLong = data.length;
                 }
 
                 start = (int) startLong;
+                length = data.length - start;
 
                 if (context.numberOfOperands >= 3) {
                     final Value lengthOperand = evaluateExpressionOperand(context, 2);
                     final CardinalValueVisitor lengthVisitor = context.cardinalValueVisitor;
-                    lengthVisitor.reset(start, LENGTH_NEGATIVE_VALUE_ERROR_FACTORY);
+                    lengthVisitor.reset(length, LENGTH_NEGATIVE_VALUE_ERROR_FACTORY);
                     Value.accept(lengthOperand, lengthVisitor);
-                    final long lengthLong = lengthVisitor.getValue();
-                    if (lengthLong < 0 || lengthLong > Integer.MAX_VALUE) {
-                        new ValueOutOfRangeErrorMessage(lengthLong);
+
+                    long lengthLong = lengthVisitor.getValue();
+                    if (lengthLong > data.length - start) {
+                        context.addTentativeMessage(new ValueOutOfRangeErrorMessage(lengthLong));
+                        lengthLong = data.length - start;
                     }
 
                     length = (int) lengthLong;
