@@ -732,6 +732,7 @@ public class InstructionsTest extends BaseInstructionsTest {
         addDataItem(" DIVU.L D2,D1:D0", new short[] { 0x4C42, 0x0401 }, NOT_SUPPORTED_ON_ARCHITECTURE);
         addDataItem(" DIVU.L D2,D1:D0", new short[] { 0x4C42, 0x0401 }, M68KArchitecture.CPU32);
         addDataItem(" DIVU.L D2,D1:D0", new short[] { 0x4C42, 0x0401 }, M68KArchitecture.MC68020);
+        addDataItem(" DIVU.L D2,D1 : D0", new short[] { 0x4C42, 0x0401 }, M68KArchitecture.MC68020);
         addDataItem(" DIVU.L D2,D0:D0", new short[] { 0x4C42, 0x0400 }, M68KArchitecture.CPU32,
                 new DivisionRemainderDiscardedWarningMessage());
         addDataItem(" DIVU.L D2,D0:D1", new short[] { 0x4C42, 0x1400 }, M68KArchitecture.CPU32);
@@ -1028,14 +1029,18 @@ public class InstructionsTest extends BaseInstructionsTest {
         addDataItem(" MOVEM A7,(A0)", new short[] { 0x4890, (short) 0x8000 });
         addDataItem(" MOVEM SP,(A0)", new short[] { 0x4890, (short) 0x8000 });
         addDataItem(" MOVEM D0-D3,(A0)", new short[] { 0x4890, 0x000F });
+        addDataItem(" MOVEM D0 - D3,(A0)", new short[] { 0x4890, 0x000F });
         addDataItem(" MOVEM D3-D0,(A0)", new short[] { 0x4890, 0x000F });
         addDataItem(" MOVEM D0/D3,(A0)", new short[] { 0x4890, 0x0009 });
+        addDataItem(" MOVEM D0 / D3,(A0)", new short[] { 0x4890, 0x0009 });
         addDataItem(" MOVEM D0-D4/D3-D6,(A0)", new short[] { 0x4890, 0x007F }, new DuplicateRegistersInRegisterListWarningMessage());
         addDataItem(" MOVEM D0-D4/A0-A2,(A0)", new short[] { 0x4890, 0x071F });
+        addDataItem(" MOVEM D0 - D4 /\tA0 - A2,(A0)", new short[] { 0x4890, 0x071F });
         addDataItem(" MOVEM D0,-(A0)", new short[] { 0x48A0, (short) 0x8000 });
         addDataItem(" MOVEM D0-D4/A0-A2,-(A0)", new short[] { 0x48A0, (short) 0xF8E0 });
         addDataItem(" MOVEM (A0),D0", new short[] { 0x4C90, 0x0001 });
         addDataItem(" MOVEM (A0),D0-D4/A0-A2", new short[] { 0x4C90, 0x071F });
+        addDataItem(" MOVEM (A0),D0 - D4 / A0 - A2", new short[] { 0x4C90, 0x071F });
         addDataItem(" MOVEM (A0)+,D0", new short[] { 0x4C98, 0x0001 });
         addDataItem(" MOVEM (A0),(A0)", NO_DATA, MOVEM_REQUIRES_A_REGISTER_LIST_IN_ONE_OPERAND);
         addDataItem(" MOVEM D0-,(A0)", NO_DATA, MOVEM_REQUIRES_A_REGISTER_LIST_IN_ONE_OPERAND);
@@ -1128,6 +1133,7 @@ public class InstructionsTest extends BaseInstructionsTest {
         addDataItem(" MULU.L D2,D1-D0", new short[] { 0x4C02, 0x0401 }, NOT_SUPPORTED_ON_ARCHITECTURE);
         addDataItem(" MULU.L D2,D1-D0", new short[] { 0x4C02, 0x0401 }, M68KArchitecture.CPU32);
         addDataItem(" MULU.L D2,D1-D0", new short[] { 0x4C02, 0x0401 }, M68KArchitecture.MC68020);
+        addDataItem(" MULU.L D2,D1 - D0", new short[] { 0x4C02, 0x0401 }, M68KArchitecture.MC68020);
         addDataItem(" MULU.L D2,D0-D0", new short[] { 0x4C02, 0x0400 }, M68KArchitecture.CPU32,
                 new MultiplicationResultsUndefinedWarningMessage());
         addDataItem(" MULU.L D2,D0-D1", new short[] { 0x4C02, 0x1400 }, M68KArchitecture.CPU32);

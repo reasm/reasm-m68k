@@ -191,8 +191,13 @@ public class OutputDirectivesTest extends BaseProgramsTest {
         addDataItem(" HEX 00", new byte[] { 0x00 });
         addDataItem(" HEX 123G45,67", new byte[] { 0x12, 0x67 }, new InvalidCharacterInHexDirectiveErrorMessage('G'));
         addDataItem(" HEX 11", new byte[] { 0x11 });
+        addDataItem(" HEX 1 1", new byte[] { 0x11 });
         addDataItem(" HEX FF", new byte[] { (byte) 0xFF });
+        addDataItem(" HEX F\tF", new byte[] { (byte) 0xFF });
         addDataItem(" HEX 1122", new byte[] { 0x11, 0x22 });
+        addDataItem(" HEX 11 22", new byte[] { 0x11, 0x22 });
+        addDataItem(" HEX 11  22", new byte[] { 0x11, 0x22 });
+        addDataItem(" HEX 11 \t 22", new byte[] { 0x11, 0x22 });
         addDataItem(" HEX 11,22", new byte[] { 0x11, 0x22 });
         addDataItem(" HEX 01234567,89ABCDEF,fedcba", new byte[] { 0x01, 0x23, 0x45, 0x67, (byte) 0x89, (byte) 0xAB, (byte) 0xCD,
                 (byte) 0xEF, (byte) 0xFE, (byte) 0xDC, (byte) 0xBA });
