@@ -228,6 +228,16 @@ public class ProgramsTest extends BaseProgramsTest {
         addDataItem("Z EQU 5\nN1 NAMESPACE\nZ EQU 7\nF FUNCTION A,Z*A\n ENDNS\n DC.B N1.F(3)", 9, new byte[] { 21 });
         addDataItem("Z EQU 5\nF FUNCTION A,Z*A\nN1 NAMESPACE\nZ EQU 7\n DC.B F(Z)\n ENDNS", 9, new byte[] { 35 });
         addDataItem("Z.Y EQU 5\nF FUNCTION A,Z.Y*A.Y\nN1 NAMESPACE\nZ.Y EQU 7\n DC.B F(Z)\n ENDNS", 9, new byte[] { 35 });
+
+        // continuation characters
+        addDataItem(" DC.B &\n1", 2, new byte[] { 1 });
+        addDataItem(" DC&\n.B 1", 2, new byte[] { 1 });
+        addDataItem(" DC&\r.B 1", 2, new byte[] { 1 });
+        addDataItem(" DC&\r\n.B 1", 2, new byte[] { 1 });
+        addDataItem(" DC&\n .B 1", 2, new byte[] { 1 });
+        addDataItem(" DC&\n\t.B 1", 2, new byte[] { 1 });
+        addDataItem(" DC&\n\t\t  .B 1", 2, new byte[] { 1 });
+        addDataItem(" DC.B 1&\n1", 2, new byte[] { 11 });
     }
 
     /**
