@@ -5,9 +5,17 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
+import org.reasm.SymbolContext;
+
+/**
+ * Wraps a {@link Set}&lt;{@link GeneralPurposeRegister}&gt; to work around type erasure when used with {@link SymbolContext}.
+ *
+ * @author Francis Gagné
+ */
 @Immutable
 final class RegisterList {
 
+    @Nonnull
     private final Set<GeneralPurposeRegister> registers;
 
     RegisterList(@Nonnull Set<GeneralPurposeRegister> registers) {
@@ -28,7 +36,7 @@ final class RegisterList {
             return false;
         }
 
-        RegisterList other = (RegisterList) obj;
+        final RegisterList other = (RegisterList) obj;
         if (!this.registers.equals(other.registers)) {
             return false;
         }
