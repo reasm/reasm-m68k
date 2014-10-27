@@ -32,13 +32,11 @@ class RsresetRssetDirective extends Mnemonic {
         boolean signed = false;
         if (context.numberOfOperands >= 1) {
             final Value countValue = evaluateExpressionOperand(context, 0);
-            if (countValue != null) {
-                final IntegerValueVisitor valueVisitor = context.integerValueVisitor;
-                valueVisitor.reset();
-                Value.accept(countValue, valueVisitor);
-                value = valueVisitor.getValue();
-                signed = valueVisitor.getSigned();
-            }
+            final IntegerValueVisitor valueVisitor = context.integerValueVisitor;
+            valueVisitor.reset();
+            Value.accept(countValue, valueVisitor);
+            value = valueVisitor.getValue();
+            signed = valueVisitor.getSigned();
         }
 
         context.rs.set(value, signed);

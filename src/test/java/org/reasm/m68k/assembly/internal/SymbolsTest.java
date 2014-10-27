@@ -144,6 +144,7 @@ public class SymbolsTest extends BaseProgramsTest {
 
         // RSRESET
         addDataItem(" RSRESET", 2, NO_SYMBOLS);
+        addDataItem(" RSRESET UNDEFINED", 2, NO_SYMBOLS, UNDEFINED_SYMBOL);
         addDataItem(" RSRESET 0", 2, NO_SYMBOLS);
         addDataItem(" RSRESET 0,0", 2, NO_SYMBOLS, WRONG_NUMBER_OF_OPERANDS);
         addDataItem(" RSRESET\nfoo RS 0", 3, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0 });
@@ -153,9 +154,13 @@ public class SymbolsTest extends BaseProgramsTest {
                 SymbolType.CONSTANT, new UnsignedIntValue(0x100)) });
         addDataItem(" RSRESET -$100\nfoo RS 0", 3, new UserSymbolMatcher[] { new UserSymbolMatcher<>(SymbolContext.VALUE, "foo",
                 SymbolType.CONSTANT, new SignedIntValue(-0x100)) });
+        addDataItem(" RSRESET '256'\nfoo RS 0", 3, new UserSymbolMatcher[] { new UserSymbolMatcher<>(SymbolContext.VALUE, "foo",
+                SymbolType.CONSTANT, new SignedIntValue(0x100)) });
         addDataItem("foo RS 2\n RSRESET $100\nbar RS 0", 4, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0,
                 new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, new UnsignedIntValue(0x100)) });
         addDataItem(" RSRESET ~", 2, NO_SYMBOLS, new InvalidExpressionErrorMessage("~"));
+        // TODO: test with a built-in function symbol
+        //addDataItem(" RSRESET STRLEN", 2, NO_SYMBOLS, new FunctionCannotBeConvertedToIntegerErrorMessage());
 
         // RSSET
         addDataItem(" RSSET", 2, NO_SYMBOLS, WRONG_NUMBER_OF_OPERANDS);
