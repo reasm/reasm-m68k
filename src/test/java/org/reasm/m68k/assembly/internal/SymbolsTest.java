@@ -31,6 +31,7 @@ public class SymbolsTest extends BaseProgramsTest {
 
     private static final UnsignedIntValue UINT_0 = new UnsignedIntValue(0);
     private static final UnsignedIntValue UINT_1 = new UnsignedIntValue(1);
+    private static final UnsignedIntValue UINT_2 = new UnsignedIntValue(2);
     private static final RegisterList REGISTER_LIST_D0 = new RegisterList(EnumSet.of(GeneralPurposeRegister.D0));
 
     private static final UserSymbolMatcher<Value> FOO_CONSTANT_UINT_0 = new UserSymbolMatcher<>(SymbolContext.VALUE, "foo",
@@ -109,9 +110,9 @@ public class SymbolsTest extends BaseProgramsTest {
                 new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, UINT_0) });
         addDataItem("foo RS 1", 2, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0 });
         addDataItem("foo RS 1\nbar RS 0", 3, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0,
-                new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, new UnsignedIntValue(2)) });
+                new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, UINT_2) });
         addDataItem(" RS 1\nbar RS 0", 3, new UserSymbolMatcher[] { new UserSymbolMatcher<>(SymbolContext.VALUE, "bar",
-                SymbolType.CONSTANT, new UnsignedIntValue(2)) });
+                SymbolType.CONSTANT, UINT_2) });
         addDataItem("foo RS 13\nbar RS 0", 3, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0,
                 new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, new UnsignedIntValue(26)) });
         addDataItem("foo RS $8000000000000000\nbar RS 0", 3, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0,
@@ -120,12 +121,11 @@ public class SymbolsTest extends BaseProgramsTest {
         addDataItem("foo RS ~", 2, NO_SYMBOLS, new InvalidExpressionErrorMessage("~"));
         addDataItem("foo RS 0, 0", 2, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0 }, WRONG_NUMBER_OF_OPERANDS);
         addDataItem("foo RS. 1\nbar RS 0", 3, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0,
-                new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, new UnsignedIntValue(2)) },
-                INVALID_SIZE_ATTRIBUTE_EMPTY);
+                new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, UINT_2) }, INVALID_SIZE_ATTRIBUTE_EMPTY);
         addDataItem("foo RS.B 1\nbar RS 0", 3, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0,
                 new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, UINT_1) });
         addDataItem("foo RS.W 1\nbar RS 0", 3, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0,
-                new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, new UnsignedIntValue(2)) });
+                new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, UINT_2) });
         addDataItem("foo RS.L 1\nbar RS 0", 3, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0,
                 new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, new UnsignedIntValue(4)) });
         addDataItem("foo RS.Q 1\nbar RS 0", 3, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0,
@@ -139,8 +139,10 @@ public class SymbolsTest extends BaseProgramsTest {
         addDataItem("foo RS.P 1\nbar RS 0", 3, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0,
                 new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, new UnsignedIntValue(12)) });
         addDataItem("foo RS.Z 1\nbar RS 0", 3, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0,
-                new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, new UnsignedIntValue(2)) },
-                INVALID_SIZE_ATTRIBUTE_Z);
+                new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, UINT_2) }, INVALID_SIZE_ATTRIBUTE_Z);
+        addDataItem("foo RS 1\nbar EQU baz\nbaz RS 1", 8, new UserSymbolMatcher[] { FOO_CONSTANT_UINT_0,
+                new UserSymbolMatcher<>(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, UINT_2),
+                new UserSymbolMatcher<>(SymbolContext.VALUE, "baz", SymbolType.CONSTANT, UINT_2) });
 
         // RSRESET
         addDataItem(" RSRESET", 2, NO_SYMBOLS);
