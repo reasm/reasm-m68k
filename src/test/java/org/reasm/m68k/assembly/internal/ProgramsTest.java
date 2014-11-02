@@ -68,6 +68,12 @@ public class ProgramsTest extends BaseProgramsTest {
         addDataItem(" DCB.B 20,$FF\n CNOP 2,16\n DC.B $77", 4, new byte[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
                 -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x77 });
 
+        // DEPHASE
+        final DephaseWithoutPhaseErrorMessage dephaseWithoutPhase = new DephaseWithoutPhaseErrorMessage();
+        addDataItem(" DEPHASE", 2, NO_DATA, dephaseWithoutPhase);
+        addDataItem(" DEPHASE 0", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, dephaseWithoutPhase);
+        addDataItem(" DEPHASE.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, dephaseWithoutPhase);
+
         // DO
         addDataItem(" DO\n DC.W $1234\n UNTIL", 6, new byte[] { 0x12, 0x34 }, WRONG_NUMBER_OF_OPERANDS);
         addDataItem(" DO\n DC.W $1234\n UNTIL 1", 6, new byte[] { 0x12, 0x34 });
@@ -184,6 +190,46 @@ public class ProgramsTest extends BaseProgramsTest {
         addDataItem(" NEXT", 2, NO_DATA, nextWithoutFor);
         addDataItem(" NEXT 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, nextWithoutFor);
         addDataItem(" NEXT.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, nextWithoutFor);
+
+        // OBJ
+        final InvalidDataTypeForOrgOrObjDirectiveErrorMessage invalidDataTypeForOrgOrObjDirective = new InvalidDataTypeForOrgOrObjDirectiveErrorMessage();
+        addDataItem(" OBJ\n DC.L *\n OBJEND", 6, new byte[] { 0, 0, 0, 0 }, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" OBJ UNDEFINED\n DC.L *\n OBJEND", 6, new byte[] { 0, 0, 0, 0 }, UNDEFINED_SYMBOL);
+        addDataItem(" OBJ $400000\n DC.L *\n OBJEND", 6, new byte[] { 0, 0x40, 0, 0 });
+        addDataItem(" OBJ +$400000\n DC.L *\n OBJEND", 6, new byte[] { 0, 0x40, 0, 0 });
+        addDataItem(" OBJ 3.14159\n DC.L *\n OBJEND", 6, new byte[] { 0, 0, 0, 0 }, invalidDataTypeForOrgOrObjDirective);
+        addDataItem(" OBJ '4'\n DC.L *\n OBJEND", 6, new byte[] { 0, 0, 0, 0 }, invalidDataTypeForOrgOrObjDirective);
+        // TODO: test with a built-in function symbol
+        //addDataItem(" OBJ STRLEN\n DC.L *\n OBJEND", 6, new byte[] { 0, 0, 0, 0 }, invalidDataTypeForOrgOrObjDirective);
+        addDataItem(" OBJ.W $400000\n DC.L *\n OBJEND", 6, new byte[] { 0, 0x40, 0, 0 }, SIZE_ATTRIBUTE_NOT_ALLOWED);
+
+        // OBJEND
+        final ObjendWithoutObjErrorMessage objendWithoutObj = new ObjendWithoutObjErrorMessage();
+        addDataItem(" OBJEND", 2, NO_DATA, objendWithoutObj);
+        addDataItem(" OBJEND 0", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, objendWithoutObj);
+        addDataItem(" OBJEND.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, objendWithoutObj);
+
+        // ORG
+        addDataItem(" ORG\n DC.L *", 3, new byte[] { 0, 0, 0, 0 }, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" ORG UNDEFINED\n DC.L *", 3, new byte[] { 0, 0, 0, 0 }, UNDEFINED_SYMBOL);
+        addDataItem(" ORG $400000\n DC.L *", 3, new byte[] { 0, 0x40, 0, 0 });
+        addDataItem(" ORG +$400000\n DC.L *", 3, new byte[] { 0, 0x40, 0, 0 });
+        addDataItem(" ORG 3.14159\n DC.L *", 3, new byte[] { 0, 0, 0, 0 }, invalidDataTypeForOrgOrObjDirective);
+        addDataItem(" ORG '4'\n DC.L *", 3, new byte[] { 0, 0, 0, 0 }, invalidDataTypeForOrgOrObjDirective);
+        // TODO: test with a built-in function symbol
+        //addDataItem(" ORG STRLEN\n DC.L *", 3, new byte[] { 0, 0, 0, 0 }, invalidDataTypeForOrgOrObjDirective);
+        addDataItem(" ORG.W $400000\n DC.L *", 3, new byte[] { 0, 0x40, 0, 0 }, SIZE_ATTRIBUTE_NOT_ALLOWED);
+
+        // PHASE
+        addDataItem(" PHASE\n DC.L *\n DEPHASE", 6, new byte[] { 0, 0, 0, 0 }, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" PHASE UNDEFINED\n DC.L *\n DEPHASE", 6, new byte[] { 0, 0, 0, 0 }, UNDEFINED_SYMBOL);
+        addDataItem(" PHASE $400000\n DC.L *\n DEPHASE", 6, new byte[] { 0, 0x40, 0, 0 });
+        addDataItem(" PHASE +$400000\n DC.L *\n DEPHASE", 6, new byte[] { 0, 0x40, 0, 0 });
+        addDataItem(" PHASE 3.14159\n DC.L *\n DEPHASE", 6, new byte[] { 0, 0, 0, 0 }, invalidDataTypeForOrgOrObjDirective);
+        addDataItem(" PHASE '4'\n DC.L *\n DEPHASE", 6, new byte[] { 0, 0, 0, 0 }, invalidDataTypeForOrgOrObjDirective);
+        // TODO: test with a built-in function symbol
+        //addDataItem(" PHASE STRLEN\n DC.L *\n DEPHASE", 6, new byte[] { 0, 0, 0, 0 }, invalidDataTypeForOrgOrObjDirective);
+        addDataItem(" PHASE.W $400000\n DC.L *\n DEPHASE", 6, new byte[] { 0, 0x40, 0, 0 }, SIZE_ATTRIBUTE_NOT_ALLOWED);
 
         // REPT
         addDataItem(" REPT\n DC.W $1234\n ENDR", 5, NO_DATA, WRONG_NUMBER_OF_OPERANDS);

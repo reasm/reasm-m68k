@@ -354,7 +354,7 @@ public final class Mnemonics {
         map.put(CNOP, CnopDirective.CNOP);
         map.put(DC, DcDirective.DC);
         map.put(DCB, DcbDirective.DCB);
-        map.put(DEPHASE, ObjendDirective.OBJEND);
+        map.put(DEPHASE, ObjendDirective.DEPHASE);
         map.put(DO, DoDirective.DO);
         map.put(DS, DsRsDirective.DS);
         map.put(ELSEIF, IfElseifDirective.ELSEIF);
