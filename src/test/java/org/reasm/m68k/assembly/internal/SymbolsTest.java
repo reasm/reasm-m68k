@@ -67,6 +67,7 @@ public class SymbolsTest extends BaseProgramsTest {
                                 GeneralPurposeRegister.D0),
                         new UserSymbolMatcher<>(M68KAssemblyContext.REGISTER_ALIAS, "bar", SymbolType.CONSTANT,
                                 GeneralPurposeRegister.D0) });
+        addDataItem("foo EQUR .D0", 2, NO_SYMBOLS, new RegisterExpectedErrorMessage());
         addDataItem("foo EQUR 0", 2, NO_SYMBOLS, new RegisterExpectedErrorMessage());
 
         // NAMESPACE
