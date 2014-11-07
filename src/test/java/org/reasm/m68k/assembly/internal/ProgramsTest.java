@@ -253,6 +253,18 @@ public class ProgramsTest extends BaseProgramsTest {
                 0x34, 0x12, 0x34, 0x12, 0x34 }, WRONG_NUMBER_OF_OPERANDS);
         addDataItem(" WHILE UNDEFINED\n DC.W $1234\n ENDW", 4, NO_DATA, UNDEFINED_SYMBOL);
 
+        // M68KAssemblyContext.getRegisterAliasByName()
+        addDataItem("A EQUR D0\n MOVE.W A,D1", 3, new byte[] { 0x32, 0x00 });
+        addDataItem("A EQU 0\n MOVE.W A,D1", 3, new byte[] { 0x32, 0x38, 0x00, 0x00 });
+        addDataItem(" MOVE.W UNDEFINED,D1", 2, new byte[] { 0x32, 0x38, 0x00, 0x00 }, UNDEFINED_SYMBOL, UNDEFINED_SYMBOL);
+
+        // M68KAssemblyContext.getRegisterAliasOrRegisterListAliasSymbolByName()
+        addDataItem("A REG D0-D3/A2-A4\n MOVEM.L A,(A0)", 3, new byte[] { 0x48, (byte) 0xD0, 0x1C, 0x0F });
+        addDataItem("A EQUR D0\n MOVEM.L A,(A0)", 3, new byte[] { 0x48, (byte) 0xD0, 0x00, 0x01 });
+        addDataItem("A EQU 0\n MOVEM.L A,D0", 3, new byte[] { 0x4C, (byte) 0xF8, 0x00, 0x01, 0x00, 0x00 });
+        addDataItem(" MOVEM.L UNDEFINED,D0", 2, new byte[] { 0x4C, (byte) 0xF8, 0x00, 0x01, 0x00, 0x00 }, UNDEFINED_SYMBOL,
+                UNDEFINED_SYMBOL, UNDEFINED_SYMBOL);
+
         // UserFunction class
         addDataItem("F FUNCTION A,B,A+B\n DC.B F()", 3, new byte[] { 0 }, WRONG_NUMBER_OF_ARGUMENTS);
         addDataItem("Z EQU 7\nF FUNCTION A,Z*A\n DC.B F(3)", 4, new byte[] { 21 });
