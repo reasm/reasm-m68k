@@ -328,10 +328,6 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         return null;
     }
 
-    Symbol getRegisterListAliasSymbolByName(String name) {
-        return this.getSymbolByContextAndName(REGISTER_LIST_ALIAS, name, null);
-    }
-
     InstructionSize parseInstructionSize() {
         if (this.attribute == null) {
             return InstructionSize.DEFAULT;
