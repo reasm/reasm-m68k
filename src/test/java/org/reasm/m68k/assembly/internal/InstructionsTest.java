@@ -19,7 +19,7 @@ import org.reasm.m68k.messages.*;
 public class InstructionsTest extends BaseInstructionsTest {
 
     private static final AssemblyMessage DATA_FOR_ADDQ_SUBQ_OUT_OF_RANGE = new DataForAddqSubqOutOfRangeErrorMessage();
-    private static final AssemblyMessage MOVEM_REQUIRES_A_REGISTER_LIST_IN_ONE_OPERAND = new MovemRequiresARegisterListInOneOperandErrorMessage();
+    private static final AssemblyMessage MOVEM_REQUIRES_A_REGISTER_LIST_IN_EXACTLY_ONE_OPERAND = new MovemRequiresARegisterListInExactlyOneOperandErrorMessage();
     private static final AssemblyMessage DATA_FOR_MOVEQ_WILL_BE_SIGN_EXTENDED = new DataForMoveqWillBeSignExtendedWarningMessage();
     private static final AssemblyMessage DATA_FOR_MOVEQ_OUT_OF_RANGE = new DataForMoveqOutOfRangeErrorMessage();
     private static final AssemblyMessage SHIFT_COUNT_OUT_OF_RANGE = new ShiftCountOutOfRangeErrorMessage();
@@ -1020,7 +1020,7 @@ public class InstructionsTest extends BaseInstructionsTest {
         // MOVEM
         addDataItem(" MOVEM", NO_DATA, WRONG_NUMBER_OF_OPERANDS);
         addDataItem(" MOVEM D0", NO_DATA, WRONG_NUMBER_OF_OPERANDS);
-        addDataItem(" MOVEM D0,D0", new short[] { 0x4880, 0x0001 }, ADDRESSING_MODE_NOT_ALLOWED_HERE);
+        addDataItem(" MOVEM D0,D0", NO_DATA, MOVEM_REQUIRES_A_REGISTER_LIST_IN_EXACTLY_ONE_OPERAND);
         addDataItem(" MOVEM D0,(A0)", new short[] { 0x4890, 0x0001 });
         addDataItem(" MOVEM D1,(A0)", new short[] { 0x4890, 0x0002 });
         addDataItem(" MOVEM D7,(A0)", new short[] { 0x4890, 0x0080 });
@@ -1042,10 +1042,10 @@ public class InstructionsTest extends BaseInstructionsTest {
         addDataItem(" MOVEM (A0),D0-D4/A0-A2", new short[] { 0x4C90, 0x071F });
         addDataItem(" MOVEM (A0),D0 - D4 / A0 - A2", new short[] { 0x4C90, 0x071F });
         addDataItem(" MOVEM (A0)+,D0", new short[] { 0x4C98, 0x0001 });
-        addDataItem(" MOVEM (A0),(A0)", NO_DATA, MOVEM_REQUIRES_A_REGISTER_LIST_IN_ONE_OPERAND);
-        addDataItem(" MOVEM D0-,(A0)", NO_DATA, MOVEM_REQUIRES_A_REGISTER_LIST_IN_ONE_OPERAND);
-        addDataItem(" MOVEM D0/,(A0)", NO_DATA, MOVEM_REQUIRES_A_REGISTER_LIST_IN_ONE_OPERAND);
-        addDataItem(" MOVEM D0~,(A0)", NO_DATA, MOVEM_REQUIRES_A_REGISTER_LIST_IN_ONE_OPERAND);
+        addDataItem(" MOVEM (A0),(A0)", NO_DATA, MOVEM_REQUIRES_A_REGISTER_LIST_IN_EXACTLY_ONE_OPERAND);
+        addDataItem(" MOVEM D0-,(A0)", NO_DATA, MOVEM_REQUIRES_A_REGISTER_LIST_IN_EXACTLY_ONE_OPERAND);
+        addDataItem(" MOVEM D0/,(A0)", NO_DATA, MOVEM_REQUIRES_A_REGISTER_LIST_IN_EXACTLY_ONE_OPERAND);
+        addDataItem(" MOVEM D0~,(A0)", NO_DATA, MOVEM_REQUIRES_A_REGISTER_LIST_IN_EXACTLY_ONE_OPERAND);
         addDataItem("FOO: MOVEM FOO.W,D0-A6", new short[] { 0x4CB8, 0x7FFF, 0x0000 });
         addDataItem(" MOVEM. D0,(A0)", new short[] { 0x4890, 0x0001 }, INVALID_SIZE_ATTRIBUTE_EMPTY);
         addDataItem(" MOVEM.B D0,(A0)", new short[] { 0x4890, 0x0001 }, INVALID_SIZE_ATTRIBUTE_B);

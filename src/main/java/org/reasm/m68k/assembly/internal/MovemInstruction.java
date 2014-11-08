@@ -3,7 +3,7 @@ package org.reasm.m68k.assembly.internal;
 import java.io.IOException;
 import java.util.Set;
 
-import org.reasm.m68k.messages.MovemRequiresARegisterListInOneOperandErrorMessage;
+import org.reasm.m68k.messages.MovemRequiresARegisterListInExactlyOneOperandErrorMessage;
 
 /**
  * The <code>MOVEM</code> instruction.
@@ -25,18 +25,29 @@ class MovemInstruction extends TwoOperandIntegerInstruction {
         }
 
         final EffectiveAddress ea = context.ea0;
-        Set<GeneralPurposeRegister> registerList;
+        final Set<GeneralPurposeRegister> registerListLeft = parseRegisterList(context, 0);
+        final Set<GeneralPurposeRegister> registerListRight = parseRegisterList(context, 1);
+        final Set<GeneralPurposeRegister> registerList;
         final int direction;
-        if ((registerList = parseRegisterList(context, 0)) != null) {
+        if (registerListLeft != null) {
+            if (registerListRight != null) {
+                context.addMessage(new MovemRequiresARegisterListInExactlyOneOperandErrorMessage());
+                return;
+            }
+
             context.getEffectiveAddress(context.getOperandText(1), AddressingModeCategory.CONTROL_ALTERABLE_WITH_PREDECREMENT,
                     size, 4, ea);
+            registerList = registerListLeft;
             direction = 0;
-        } else if ((registerList = parseRegisterList(context, 1)) != null) {
-            context.getEffectiveAddress(context.getOperandText(0), AddressingModeCategory.CONTROL_WITH_POSTINCREMENT, size, 4, ea);
-            direction = 1 << 10;
         } else {
-            context.addMessage(new MovemRequiresARegisterListInOneOperandErrorMessage());
-            return;
+            if (registerListRight == null) {
+                context.addMessage(new MovemRequiresARegisterListInExactlyOneOperandErrorMessage());
+                return;
+            }
+
+            context.getEffectiveAddress(context.getOperandText(0), AddressingModeCategory.CONTROL_WITH_POSTINCREMENT, size, 4, ea);
+            registerList = registerListRight;
+            direction = 1 << 10;
         }
 
         ea.word0 |= 0b01001000_10000000 | direction | (size == InstructionSize.LONG ? 1 << 6 : 0);
