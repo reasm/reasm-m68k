@@ -4,7 +4,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayOutputStream;
@@ -111,17 +111,16 @@ public abstract class BaseProgramsTest {
                     this.getFileFetcher()).setCustomConfigurationOptions(this.getCustomConfigurationOptions());
             final Assembly assembly = new Assembly(configuration);
 
-            int steps = this.steps;
+            int steps = 0;
             AssemblyCompletionStatus status;
             do {
-                assertThat("The assembly is performing more steps than expected (expecting " + this.steps + " steps).", steps,
-                        is(not(0)));
+                assertThat("The assembly is performing more steps than expected.", steps, is(lessThan(this.steps)));
 
                 status = assembly.step();
-                --steps;
+                ++steps;
             } while (status != AssemblyCompletionStatus.COMPLETE);
 
-            assertThat("The assembly is performing fewer steps than expected (expecting " + this.steps + " steps).", steps, is(0));
+            assertThat("The assembly is performing fewer steps than expected.", steps, is(this.steps));
 
             if (this.expectedMessages != null) {
                 final EquivalentAssemblyMessage[] matchers = new EquivalentAssemblyMessage[this.expectedMessages.length];
