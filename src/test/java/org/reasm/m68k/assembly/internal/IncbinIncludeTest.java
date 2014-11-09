@@ -28,6 +28,8 @@ import org.reasm.source.SourceFile;
 @RunWith(Parameterized.class)
 public class IncbinIncludeTest extends BaseProgramsTest {
 
+    private static final IOErrorMessage FILE_0_NOT_FOUND = new IOErrorMessage(new FileNotFoundException("0"));
+    private static final IOErrorMessage FILE_0_0_NOT_FOUND = new IOErrorMessage(new FileNotFoundException("0.0"));
     private static final IOErrorMessage FILE_A_NOT_FOUND = new IOErrorMessage(new FileNotFoundException("A"));
     static final byte[] FILE_B = new byte[] { 1, 2, 3, 4 };
     static final SourceFile FILE_C = new SourceFile(" DC.B $77", "C");
@@ -75,6 +77,10 @@ public class IncbinIncludeTest extends BaseProgramsTest {
 
         // INCBIN
         addDataItem(" INCBIN", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" INCBIN UNDEFINED", 2, NO_DATA, UNDEFINED_SYMBOL);
+        addDataItem(" INCBIN 0", 2, NO_DATA, FILE_0_NOT_FOUND);
+        addDataItem(" INCBIN +0", 2, NO_DATA, FILE_0_NOT_FOUND);
+        addDataItem(" INCBIN 0.0", 2, NO_DATA, FILE_0_0_NOT_FOUND);
         addDataItem(" INCBIN 'A'", 2, NO_DATA, FILE_A_NOT_FOUND);
         addDataItem(" INCBIN 'B'", 2, FILE_B);
         addDataItem(" INCBIN 'B',0", 2, FILE_B);
@@ -89,15 +95,23 @@ public class IncbinIncludeTest extends BaseProgramsTest {
         addDataItem(" INCBIN 'B',1,3", 2, new byte[] { 2, 3, 4 });
         addDataItem(" INCBIN 'B',1,4", 2, new byte[] { 2, 3, 4 }, new ValueOutOfRangeErrorMessage(4));
         addDataItem(" INCBIN 'B',0,4,1", 2, FILE_B, WRONG_NUMBER_OF_OPERANDS);
+        // TODO: test with a built-in function
+        //addDataItem(" INCBIN STRLEN", 2, NO_DATA, new FunctionCannotBeConvertedToStringErrorMessage());
 
         // INCLUDE
         addDataItem(" INCLUDE", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" INCLUDE UNDEFINED", 2, NO_DATA, UNDEFINED_SYMBOL);
+        addDataItem(" INCLUDE 0", 2, NO_DATA, FILE_0_NOT_FOUND);
+        addDataItem(" INCLUDE +0", 2, NO_DATA, FILE_0_NOT_FOUND);
+        addDataItem(" INCLUDE 0.0", 2, NO_DATA, FILE_0_0_NOT_FOUND);
         addDataItem(" INCLUDE 'A'", 2, NO_DATA, FILE_A_NOT_FOUND);
         addDataItem(" INCLUDE 'C'", 4, FILE_C_OUTPUT);
         addDataItem(" INCLUDE 'C',UNREGISTERED", 4, FILE_C_OUTPUT, new ArchitectureNotRegisteredErrorMessage("UNREGISTERED"));
         addDataItem(" INCLUDE 'D'", 4, FILE_D_OUTPUT, new NotSupportedOnArchitectureErrorMessage());
         addDataItem(" INCLUDE 'D',CPU32", 4, FILE_D_OUTPUT);
         addDataItem(" INCLUDE 'D',CPU32,1", 4, FILE_D_OUTPUT, WRONG_NUMBER_OF_OPERANDS);
+        // TODO: test with a built-in function
+        //addDataItem(" INCLUDE STRLEN", 2, NO_DATA, new FunctionCannotBeConvertedToStringErrorMessage());
     }
 
     /**
