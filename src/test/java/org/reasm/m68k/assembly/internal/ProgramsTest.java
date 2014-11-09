@@ -10,8 +10,11 @@ import org.reasm.AssemblyMessage;
 import org.reasm.m68k.M68KArchitecture;
 import org.reasm.m68k.messages.*;
 import org.reasm.messages.DirectiveRequiresLabelErrorMessage;
+import org.reasm.messages.ParseErrorMessage;
+import org.reasm.messages.UnknownMnemonicErrorMessage;
 import org.reasm.messages.UnresolvedSymbolReferenceErrorMessage;
 import org.reasm.messages.WrongNumberOfArgumentsErrorMessage;
+import org.reasm.source.parseerrors.UnterminatedStringParseError;
 
 /**
  * Test class for short M68000 programs.
@@ -106,6 +109,12 @@ public class ProgramsTest extends BaseProgramsTest {
         addDataItem(" ENDIF 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, endifWithoutIf);
         addDataItem(" ENDIF.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, endifWithoutIf);
 
+        // ENDM
+        final EndmWithoutMacroErrorMessage endmWithoutMacro = new EndmWithoutMacroErrorMessage();
+        addDataItem(" ENDM", 2, NO_DATA, endmWithoutMacro);
+        addDataItem(" ENDM 1", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS, endmWithoutMacro);
+        addDataItem(" ENDM.W", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, endmWithoutMacro);
+
         // ENDNS
         final EndnsWithoutNamespaceErrorMessage endnsWithoutNamespace = new EndnsWithoutNamespaceErrorMessage();
         addDataItem(" ENDNS", 2, NO_DATA, endnsWithoutNamespace);
@@ -184,6 +193,67 @@ public class ProgramsTest extends BaseProgramsTest {
         addDataItem(" IF 0\n DC.W $1234\n ELSEIF 1\n DC.W $2345\n ELSE\n DC.W $3456\n ENDIF", 6, new byte[] { 0x23, 0x45 });
         addDataItem(" IF 1\n DC.W $1234\n ELSEIF 0\n DC.W $2345\n ELSE\n DC.W $3456\n ENDIF", 5, new byte[] { 0x12, 0x34 });
         addDataItem(" IF 1\n DC.W $1234\n ELSEIF 1\n DC.W $2345\n ELSE\n DC.W $3456\n ENDIF", 5, new byte[] { 0x12, 0x34 });
+
+        // MACRO
+        addDataItem(" MACRO\n ENDM", 4, NO_DATA, new DirectiveRequiresLabelErrorMessage(Mnemonics.MACRO));
+        addDataItem("A MACRO\n ENDM", 4, NO_DATA);
+        addDataItem("A MACRO.W\n ENDM", 4, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED);
+        addDataItem("A MACRO\n ENDM\n A", 6, NO_DATA);
+        addDataItem("A MACRO Z\n ENDM\n A", 6, NO_DATA);
+        addDataItem("A MACRO\n DC.B $7F\n ENDM\n A", 7, new byte[] { 0x7F });
+        addDataItem("A MACRO\n DC.B NARG\n ENDM\n A", 7, new byte[] { 0 });
+        addDataItem("A MACRO\n DC.B NARG\n ENDM\n A 0", 7, new byte[] { 1 });
+        addDataItem("A MACRO\n DC.B NARG\n ENDM\n A 0,0,0,0,0,0,0,0,0,0,0,0,0", 7, new byte[] { 13 });
+        addDataItem("A MACRO Z\n DC.B Z\n ENDM\n A", 7, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem("A MACRO Z\n DC.B Z\n ENDM\n A $7F", 7, new byte[] { 0x7F });
+        addDataItem("A MACRO Z\n DC.B \\\n ENDM\n A $7F", 7, new byte[] { 0 }, new InvalidExpressionErrorMessage("\\"));
+        addDataItem("A MACRO Z\n DC.B \\*\n ENDM\n A $7F", 7, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem("A MACRO Z\n DC.B \\*\n ENDM\nL A $7F\nL:", 16, new byte[] { 1 });
+        addDataItem("A MACRO Z\n DC.\\0 \\1\n ENDM\n A $7F", 7, new byte[] { 0x00, 0x7F }, INVALID_SIZE_ATTRIBUTE_EMPTY);
+        addDataItem("A MACRO Z\n DC.\\0 \\1\n ENDM\n A.B $7F", 7, new byte[] { 0x7F });
+        addDataItem("A MACRO Z\n DC.B \\1\n ENDM\n A $7F", 7, new byte[] { 0x7F });
+        addDataItem("A MACRO\n DC.B \\1\n ENDM\n A $7F", 7, new byte[] { 0x7F });
+        addDataItem("A MACRO\n DC.B \\10\n ENDM\n A ,,,,,,,,,$7F", 7, new byte[] { 0x7F });
+        addDataItem("A MACRO\n DC.B \\2147483648\n ENDM\n A", 7, new byte[] { 0 },
+                new InvalidExpressionErrorMessage("\\2147483648"));
+        addDataItem("A MACRO Z\n DC.B \\{\n ENDM\n A $7F", 7, new byte[] { 0 }, new InvalidExpressionErrorMessage("\\{"));
+        addDataItem("A MACRO Z\n DC.B \\{}\n ENDM\n A $7F", 7, new byte[] { 0 }, new InvalidExpressionErrorMessage("\\{}"));
+        addDataItem("A MACRO Z\n DC.B \\{1\n ENDM\n A $7F", 7, new byte[] { 0 }, new InvalidExpressionErrorMessage("\\{1"));
+        addDataItem("A MACRO Z\n DC.B \\{1}\n ENDM\n A $7F", 7, new byte[] { 0x7F });
+        addDataItem("A MACRO\n DC.B \\{1}\n ENDM\n A $7F", 7, new byte[] { 0x7F });
+        addDataItem("A MACRO\n DC.B \\{10}\n ENDM\n A ,,,,,,,,,$7F", 7, new byte[] { 0x7F });
+        addDataItem("A MACRO\n DC.B \\{2147483648}\n ENDM\n A", 7, new byte[] { 0 }, new InvalidExpressionErrorMessage(
+                "\\{2147483648}"));
+        addDataItem("A MACRO Z\n DC.B \\{N}\n ENDM\n A $7F", 7, new byte[] { 0 }, new InvalidExpressionErrorMessage("\\{N}"));
+        addDataItem("A MACRO Z\n DC.B \\{NARG}\n ENDM\n A 0,0,0,0,0,0,0,0,0,0,0,0,0", 7, new byte[] { 13 });
+        addDataItem("A MACRO Z\n DC.B \\{Z}\n ENDM\n A $7F", 7, new byte[] { 0x7F });
+        addDataItem("A MACRO Z\n DC.B 'Z'\n ENDM\n A $7F", 7, new byte[] { 'Z' });
+        addDataItem("A MACRO Z\n DC.B '\\'\n ENDM\n A $7F", 7, NO_DATA, new ParseErrorMessage(new UnterminatedStringParseError(0)));
+        addDataItem("A MACRO Z\n DC.B '\\*'\n ENDM\n A $7F", 7, NO_DATA);
+        addDataItem("A MACRO Z\n DC.B '\\*'\n ENDM\nL A $7F", 7, new byte[] { 'L' });
+        addDataItem("A MACRO Z\n DC.B '\\1'\n ENDM\n A $7F", 7, new byte[] { '1' }, new UnrecognizedEscapeSequenceWarningMessage(
+                '1'));
+        addDataItem("A MACRO Z\n DC.B '\\{'\n ENDM\n A $7F", 7, new byte[] { '{' }, new UnrecognizedEscapeSequenceWarningMessage(
+                '{'));
+        addDataItem("A MACRO Z\n DC.B '\\{}'\n ENDM\n A $7F", 7, new byte[] { '{', '}' },
+                new UnrecognizedEscapeSequenceWarningMessage('{'));
+        addDataItem("A MACRO Z\n DC.B '\\{1'\n ENDM\n A $7F", 7, new byte[] { '{', '1' },
+                new UnrecognizedEscapeSequenceWarningMessage('{'));
+        addDataItem("A MACRO Z\n DC.B '\\{1}'\n ENDM\n A $7F", 7, new byte[] { '$', '7', 'F' });
+        addDataItem("A MACRO Z\n DC.B '\\{2147483648}'\n ENDM\n A $7F", 7, new byte[] { '{', '2', '1', '4', '7', '4', '8', '3',
+                '6', '4', '8', '}' }, new UnrecognizedEscapeSequenceWarningMessage('{'));
+        addDataItem("A MACRO Z\n DC.B '\\{N}'\n ENDM\n A $7F", 7, new byte[] { '{', 'N', '}' },
+                new UnrecognizedEscapeSequenceWarningMessage('{'));
+        addDataItem("A MACRO Z\n DC.B '\\{NARG}'\n ENDM\n A 0,0,0,0,0,0,0,0,0,0,0,0,0", 7, new byte[] { '1', '3' });
+        addDataItem("A MACRO Z\n DC.B '\\{Z}'\n ENDM\n A $7F", 7, new byte[] { '$', '7', 'F' });
+        addDataItem("A MACRO Z\n DC.B \"Z\"\n ENDM\n A $7F", 7, new byte[] { 'Z' });
+        addDataItem("A MACRO Z\n DC.B \"\\*\"\n ENDM\nL A $7F", 7, new byte[] { 'L' });
+        addDataItem("A MACRO Z\n DC.B \"\\1\"\n ENDM\n A $7F", 7, new byte[] { '1' }, new UnrecognizedEscapeSequenceWarningMessage(
+                '1'));
+        addDataItem("A MACRO Z\n DC.B \"\\{1}\"\n ENDM\n A $7F", 7, new byte[] { '$', '7', 'F' });
+        addDataItem("A MACRO Z\n DC.B \"\\{NARG}\"\n ENDM\n A 0,0,0,0,0,0,0,0,0,0,0,0,0", 7, new byte[] { '1', '3' });
+        addDataItem("A MACRO Z\n DC.B \"\\{Z}\"\n ENDM\n A $7F", 7, new byte[] { '$', '7', 'F' });
+        addDataItem("A MACRO\n DC.B $7F\n ENDM\n !A", 5, NO_DATA, new UnknownMnemonicErrorMessage());
 
         // NEXT
         final NextWithoutForErrorMessage nextWithoutFor = new NextWithoutForErrorMessage();

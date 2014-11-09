@@ -87,7 +87,7 @@ final class Macro {
                         reader.setCurrentPosition(startPosition + 2);
                         final String name = reader.readSubstring(endPosition - startPosition - 3).trim();
 
-                        Integer i = tryParseInt(name);
+                        final Integer i = tryParseInt(name);
                         if (i != null) {
                             // NOTE: i - 1 is ATTRIBUTE when i == 0
                             substitutions.add(new Substitution(startPosition, endPosition - startPosition, i - 1));
