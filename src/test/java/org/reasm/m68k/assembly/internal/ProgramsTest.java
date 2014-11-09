@@ -335,6 +335,9 @@ public class ProgramsTest extends BaseProgramsTest {
         addDataItem(" MOVEM.L UNDEFINED,D0", 2, new byte[] { 0x4C, (byte) 0xF8, 0x00, 0x01, 0x00, 0x00 }, UNDEFINED_SYMBOL,
                 UNDEFINED_SYMBOL, UNDEFINED_SYMBOL);
 
+        // Mnemonic.identifyRegister()
+        addDataItem("A EQUR D0\nB EQUR D3\n MOVEM A-B,(A0)", 4, new byte[] { 0x48, (byte) 0x90, 0x00, 0x0F });
+
         // Mnemonic.parseRegisterList()
         addDataItem("A EQUR D0\nB EQUR D3\nC EQUR A2\nA REG D0-D7\nB REG D0-D7\nC REG D0-D7\n MOVEM A/B/C,(A0)", 8, new byte[] {
                 0x48, (byte) 0x90, 0x04, 0x09 });
