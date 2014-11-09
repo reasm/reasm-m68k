@@ -324,6 +324,10 @@ public class ProgramsTest extends BaseProgramsTest {
                 0x34, 0x12, 0x34, 0x12, 0x34 }, WRONG_NUMBER_OF_OPERANDS);
         addDataItem(" WHILE UNDEFINED\n DC.W $1234\n ENDW", 4, NO_DATA, UNDEFINED_SYMBOL);
 
+        // undefined mnemonic
+        addDataItem(" UNDEFINED", 2, NO_DATA, UNDEFINED_SYMBOL);
+        addDataItem("A: UNDEFINED\n DC.W A", 3, new byte[] { 0x00, 0x00 }, UNDEFINED_SYMBOL);
+
         // ! prefix on a block directive
         addDataItem(" !IF 0\n DC.W $0123\n !ELSEIF 1\n DC.W $1234\n !ENDIF", 6, new byte[] { 0x12, 0x34 });
 
