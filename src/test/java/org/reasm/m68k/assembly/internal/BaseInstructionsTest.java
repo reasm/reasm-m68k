@@ -46,7 +46,7 @@ public abstract class BaseInstructionsTest extends BaseProgramsTest {
      *            an {@link AssemblyMessage} that is expected to be generated while assembling the line of code
      * @param expectedMessages
      *            an array of {@link AssemblyMessage} that are expected to be generated while assembling the line of code. Takes
-     *            priority over expectedMessage.
+     *            priority over <code>expectedMessage</code>.
      */
     public BaseInstructionsTest(String code, short[] output, M68KArchitecture architecture, AssemblyMessage expectedMessage,
             AssemblyMessage[] expectedMessages) {

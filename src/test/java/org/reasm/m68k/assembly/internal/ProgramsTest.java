@@ -402,7 +402,8 @@ public class ProgramsTest extends BaseProgramsTest {
      * @param expectedMessage
      *            an {@link AssemblyMessage} that is expected to be generated while assembling the code
      * @param expectedMessages
-     *            the {@link AssemblyMessage}s that are expected to be generated while assembling the code
+     *            an array of {@link AssemblyMessage AssemblyMessages} that are expected to be generated while assembling the code.
+     *            Takes priority over <code>expectedMessage</code>.
      */
     public ProgramsTest(String code, int steps, byte[] output, AssemblyMessage expectedMessage, AssemblyMessage[] expectedMessages) {
         super(code, steps, output, M68KArchitecture.MC68000, expectedMessage, expectedMessages, null);

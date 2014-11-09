@@ -39,6 +39,8 @@ public class OutputDirectivesTest extends BaseProgramsTest {
         addDataItem(" DC 'ABC'", new byte[] { 0x41, 0x42 }, new StringTooLongErrorMessage("ABC"));
         // TODO: test with a built-in function symbol
         //addDataItem(" DC STRLEN", new byte[] { 0, 0 }, new FunctionCannotBeConvertedToRealErrorMessage());
+        addDataItem(" DC ,", new byte[] { 0, 0, 0, 0 }, new InvalidExpressionErrorMessage(""),
+                new InvalidExpressionErrorMessage(""));
         addDataItem(" DC. 0", new byte[] { 0, 0 }, INVALID_SIZE_ATTRIBUTE_EMPTY);
         addDataItem(" DC.B 0", new byte[] { 0 });
         addDataItem(" DC.B $FF", new byte[] { -1 });
@@ -215,11 +217,15 @@ public class OutputDirectivesTest extends BaseProgramsTest {
     }
 
     private static void addDataItem(String code, byte[] output) {
-        addDataItem(code, output, null);
+        addDataItem(code, output, (AssemblyMessage) null);
     }
 
     private static void addDataItem(String code, byte[] output, AssemblyMessage expectedMessage) {
-        TEST_DATA.add(new Object[] { code, output, expectedMessage });
+        TEST_DATA.add(new Object[] { code, output, expectedMessage, null });
+    }
+
+    private static void addDataItem(String code, byte[] output, AssemblyMessage... expectedMessages) {
+        TEST_DATA.add(new Object[] { code, output, null, expectedMessages });
     }
 
     /**
@@ -232,9 +238,12 @@ public class OutputDirectivesTest extends BaseProgramsTest {
      * @param expectedMessage
      *            an {@link AssemblyMessage} that is expected to be generated while assembling the line of code, or
      *            <code>null</code> if no message is expected
+     * @param expectedMessages
+     *            an array of {@link AssemblyMessage AssemblyMessages} that are expected to be generated while assembling the code.
+     *            Takes priority over <code>expectedMessage</code>.
      */
-    public OutputDirectivesTest(String code, byte[] output, AssemblyMessage expectedMessage) {
-        super(code, 2, output, M68KArchitecture.MC68000, expectedMessage, null, null);
+    public OutputDirectivesTest(String code, byte[] output, AssemblyMessage expectedMessage, AssemblyMessage[] expectedMessages) {
+        super(code, 2, output, M68KArchitecture.MC68000, expectedMessage, expectedMessages, null);
     }
 
 }

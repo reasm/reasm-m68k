@@ -229,7 +229,8 @@ public class SymbolsTest extends BaseProgramsTest {
      * @param expectedMessage
      *            an {@link AssemblyMessage} that is expected to be generated while assembling the code
      * @param expectedMessages
-     *            an array of {@link AssemblyMessage} that is expected to be generated while assembling the code
+     *            an array of {@link AssemblyMessage AssemblyMessages} that are expected to be generated while assembling the code.
+     *            Takes priority over <code>expectedMessage</code>.
      */
     public SymbolsTest(String code, int steps, UserSymbolMatcher<?>[] symbolMatchers, AssemblyMessage expectedMessage,
             AssemblyMessage[] expectedMessages) {

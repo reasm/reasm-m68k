@@ -80,7 +80,7 @@ public abstract class BaseProgramsTest {
      *            an {@link AssemblyMessage} that is expected to be generated while assembling the code
      * @param expectedMessages
      *            an array of {@link AssemblyMessage AssemblyMessages} that are expected to be generated while assembling the code.
-     *            Takes priority over expectedMessage.
+     *            Takes priority over <code>expectedMessage</code>.
      * @param symbolMatchers
      *            an array of {@link UserSymbolMatcher UserSymbolMatchers} that match the {@link UserSymbol UserSymbols} that are
      *            expected to be generated while assembling the code, or <code>null</code> to omit checking the generated symbols
