@@ -41,17 +41,17 @@ class MacroDirective extends Mnemonic {
         // because we don't want to assemble the macro body now!
         final SourceLocation macroBody = macroBlockState.iterator.next();
 
-        // In a subsequent pass, when we meet a macro definition that was already defined,
-        // we must reuse the MacroInvocation object we used earlier
+        // In a subsequent pass, when we meet a macro that was already defined,
+        // we must reuse the Macro object we created earlier
         // to avoid changing the symbol's value and triggering new passes indefinitely.
         final AssemblyStepLocation stepLocation = context.step.getLocation();
-        MacroInvocation macroInvocation = context.macroInvocationsByLocation.get(stepLocation);
-        if (macroInvocation == null) {
-            macroInvocation = new MacroInvocation(new Macro(operands, macroBody));
-            context.macroInvocationsByLocation.put(stepLocation, macroInvocation);
+        Macro macro = context.macrosByDefinitionLocation.get(stepLocation);
+        if (macro == null) {
+            macro = new Macro(operands, macroBody);
+            context.macrosByDefinitionLocation.put(stepLocation, macro);
         }
 
-        context.defineSymbols(M68KAssemblyContext.MNEMONIC, SymbolType.VARIABLE, macroInvocation);
+        context.defineSymbols(M68KAssemblyContext.MNEMONIC, SymbolType.VARIABLE, macro);
     }
 
     @Override

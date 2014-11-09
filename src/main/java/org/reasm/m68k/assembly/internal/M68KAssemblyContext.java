@@ -113,7 +113,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
 
     // Persistent state
     final Map<AssemblyStepLocation, Object> blockStateMap = new HashMap<>();
-    final Map<AssemblyStepLocation, MacroInvocation> macroInvocationsByLocation = new HashMap<>();
+    final Map<AssemblyStepLocation, Macro> macrosByDefinitionLocation = new HashMap<>();
     // - Special symbols
     final RsSymbol rs = new RsSymbol();
 

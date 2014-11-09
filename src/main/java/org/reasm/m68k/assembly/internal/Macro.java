@@ -2,7 +2,6 @@ package org.reasm.m68k.assembly.internal;
 
 import java.util.ArrayList;
 
-import org.reasm.Architecture;
 import org.reasm.m68k.Identifier;
 import org.reasm.source.MacroInstantiation;
 import org.reasm.source.SourceLocation;
@@ -10,7 +9,12 @@ import org.reasm.source.SourceLocation;
 import ca.fragag.text.DocumentReader;
 import ca.fragag.text.RangedCharSequenceReader;
 
-final class Macro {
+/**
+ * A user-defined macro.
+ *
+ * @author Francis Gagné
+ */
+class Macro extends Mnemonic {
 
     private static final class Substitution {
 
@@ -207,15 +211,22 @@ final class Macro {
         this.hasLabelSubstitutions = hasLabelSubstitutions;
     }
 
-    final Architecture getArchitecture() {
-        return this.body.getArchitecture();
+    @Override
+    void assemble(M68KAssemblyContext context) {
+        final MacroInstantiation macroInstantiation = this.substituteMacroOperands(context);
+        context.builder.enterFile(macroInstantiation, this.body.getArchitecture());
     }
 
-    final boolean hasLabelSubstitutions() {
-        return this.hasLabelSubstitutions;
+    @Override
+    void defineLabels(M68KAssemblyContext context) {
+        if (this.hasLabelSubstitutions) {
+            context.defineExtraLabels();
+        } else {
+            context.defineLabels();
+        }
     }
 
-    final MacroInstantiation substituteMacroOperands(M68KAssemblyContext context) {
+    private final MacroInstantiation substituteMacroOperands(M68KAssemblyContext context) {
         MacroInstantiation result = new MacroInstantiation(this.body);
         int correction = 0;
 
