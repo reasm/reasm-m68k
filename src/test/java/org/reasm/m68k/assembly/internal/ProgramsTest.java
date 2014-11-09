@@ -254,6 +254,7 @@ public class ProgramsTest extends BaseProgramsTest {
         addDataItem("A MACRO Z\n DC.B \"\\{NARG}\"\n ENDM\n A 0,0,0,0,0,0,0,0,0,0,0,0,0", 7, new byte[] { '1', '3' });
         addDataItem("A MACRO Z\n DC.B \"\\{Z}\"\n ENDM\n A $7F", 7, new byte[] { '$', '7', 'F' });
         addDataItem("A MACRO\n DC.B $7F\n ENDM\n !A", 5, NO_DATA, new UnknownMnemonicErrorMessage());
+        addDataItem("NOP MACRO\n ENDM\n NOP\n DC.W $1111\n !NOP", 8, new byte[] { 0x11, 0x11, 0x4E, 0x71 });
 
         // NEXT
         final NextWithoutForErrorMessage nextWithoutFor = new NextWithoutForErrorMessage();
@@ -322,6 +323,9 @@ public class ProgramsTest extends BaseProgramsTest {
         addDataItem("I SET 0\n WHILE I < 5, I > 2\n DC.W $1234\nI SET I + 1\n ENDW", 30, new byte[] { 0x12, 0x34, 0x12, 0x34, 0x12,
                 0x34, 0x12, 0x34, 0x12, 0x34 }, WRONG_NUMBER_OF_OPERANDS);
         addDataItem(" WHILE UNDEFINED\n DC.W $1234\n ENDW", 4, NO_DATA, UNDEFINED_SYMBOL);
+
+        // ! prefix on a block directive
+        addDataItem(" !IF 0\n DC.W $0123\n !ELSEIF 1\n DC.W $1234\n !ENDIF", 6, new byte[] { 0x12, 0x34 });
 
         // M68KAssemblyContext.getRegisterAliasByName()
         addDataItem("A EQUR D0\n MOVE.W A,D1", 3, new byte[] { 0x32, 0x00 });
