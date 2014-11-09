@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.reasm.AssemblyStepLocation;
 import org.reasm.SymbolType;
+import org.reasm.messages.DirectiveRequiresLabelErrorMessage;
 import org.reasm.source.SourceLocation;
 
 class MacroDirective extends Mnemonic {
@@ -20,6 +21,10 @@ class MacroDirective extends Mnemonic {
         final Object block = context.getParentBlock();
         if (!(block instanceof MacroBlockState)) {
             throw new AssertionError();
+        }
+
+        if (context.numberOfLabels < 1) {
+            context.addMessage(new DirectiveRequiresLabelErrorMessage(Mnemonics.MACRO));
         }
 
         final MacroBlockState macroBlockState = (MacroBlockState) block;
