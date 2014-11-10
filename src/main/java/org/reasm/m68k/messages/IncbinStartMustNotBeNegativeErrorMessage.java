@@ -3,8 +3,8 @@ package org.reasm.m68k.messages;
 import org.reasm.AssemblyErrorMessage;
 
 /**
- * An error message that is generated during an assembly when the <em>start</em> operand of an <code>INCBIN</code> directive is
- * negative.
+ * An error message that is generated during an assembly when the <em>start</em> operand of an <code>INCBIN</code> or
+ * <code>BINCLUDE</code> directive is negative.
  *
  * @author Francis Gagné
  */

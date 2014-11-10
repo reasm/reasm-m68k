@@ -1135,7 +1135,7 @@ public class InstructionsTest extends BaseInstructionsTest {
         addDataItem(" MULU.L D2,D1-D0", new short[] { 0x4C02, 0x0401 }, M68KArchitecture.MC68020);
         addDataItem(" MULU.L D2,D1 - D0", new short[] { 0x4C02, 0x0401 }, M68KArchitecture.MC68020);
         addDataItem(" MULU.L D2,D0-D0", new short[] { 0x4C02, 0x0400 }, M68KArchitecture.CPU32,
-                new MultiplicationResultsUndefinedWarningMessage());
+                new MultiplicationResultUndefinedWarningMessage());
         addDataItem(" MULU.L D2,D0-D1", new short[] { 0x4C02, 0x1400 }, M68KArchitecture.CPU32);
         addDataItem(" MULU.L D0,D4-D7", new short[] { 0x4C00, 0x7404 }, M68KArchitecture.CPU32);
         addDataItem(" MULU.L A0,D1-D0", new short[] { 0x4C08, 0x0401 }, M68KArchitecture.CPU32, ADDRESSING_MODE_NOT_ALLOWED_HERE);

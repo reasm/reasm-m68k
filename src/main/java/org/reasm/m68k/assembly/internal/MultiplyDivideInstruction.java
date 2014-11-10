@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.reasm.m68k.messages.AddressingModeNotAllowedHereErrorMessage;
 import org.reasm.m68k.messages.DivisionRemainderDiscardedWarningMessage;
-import org.reasm.m68k.messages.MultiplicationResultsUndefinedWarningMessage;
+import org.reasm.m68k.messages.MultiplicationResultUndefinedWarningMessage;
 
 /**
  * The <code>DIVS</code>, <code>DIVSL</code>, <code>DIVU</code>, <code>DIVUL</code>, <code>MULS</code> and <code>MULU</code>
@@ -95,7 +95,7 @@ class MultiplyDivideInstruction extends TwoOperandIntegerInstruction {
 
                 if (!errorInDestination && firstRegisterNumber == secondRegisterNumber) {
                     if (this.operation == Operation.MULX) {
-                        context.addTentativeMessage(new MultiplicationResultsUndefinedWarningMessage());
+                        context.addTentativeMessage(new MultiplicationResultUndefinedWarningMessage());
                     } else {
                         context.addTentativeMessage(new DivisionRemainderDiscardedWarningMessage());
                     }
