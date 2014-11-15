@@ -2,6 +2,9 @@ package org.reasm.m68k.source;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.AssemblyBuilder;
 import org.reasm.m68k.assembly.internal.SourceNodesImpl;
 import org.reasm.source.SourceNode;
@@ -11,11 +14,13 @@ import org.reasm.source.SourceNode;
  *
  * @author Francis Gagné
  */
+@Immutable
 public final class BlockDirectiveLine extends SourceNode {
 
+    @Nonnull
     private final LogicalLine logicalLine;
 
-    BlockDirectiveLine(LogicalLine logicalLine) {
+    BlockDirectiveLine(@Nonnull LogicalLine logicalLine) {
         super(logicalLine.getLength(), logicalLine.getParseError());
         this.logicalLine = logicalLine;
     }
@@ -25,6 +30,7 @@ public final class BlockDirectiveLine extends SourceNode {
      *
      * @return the {@link LogicalLine}
      */
+    @Nonnull
     public final LogicalLine getLogicalLine() {
         return this.logicalLine;
     }

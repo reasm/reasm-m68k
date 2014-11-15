@@ -2,6 +2,10 @@ package org.reasm.m68k.assembly.internal;
 
 import java.util.ArrayList;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.Identifier;
 import org.reasm.source.MacroInstantiation;
 import org.reasm.source.SourceLocation;
@@ -14,8 +18,10 @@ import ca.fragag.text.RangedCharSequenceReader;
  *
  * @author Francis Gagné
  */
+@Immutable
 class Macro extends Mnemonic {
 
+    @Immutable
     private static final class Substitution {
 
         static final int ATTRIBUTE = -1;
@@ -34,8 +40,8 @@ class Macro extends Mnemonic {
 
     }
 
-    private static void findNamedSubstitution(String[] operands, String name, int startPosition, int endPosition,
-            ArrayList<Substitution> substitutions) {
+    private static void findNamedSubstitution(@Nonnull String[] operands, @Nonnull String name, int startPosition, int endPosition,
+            @Nonnull ArrayList<Substitution> substitutions) {
         if ("NARG".equalsIgnoreCase(name)) {
             substitutions.add(new Substitution(startPosition, endPosition - startPosition, Substitution.NARG));
             return;
@@ -49,7 +55,8 @@ class Macro extends Mnemonic {
         }
     }
 
-    private static ArrayList<Substitution> identifySubstitutions(String[] operands, SourceLocation body) {
+    @Nonnull
+    private static ArrayList<Substitution> identifySubstitutions(@Nonnull String[] operands, @Nonnull SourceLocation body) {
         // There are a few patterns that will get substituted in macros.
         //
         // The following patterns are matched anywhere in the macro body:
@@ -168,7 +175,8 @@ class Macro extends Mnemonic {
         return substitutions;
     }
 
-    private static Integer tryParseInt(String name) {
+    @CheckForNull
+    private static Integer tryParseInt(@Nonnull String name) {
         final int length = name.length();
         if (length == 0) {
             return null;
@@ -192,11 +200,14 @@ class Macro extends Mnemonic {
         return (int) result;
     }
 
+    @Nonnull
     private final SourceLocation body;
+    @Nonnull
     private final ArrayList<Substitution> substitutions;
+    @Nonnull
     private final boolean hasLabelSubstitutions;
 
-    Macro(String[] operands, SourceLocation body) {
+    Macro(@Nonnull String[] operands, @Nonnull SourceLocation body) {
         this.body = body;
         this.substitutions = identifySubstitutions(operands, body);
         boolean hasLabelSubstitutions = false;
@@ -226,7 +237,8 @@ class Macro extends Mnemonic {
         }
     }
 
-    private final MacroInstantiation substituteMacroOperands(M68KAssemblyContext context) {
+    @Nonnull
+    private final MacroInstantiation substituteMacroOperands(@Nonnull M68KAssemblyContext context) {
         MacroInstantiation result = new MacroInstantiation(this.body);
         int correction = 0;
 

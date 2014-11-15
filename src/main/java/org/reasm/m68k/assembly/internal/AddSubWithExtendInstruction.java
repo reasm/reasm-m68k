@@ -5,6 +5,9 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.InstructionSet;
 
 /**
@@ -12,8 +15,10 @@ import org.reasm.m68k.InstructionSet;
  *
  * @author Francis Gagné
  */
+@Immutable
 class AddSubWithExtendInstruction extends TwoEaInstruction {
 
+    @Immutable
     private static class AbcdSbcd extends AddSubWithExtendInstruction {
 
         AbcdSbcd(int fixedBits) {
@@ -32,11 +37,16 @@ class AddSubWithExtendInstruction extends TwoEaInstruction {
 
     }
 
+    @Nonnull
     static final AddSubWithExtendInstruction ABCD = new AddSubWithExtendInstruction.AbcdSbcd(0b100 << 12);
+    @Nonnull
     static final AddSubWithExtendInstruction ADDX = new AddSubWithExtendInstruction(0b101 << 12);
+    @Nonnull
     static final AddSubWithExtendInstruction SBCD = new AddSubWithExtendInstruction.AbcdSbcd(0b000 << 12);
+    @Nonnull
     static final AddSubWithExtendInstruction SUBX = new AddSubWithExtendInstruction(0b001 << 12);
 
+    @Nonnull
     private static final Set<AddressingMode> DATA_REGISTER_DIRECT_OR_ADDRESS_REGISTER_INDIRECT_WITH_PREDECREMENT = Collections
             .unmodifiableSet(EnumSet.of(AddressingMode.DATA_REGISTER_DIRECT,
                     AddressingMode.ADDRESS_REGISTER_INDIRECT_WITH_PREDECREMENT));

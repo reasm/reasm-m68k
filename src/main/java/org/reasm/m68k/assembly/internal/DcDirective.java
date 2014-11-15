@@ -2,6 +2,9 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.Value;
 
 /**
@@ -9,8 +12,10 @@ import org.reasm.Value;
  *
  * @author Francis Gagné
  */
+@Immutable
 class DcDirective extends Mnemonic {
 
+    @Nonnull
     static final DcDirective DC = new DcDirective();
 
     private DcDirective() {

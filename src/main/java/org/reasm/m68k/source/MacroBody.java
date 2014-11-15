@@ -1,5 +1,8 @@
 package org.reasm.m68k.source;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.AssemblyBuilder;
 import org.reasm.source.CompositeSourceNode;
 import org.reasm.source.SourceNode;
@@ -9,6 +12,7 @@ import org.reasm.source.SourceNode;
  *
  * @author Francis Gagné
  */
+@Immutable
 public final class MacroBody extends CompositeSourceNode {
 
     /**
@@ -17,7 +21,7 @@ public final class MacroBody extends CompositeSourceNode {
      * @param childNodes
      *            the child nodes
      */
-    public MacroBody(Iterable<? extends SourceNode> childNodes) {
+    public MacroBody(@Nonnull Iterable<? extends SourceNode> childNodes) {
         super(childNodes, null);
     }
 

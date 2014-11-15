@@ -3,6 +3,9 @@ package org.reasm.m68k.assembly.internal;
 import java.io.IOException;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.messages.MovemRequiresARegisterListInExactlyOneOperandErrorMessage;
 
 /**
@@ -10,8 +13,10 @@ import org.reasm.m68k.messages.MovemRequiresARegisterListInExactlyOneOperandErro
  *
  * @author Francis Gagné
  */
+@Immutable
 class MovemInstruction extends TwoOperandIntegerInstruction {
 
+    @Nonnull
     static final MovemInstruction MOVEM = new MovemInstruction();
 
     private MovemInstruction() {

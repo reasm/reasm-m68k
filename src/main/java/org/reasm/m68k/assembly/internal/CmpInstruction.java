@@ -5,6 +5,9 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.InstructionSet;
 
 /**
@@ -12,18 +15,22 @@ import org.reasm.m68k.InstructionSet;
  *
  * @author Francis Gagné
  */
+@Immutable
 class CmpInstruction extends TwoEaInstruction {
 
+    @Nonnull
     static final CmpInstruction CMP = new CmpInstruction();
 
+    @Nonnull
     private static final AddAndCmpEorOrSubForms FORMS = AddAndCmpEorOrSubForms.CMP;
 
+    @Nonnull
     private static final Set<AddressingMode> DATA_OR_ADDRESS_REGISTER_DIRECT_OR_ADDRESS_REGISTER_INDIRECT_WITH_POSTINCREMENT = Collections
             .unmodifiableSet(EnumSet.of(AddressingMode.DATA_REGISTER_DIRECT, AddressingMode.ADDRESS_REGISTER_DIRECT,
                     AddressingMode.ADDRESS_REGISTER_INDIRECT_WITH_POSTINCREMENT));
 
-    static boolean encodeCmpiAsTst(M68KAssemblyContext context, InstructionSize size, EffectiveAddress ea0, EffectiveAddress ea1)
-            throws IOException {
+    static boolean encodeCmpiAsTst(@Nonnull M68KAssemblyContext context, @Nonnull InstructionSize size,
+            @Nonnull EffectiveAddress ea0, @Nonnull EffectiveAddress ea1) throws IOException {
         if (context.optimizeCmpiToTst) {
             if (ea0.isImmediateData()) {
                 // TST only accepts an address register direct as the destination on CPU32 and on MC68020 or later

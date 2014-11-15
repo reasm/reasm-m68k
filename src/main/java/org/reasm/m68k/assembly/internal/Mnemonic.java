@@ -5,6 +5,10 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.Block;
 import org.reasm.BlockEvents;
 import org.reasm.Function;
@@ -27,6 +31,7 @@ import org.reasm.m68k.messages.NotSupportedOnArchitectureErrorMessage;
  *
  * @author Francis Gagné
  */
+@Immutable
 abstract class Mnemonic {
 
     /**
@@ -34,6 +39,7 @@ abstract class Mnemonic {
      *
      * @author Francis Gagné
      */
+    @Immutable
     private static final class UnsignedIntValueVisitor implements ValueVisitor<Long> {
 
         public static final UnsignedIntValueVisitor INSTANCE = new UnsignedIntValueVisitor();
@@ -73,15 +79,16 @@ abstract class Mnemonic {
 
     }
 
+    @Nonnull
     private static final GeneralPurposeRegister[] GENERAL_PURPOSE_REGISTERS = GeneralPurposeRegister.values();
 
-    static void checkInstructionSet(InstructionSetCheck instructionSetCheck, M68KAssemblyContext context) {
+    static void checkInstructionSet(@Nonnull InstructionSetCheck instructionSetCheck, @Nonnull M68KAssemblyContext context) {
         if (!instructionSetCheck.isSupported(context.instructionSet)) {
             context.addMessage(new NotSupportedOnArchitectureErrorMessage());
         }
     }
 
-    static short encodeIntegerSizeStandard(InstructionSize size) {
+    static short encodeIntegerSizeStandard(@Nonnull InstructionSize size) {
         switch (size) {
         case BYTE:
             return 0b00 << 6;
@@ -96,7 +103,8 @@ abstract class Mnemonic {
         }
     }
 
-    static Value evaluateExpressionOperand(M68KAssemblyContext context, int operandIndex) {
+    @CheckForNull
+    static Value evaluateExpressionOperand(@Nonnull M68KAssemblyContext context, int operandIndex) {
         final Expression expression = parseExpressionOperand(context, operandIndex);
         if (expression != null) {
             return expression.evaluate(context.getEvaluationContext());
@@ -105,7 +113,8 @@ abstract class Mnemonic {
         return null;
     }
 
-    static Expression parseExpressionOperand(M68KAssemblyContext context, int operandIndex) {
+    @CheckForNull
+    static Expression parseExpressionOperand(@Nonnull M68KAssemblyContext context, int operandIndex) {
         final String operandText = context.getOperandText(operandIndex);
         final Tokenizer tokenizer = context.tokenizer;
 
@@ -122,7 +131,8 @@ abstract class Mnemonic {
         return null;
     }
 
-    static GeneralPurposeRegister parseRegister(M68KAssemblyContext context, LogicalLineReader operandReader) {
+    @CheckForNull
+    static GeneralPurposeRegister parseRegister(@Nonnull M68KAssemblyContext context, @Nonnull LogicalLineReader operandReader) {
         final String registerIdentifier = parseRegisterIdentifier(operandReader);
         if (registerIdentifier != null) {
             return identifyRegister(context, registerIdentifier);
@@ -131,7 +141,8 @@ abstract class Mnemonic {
         return null;
     }
 
-    static String parseRegisterIdentifier(LogicalLineReader operandReader) {
+    @CheckForNull
+    static String parseRegisterIdentifier(@Nonnull LogicalLineReader operandReader) {
         if (!operandReader.atEnd() && operandReader.getCurrentChar() != '.'
                 && !Identifier.isDigit(operandReader.getCurrentCodePoint())
                 && Identifier.isValidIdentifierCodePoint(operandReader.getCurrentCodePoint())) {
@@ -151,11 +162,13 @@ abstract class Mnemonic {
         return null;
     }
 
-    static Set<GeneralPurposeRegister> parseRegisterList(M68KAssemblyContext context, int operandIndex) {
+    @CheckForNull
+    static Set<GeneralPurposeRegister> parseRegisterList(@Nonnull M68KAssemblyContext context, int operandIndex) {
         context.prepareOperandReader(operandIndex);
         return parseRegisterList(context, context.logicalLineReader);
     }
 
+    @CheckForNull
     static Set<GeneralPurposeRegister> parseRegisterList(M68KAssemblyContext context, LogicalLineReader operandReader) {
         final int initialPosition = operandReader.backupPosition();
 
@@ -244,7 +257,7 @@ abstract class Mnemonic {
         }
     }
 
-    static boolean parseSpecialRegister(M68KAssemblyContext context, int operandIndex, String registerName) {
+    static boolean parseSpecialRegister(@Nonnull M68KAssemblyContext context, int operandIndex, @Nonnull String registerName) {
         final LogicalLineReader reader = context.logicalLineReader;
         context.prepareOperandReader(operandIndex);
         for (int i = 0; i < registerName.length(); i++, reader.advance()) {
@@ -263,7 +276,8 @@ abstract class Mnemonic {
         return reader.atEnd();
     }
 
-    static Long readSingleUnsignedIntOperand(M68KAssemblyContext context) {
+    @CheckForNull
+    static Long readSingleUnsignedIntOperand(@Nonnull M68KAssemblyContext context) {
         if (context.requireNumberOfOperands(1)) {
             final Value value = evaluateExpressionOperand(context, 0);
             if (value != null) {
@@ -279,14 +293,15 @@ abstract class Mnemonic {
         return null;
     }
 
-    private static void addRegister(GeneralPurposeRegister register, EnumSet<GeneralPurposeRegister> registers,
-            EnumSet<GeneralPurposeRegister> duplicateRegisters) {
+    private static void addRegister(@Nonnull GeneralPurposeRegister register, @Nonnull EnumSet<GeneralPurposeRegister> registers,
+            @Nonnull EnumSet<GeneralPurposeRegister> duplicateRegisters) {
         if (!registers.add(register)) {
             duplicateRegisters.add(register);
         }
     }
 
-    private static GeneralPurposeRegister identifyRegister(M68KAssemblyContext context, String registerIdentifier) {
+    @CheckForNull
+    private static GeneralPurposeRegister identifyRegister(@Nonnull M68KAssemblyContext context, @Nonnull String registerIdentifier) {
         final GeneralPurposeRegister reg = GeneralPurposeRegister.identify(registerIdentifier);
         if (reg != null) {
             return reg;
@@ -301,18 +316,20 @@ abstract class Mnemonic {
      * @param context
      *            the assembly context
      * @throws IOException
+     *             an I/O exception occurred
      */
-    abstract void assemble(M68KAssemblyContext context) throws IOException;
+    abstract void assemble(@Nonnull M68KAssemblyContext context) throws IOException;
 
-    void checkInstructionSet(M68KAssemblyContext context) {
+    void checkInstructionSet(@Nonnull M68KAssemblyContext context) {
         checkInstructionSet(InstructionSetCheck.M68000_FAMILY, context);
     }
 
-    void defineLabels(M68KAssemblyContext context) {
+    void defineLabels(@Nonnull M68KAssemblyContext context) {
         context.defineLabels();
     }
 
-    ScopedEffectBlockEvents getScopedEffectBlockEvents(M68KAssemblyContext context) {
+    @Nonnull
+    ScopedEffectBlockEvents getScopedEffectBlockEvents(@Nonnull M68KAssemblyContext context) {
         final Block block = context.builder.getCurrentBlock();
         if (block == null) {
             throw new AssertionError();

@@ -19,6 +19,6 @@ abstract class ScopedEffectBlockEvents extends BlockEvents {
         }
     }
 
-    protected abstract void cancelEffect() throws IOException;
+    abstract void cancelEffect() throws IOException;
 
 }

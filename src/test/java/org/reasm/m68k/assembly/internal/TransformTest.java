@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -27,6 +30,7 @@ import ca.fragag.Consumer;
 @RunWith(Parameterized.class)
 public class TransformTest extends BaseProgramsTest {
 
+    @Nonnull
     private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
     static {
@@ -44,16 +48,18 @@ public class TransformTest extends BaseProgramsTest {
      *
      * @return the test data
      */
+    @Nonnull
     @Parameters
     public static List<Object[]> data() {
         return TEST_DATA;
     }
 
-    private static void addDataItem(String code, int steps, byte[] output) {
+    private static void addDataItem(@Nonnull String code, int steps, @Nonnull byte[] output) {
         addDataItem(code, steps, output, null);
     }
 
-    private static void addDataItem(String code, int steps, byte[] output, AssemblyMessage expectedMessage) {
+    private static void addDataItem(@Nonnull String code, int steps, @Nonnull byte[] output,
+            @CheckForNull AssemblyMessage expectedMessage) {
         TEST_DATA.add(new Object[] { code, steps, output, expectedMessage });
     }
 
@@ -69,7 +75,7 @@ public class TransformTest extends BaseProgramsTest {
      * @param expectedMessage
      *            an {@link AssemblyMessage} that is expected to be generated while assembling the code
      */
-    public TransformTest(String code, int steps, byte[] output, AssemblyMessage expectedMessage) {
+    public TransformTest(@Nonnull String code, int steps, @Nonnull byte[] output, @CheckForNull AssemblyMessage expectedMessage) {
         super(code, steps, output, M68KArchitecture.MC68000, expectedMessage, null, null);
     }
 

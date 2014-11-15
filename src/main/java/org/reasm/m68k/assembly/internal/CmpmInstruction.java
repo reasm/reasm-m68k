@@ -2,17 +2,22 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * The <code>CMPM</code> instruction.
  *
  * @author Francis Gagné
  */
+@Immutable
 class CmpmInstruction extends TwoFixedEaInstruction {
 
+    @Nonnull
     static final CmpmInstruction CMPM = new CmpmInstruction();
 
-    static boolean assembleCmpm(M68KAssemblyContext context, InstructionSize size, EffectiveAddress ea0, EffectiveAddress ea1)
-            throws IOException {
+    static boolean assembleCmpm(@Nonnull M68KAssemblyContext context, @Nonnull InstructionSize size, @Nonnull EffectiveAddress ea0,
+            @Nonnull EffectiveAddress ea1) throws IOException {
         if (ea0.isAddressRegisterIndirectWithPostincrement() && ea1.isAddressRegisterIndirectWithPostincrement()) {
             // The encoding for CMPM fills the "holes" left by the missing "EOR Dn,An" instruction.
             ea0.word0 = (short) (EffectiveAddress.MODE_ADDRESS_REGISTER_DIRECT | ea0.getRegister());

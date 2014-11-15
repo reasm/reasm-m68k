@@ -3,6 +3,9 @@ package org.reasm.m68k.assembly.internal;
 import java.io.IOException;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.InstructionSet;
 
 /**
@@ -10,14 +13,18 @@ import org.reasm.m68k.InstructionSet;
  *
  * @author Francis Gagné
  */
+@Immutable
 class AndOrInstruction extends TwoEaInstruction {
 
+    @Nonnull
     static final AndOrInstruction AND = new AndOrInstruction(AddAndCmpEorOrSubForms.AND);
+    @Nonnull
     static final AndOrInstruction OR = new AndOrInstruction(AddAndCmpEorOrSubForms.OR);
 
+    @Nonnull
     private final AddAndCmpEorOrSubForms forms;
 
-    private AndOrInstruction(AddAndCmpEorOrSubForms forms) {
+    private AndOrInstruction(@Nonnull AddAndCmpEorOrSubForms forms) {
         this.forms = forms;
     }
 

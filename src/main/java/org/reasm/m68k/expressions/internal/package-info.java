@@ -1,5 +1,5 @@
 /**
- * Contains types for internal use by the types in the <code>org.reasm.m68k.expressions</code> package.
+ * Contains types for internal use by reasm-m68k.
  *
  * @author Francis Gagné
  */

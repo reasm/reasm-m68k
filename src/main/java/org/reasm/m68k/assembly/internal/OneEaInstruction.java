@@ -3,6 +3,9 @@ package org.reasm.m68k.assembly.internal;
 import java.io.IOException;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.InstructionSet;
 import org.reasm.m68k.messages.BreakpointNumberOutOfRangeErrorMessage;
 import org.reasm.m68k.messages.TrapVectorOutOfRangeErrorMessage;
@@ -12,10 +15,13 @@ import org.reasm.m68k.messages.TrapVectorOutOfRangeErrorMessage;
  *
  * @author Francis Gagné
  */
+@Immutable
 abstract class OneEaInstruction extends Instruction {
 
+    @Immutable
     private abstract static class AnySize extends OneEaInstruction {
 
+        @Immutable
         private static class DataAlterable extends AnySize {
 
             DataAlterable(short fixedBits) {
@@ -29,6 +35,7 @@ abstract class OneEaInstruction extends Instruction {
 
         }
 
+        @Immutable
         private static class Tst extends AnySize {
 
             Tst() {
@@ -63,6 +70,7 @@ abstract class OneEaInstruction extends Instruction {
 
     }
 
+    @Immutable
     private static class Ext extends OneEaInstruction {
 
         Ext() {
@@ -95,6 +103,7 @@ abstract class OneEaInstruction extends Instruction {
 
     }
 
+    @Immutable
     private static class Extb extends OneEaInstruction {
 
         Extb() {
@@ -129,8 +138,10 @@ abstract class OneEaInstruction extends Instruction {
 
     }
 
+    @Immutable
     private static abstract class Immediate extends OneEaInstruction {
 
+        @Immutable
         private static class Bkpt extends Immediate {
 
             Bkpt() {
@@ -163,6 +174,7 @@ abstract class OneEaInstruction extends Instruction {
 
         // M68000PRM says LPSTOP is a word-size instruction, but STOP is unsized.
         // We implement both as unsized instructions.
+        @Immutable
         private static class Lpstop extends Immediate {
 
             Lpstop() {
@@ -183,6 +195,7 @@ abstract class OneEaInstruction extends Instruction {
 
         }
 
+        @Immutable
         private static class Rtd extends Immediate {
 
             Rtd() {
@@ -202,6 +215,7 @@ abstract class OneEaInstruction extends Instruction {
 
         }
 
+        @Immutable
         private static class Stop extends Immediate {
 
             Stop() {
@@ -221,6 +235,7 @@ abstract class OneEaInstruction extends Instruction {
 
         }
 
+        @Immutable
         private static class Trap extends Immediate {
 
             Trap() {
@@ -249,7 +264,7 @@ abstract class OneEaInstruction extends Instruction {
         Immediate() {
         }
 
-        abstract void encode(M68KAssemblyContext context, EffectiveAddress ea, int immediateData);
+        abstract void encode(@Nonnull M68KAssemblyContext context, @Nonnull EffectiveAddress ea, int immediateData);
 
         @Override
         final void encode(M68KAssemblyContext context, InstructionSize size, EffectiveAddress ea) {
@@ -278,6 +293,7 @@ abstract class OneEaInstruction extends Instruction {
 
     }
 
+    @Immutable
     private static class Jump extends OneEaInstruction {
 
         private final int instruction;
@@ -302,6 +318,7 @@ abstract class OneEaInstruction extends Instruction {
 
     }
 
+    @Immutable
     private static class Nbcd extends OneEaInstruction {
 
         Nbcd() {
@@ -330,6 +347,7 @@ abstract class OneEaInstruction extends Instruction {
 
     }
 
+    @Immutable
     private static class Pea extends OneEaInstruction {
 
         Pea() {
@@ -358,6 +376,7 @@ abstract class OneEaInstruction extends Instruction {
 
     }
 
+    @Immutable
     private static class Rtm extends OneEaInstruction {
 
         Rtm() {
@@ -384,11 +403,13 @@ abstract class OneEaInstruction extends Instruction {
 
     }
 
+    @Immutable
     private static class Scc extends OneEaInstruction {
 
+        @Nonnull
         private final IntegerConditionCode cc;
 
-        Scc(IntegerConditionCode cc) {
+        Scc(@Nonnull IntegerConditionCode cc) {
             this.cc = cc;
         }
 
@@ -415,6 +436,7 @@ abstract class OneEaInstruction extends Instruction {
 
     }
 
+    @Immutable
     private static class Swap extends OneEaInstruction {
 
         Swap() {
@@ -444,6 +466,7 @@ abstract class OneEaInstruction extends Instruction {
 
     }
 
+    @Immutable
     private static class Tas extends OneEaInstruction {
 
         Tas() {
@@ -472,6 +495,7 @@ abstract class OneEaInstruction extends Instruction {
 
     }
 
+    @Immutable
     private static class Unlk extends OneEaInstruction {
 
         Unlk() {
@@ -493,43 +517,81 @@ abstract class OneEaInstruction extends Instruction {
 
     }
 
+    @Nonnull
     static final OneEaInstruction BKPT = new Immediate.Bkpt();
+    @Nonnull
     static final OneEaInstruction CLR = new AnySize.DataAlterable((short) 0b01000010_00000000);
+    @Nonnull
     static final OneEaInstruction EXT = new Ext();
+    @Nonnull
     static final OneEaInstruction EXTB = new Extb();
+    @Nonnull
     static final OneEaInstruction JMP = new Jump(0b00000000_01000000);
+    @Nonnull
     static final OneEaInstruction JSR = new Jump(0b00000000_00000000);
+    @Nonnull
     static final OneEaInstruction LPSTOP = new Immediate.Lpstop();
+    @Nonnull
     static final OneEaInstruction NBCD = new Nbcd();
+    @Nonnull
     static final OneEaInstruction NEG = new AnySize.DataAlterable((short) 0b01000100_00000000);
+    @Nonnull
     static final OneEaInstruction NEGX = new AnySize.DataAlterable((short) 0b01000000_00000000);
+    @Nonnull
     static final OneEaInstruction NOT = new AnySize.DataAlterable((short) 0b01000110_00000000);
+    @Nonnull
     static final OneEaInstruction PEA = new Pea();
+    @Nonnull
     static final OneEaInstruction RTD = new Immediate.Rtd();
+    @Nonnull
     static final OneEaInstruction RTM = new Rtm();
+    @Nonnull
     static final OneEaInstruction SCC = new Scc(IntegerConditionCode.CC);
+    @Nonnull
     static final OneEaInstruction SCS = new Scc(IntegerConditionCode.CS);
+    @Nonnull
     static final OneEaInstruction SEQ = new Scc(IntegerConditionCode.EQ);
+    @Nonnull
     static final OneEaInstruction SF = new Scc(IntegerConditionCode.F);
+    @Nonnull
     static final OneEaInstruction SGE = new Scc(IntegerConditionCode.GE);
+    @Nonnull
     static final OneEaInstruction SGT = new Scc(IntegerConditionCode.GT);
+    @Nonnull
     static final OneEaInstruction SHI = new Scc(IntegerConditionCode.HI);
+    @Nonnull
     static final OneEaInstruction SHS = new Scc(IntegerConditionCode.HS);
+    @Nonnull
     static final OneEaInstruction SLE = new Scc(IntegerConditionCode.LE);
+    @Nonnull
     static final OneEaInstruction SLO = new Scc(IntegerConditionCode.LO);
+    @Nonnull
     static final OneEaInstruction SLS = new Scc(IntegerConditionCode.LS);
+    @Nonnull
     static final OneEaInstruction SLT = new Scc(IntegerConditionCode.LT);
+    @Nonnull
     static final OneEaInstruction SMI = new Scc(IntegerConditionCode.MI);
+    @Nonnull
     static final OneEaInstruction SNE = new Scc(IntegerConditionCode.NE);
+    @Nonnull
     static final OneEaInstruction SPL = new Scc(IntegerConditionCode.PL);
+    @Nonnull
     static final OneEaInstruction ST = new Scc(IntegerConditionCode.T);
+    @Nonnull
     static final OneEaInstruction STOP = new Immediate.Stop();
+    @Nonnull
     static final OneEaInstruction SVC = new Scc(IntegerConditionCode.VC);
+    @Nonnull
     static final OneEaInstruction SVS = new Scc(IntegerConditionCode.VS);
+    @Nonnull
     static final OneEaInstruction SWAP = new Swap();
+    @Nonnull
     static final OneEaInstruction TAS = new Tas();
+    @Nonnull
     static final OneEaInstruction TRAP = new Immediate.Trap();
+    @Nonnull
     static final OneEaInstruction TST = new AnySize.Tst();
+    @Nonnull
     static final OneEaInstruction UNLK = new Unlk();
 
     @Override
@@ -559,16 +621,19 @@ abstract class OneEaInstruction extends Instruction {
         checkInstructionSet(this.getInstructionSetCheck(), context);
     }
 
-    abstract void encode(M68KAssemblyContext context, InstructionSize size, EffectiveAddress ea);
+    abstract void encode(@Nonnull M68KAssemblyContext context, @Nonnull InstructionSize size, @Nonnull EffectiveAddress ea);
 
+    @Nonnull
     InstructionSize getDefaultImmediateSize() {
         return InstructionSize.WORD;
     }
 
+    @Nonnull
     InstructionSetCheck getInstructionSetCheck() {
         return InstructionSetCheck.M68000_FAMILY;
     }
 
-    abstract Set<AddressingMode> getValidAddressingModes(InstructionSet instructionSet);
+    @Nonnull
+    abstract Set<AddressingMode> getValidAddressingModes(@Nonnull InstructionSet instructionSet);
 
 }

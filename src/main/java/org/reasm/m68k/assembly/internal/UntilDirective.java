@@ -2,6 +2,9 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.Value;
 import org.reasm.ValueToBooleanVisitor;
 import org.reasm.m68k.messages.UntilWithoutDoErrorMessage;
@@ -11,8 +14,10 @@ import org.reasm.m68k.messages.UntilWithoutDoErrorMessage;
  *
  * @author Francis Gagné
  */
+@Immutable
 class UntilDirective extends Mnemonic {
 
+    @Nonnull
     static final UntilDirective UNTIL = new UntilDirective();
 
     private UntilDirective() {

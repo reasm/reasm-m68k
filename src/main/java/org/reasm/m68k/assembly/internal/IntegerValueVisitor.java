@@ -1,5 +1,7 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.Nonnull;
+
 import org.reasm.Function;
 import org.reasm.StringValue;
 import org.reasm.Value;
@@ -7,13 +9,14 @@ import org.reasm.ValueVisitor;
 import org.reasm.expressions.UnaryOperator;
 import org.reasm.m68k.messages.FunctionCannotBeConvertedToIntegerErrorMessage;
 
-class IntegerValueVisitor implements ValueVisitor<Void> {
+final class IntegerValueVisitor implements ValueVisitor<Void> {
 
+    @Nonnull
     private final M68KAssemblyContext context;
     long value;
     boolean signed;
 
-    IntegerValueVisitor(M68KAssemblyContext context) {
+    IntegerValueVisitor(@Nonnull M68KAssemblyContext context) {
         this.context = context;
     }
 

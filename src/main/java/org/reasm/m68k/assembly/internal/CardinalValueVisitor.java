@@ -1,5 +1,7 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.Nonnull;
+
 import org.reasm.AssemblyMessage;
 import org.reasm.Function;
 import org.reasm.StringValue;
@@ -8,17 +10,27 @@ import org.reasm.ValueVisitor;
 import org.reasm.expressions.UnaryOperator;
 import org.reasm.m68k.messages.FunctionCannotBeConvertedToIntegerErrorMessage;
 
-class CardinalValueVisitor implements ValueVisitor<Void> {
+final class CardinalValueVisitor implements ValueVisitor<Void> {
 
     interface ErrorFactory {
+        @Nonnull
         AssemblyMessage createMessage();
     }
 
+    private static final ErrorFactory DEFAULT_NEGATIVE_VALUE_ERROR_FACTORY = new ErrorFactory() {
+        @Override
+        public AssemblyMessage createMessage() {
+            throw new RuntimeException("CardinalValueVisitor.negativeValueErrorFactory not initialized");
+        }
+    };
+
+    @Nonnull
     private final M68KAssemblyContext context;
     private long value;
-    private ErrorFactory negativeValueErrorFactory;
+    @Nonnull
+    private ErrorFactory negativeValueErrorFactory = DEFAULT_NEGATIVE_VALUE_ERROR_FACTORY;
 
-    CardinalValueVisitor(M68KAssemblyContext context) {
+    CardinalValueVisitor(@Nonnull M68KAssemblyContext context) {
         this.context = context;
     }
 
@@ -65,7 +77,7 @@ class CardinalValueVisitor implements ValueVisitor<Void> {
         return this.value;
     }
 
-    void reset(long value, ErrorFactory negativeValueErrorFactory) {
+    void reset(long value, @Nonnull ErrorFactory negativeValueErrorFactory) {
         this.value = value;
         this.negativeValueErrorFactory = negativeValueErrorFactory;
     }

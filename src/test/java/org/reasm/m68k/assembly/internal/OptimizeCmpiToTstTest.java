@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -19,6 +21,7 @@ import org.reasm.m68k.M68KArchitecture;
 @RunWith(Parameterized.class)
 public class OptimizeCmpiToTstTest extends BaseInstructionsTest {
 
+    @Nonnull
     private static final List<Object[]> TEST_DATA = new ArrayList<>();
 
     static {
@@ -56,16 +59,17 @@ public class OptimizeCmpiToTstTest extends BaseInstructionsTest {
      *
      * @return the test data
      */
+    @Nonnull
     @Parameters
     public static List<Object[]> data() {
         return TEST_DATA;
     }
 
-    private static void addDataItem(String code, short[] output) {
+    private static void addDataItem(@Nonnull String code, @Nonnull short[] output) {
         addDataItem(code, output, M68KArchitecture.MC68000);
     }
 
-    private static void addDataItem(String code, short[] output, M68KArchitecture architecture) {
+    private static void addDataItem(@Nonnull String code, @Nonnull short[] output, @Nonnull M68KArchitecture architecture) {
         TEST_DATA.add(new Object[] { code, output, architecture });
     }
 
@@ -79,10 +83,11 @@ public class OptimizeCmpiToTstTest extends BaseInstructionsTest {
      * @param architecture
      *            the target architecture
      */
-    public OptimizeCmpiToTstTest(String code, short[] output, M68KArchitecture architecture) {
+    public OptimizeCmpiToTstTest(@Nonnull String code, @Nonnull short[] output, @Nonnull M68KArchitecture architecture) {
         super(code, output, architecture, null, null);
     }
 
+    @Nonnull
     @Override
     protected Map<String, Object> getM68KConfigurationOptions() {
         final HashMap<String, Object> m68kOptions = new HashMap<>();

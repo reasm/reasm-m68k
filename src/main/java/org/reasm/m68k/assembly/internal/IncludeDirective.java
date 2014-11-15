@@ -3,6 +3,10 @@ package org.reasm.m68k.assembly.internal;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.Architecture;
 import org.reasm.Value;
 import org.reasm.messages.ArchitectureNotRegisteredErrorMessage;
@@ -13,11 +17,14 @@ import org.reasm.source.SourceFile;
  *
  * @author Francis Gagné
  */
+@Immutable
 class IncludeDirective extends Mnemonic {
 
+    @Nonnull
     static final IncludeDirective INCLUDE = new IncludeDirective();
 
-    static String getFilePath(M68KAssemblyContext context, int operandIndex) {
+    @CheckForNull
+    static String getFilePath(@Nonnull M68KAssemblyContext context, int operandIndex) {
         final Value value = evaluateExpressionOperand(context, operandIndex);
         return Value.accept(value, context.stringValueVisitor);
     }

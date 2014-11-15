@@ -2,20 +2,28 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * The <code>ANDI</code>, <code>EORI</code> and <code>ORI</code> instructions.
  *
  * @author Francis Gagné
  */
+@Immutable
 class AndiEoriOriInstruction extends TwoFixedEaInstruction {
 
+    @Nonnull
     static final AndiEoriOriInstruction ANDI = new AndiEoriOriInstruction(AddAndCmpEorOrSubForms.AND);
+    @Nonnull
     static final AndiEoriOriInstruction EORI = new AndiEoriOriInstruction(AddAndCmpEorOrSubForms.EOR);
+    @Nonnull
     static final AndiEoriOriInstruction ORI = new AndiEoriOriInstruction(AddAndCmpEorOrSubForms.OR);
 
+    @Nonnull
     private final AddAndCmpEorOrSubForms forms;
 
-    private AndiEoriOriInstruction(AddAndCmpEorOrSubForms forms) {
+    private AndiEoriOriInstruction(@Nonnull AddAndCmpEorOrSubForms forms) {
         super(AddressingModeCategory.IMMEDIATE_DATA, AddressingModeCategory.DATA_ALTERABLE);
         this.forms = forms;
     }

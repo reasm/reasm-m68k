@@ -2,6 +2,7 @@ package org.reasm.m68k.assembly.internal;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 
 import org.reasm.Symbol;
 import org.reasm.SymbolContext;
@@ -14,6 +15,7 @@ import org.reasm.m68k.M68KArchitecture;
  *
  * @author Francis Gagné
  */
+@Immutable
 final class M68KSymbolLookup implements SymbolLookup {
 
     @Nonnull

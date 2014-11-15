@@ -3,19 +3,26 @@ package org.reasm.m68k.assembly.internal;
 import java.io.IOException;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * The <code>ADD</code> and <code>SUB</code> instructions.
  *
  * @author Francis Gagné
  */
+@Immutable
 class AddSubInstruction extends TwoOperandIntegerInstruction {
 
+    @Nonnull
     static final AddSubInstruction ADD = new AddSubInstruction(AddAndCmpEorOrSubForms.ADD);
+    @Nonnull
     static final AddSubInstruction SUB = new AddSubInstruction(AddAndCmpEorOrSubForms.SUB);
 
+    @Nonnull
     private final AddAndCmpEorOrSubForms forms;
 
-    private AddSubInstruction(AddAndCmpEorOrSubForms forms) {
+    private AddSubInstruction(@Nonnull AddAndCmpEorOrSubForms forms) {
         this.forms = forms;
     }
 

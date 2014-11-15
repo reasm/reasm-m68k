@@ -1,5 +1,8 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.messages.EndrWithoutReptErrorMessage;
 
 /**
@@ -7,8 +10,10 @@ import org.reasm.m68k.messages.EndrWithoutReptErrorMessage;
  *
  * @author Francis Gagné
  */
+@Immutable
 class EndrDirective extends Mnemonic {
 
+    @Nonnull
     static final EndrDirective ENDR = new EndrDirective();
 
     private EndrDirective() {

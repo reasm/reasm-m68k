@@ -2,6 +2,9 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.messages.ShiftCountOutOfRangeErrorMessage;
 
 /**
@@ -10,15 +13,24 @@ import org.reasm.m68k.messages.ShiftCountOutOfRangeErrorMessage;
  *
  * @author Francis Gagné
  */
+@Immutable
 class ShiftRotateInstruction extends Instruction {
 
+    @Nonnull
     static final ShiftRotateInstruction ASL = new ShiftRotateInstruction(0, 1);
+    @Nonnull
     static final ShiftRotateInstruction ASR = new ShiftRotateInstruction(0, 0);
+    @Nonnull
     static final ShiftRotateInstruction LSL = new ShiftRotateInstruction(1, 1);
+    @Nonnull
     static final ShiftRotateInstruction LSR = new ShiftRotateInstruction(1, 0);
+    @Nonnull
     static final ShiftRotateInstruction ROL = new ShiftRotateInstruction(3, 1);
+    @Nonnull
     static final ShiftRotateInstruction ROR = new ShiftRotateInstruction(3, 0);
+    @Nonnull
     static final ShiftRotateInstruction ROXL = new ShiftRotateInstruction(2, 1);
+    @Nonnull
     static final ShiftRotateInstruction ROXR = new ShiftRotateInstruction(2, 0);
 
     private final int operation;

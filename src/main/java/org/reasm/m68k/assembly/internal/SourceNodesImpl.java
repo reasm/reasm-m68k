@@ -3,6 +3,9 @@ package org.reasm.m68k.assembly.internal;
 import java.io.IOException;
 import java.util.Iterator;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.reasm.AssemblyBuilder;
 import org.reasm.AssemblyStepLocation;
 import org.reasm.BlockEvents;
@@ -28,14 +31,13 @@ public final class SourceNodesImpl {
      * @throws IOException
      *             an I/O exception occurred while assembling the directive
      */
-    public static void assembleBlockDirectiveLine(AssemblyBuilder builder) throws IOException {
+    public static void assembleBlockDirectiveLine(@Nonnull AssemblyBuilder builder) throws IOException {
+        // Get our assembly context for this assembly.
         final M68KAssemblyContext context = M68KAssemblyContext.getAssemblyContext(builder);
 
         context.setMnemonic();
 
-        String mnemonicName;
-
-        mnemonicName = context.mnemonic;
+        String mnemonicName = context.mnemonic;
         if (mnemonicName.startsWith("!")) {
             mnemonicName = mnemonicName.substring(1);
         }
@@ -49,7 +51,7 @@ public final class SourceNodesImpl {
      * @param builder
      *            an assembly builder
      */
-    public static void assembleDoBlock(AssemblyBuilder builder) {
+    public static void assembleDoBlock(@Nonnull AssemblyBuilder builder) {
         final AssemblyStepLocation stepLocation = builder.getStep().getLocation();
 
         // Get our assembly context for this assembly.
@@ -75,7 +77,7 @@ public final class SourceNodesImpl {
      * @param builder
      *            an assembly builder
      */
-    public static void assembleForBlock(AssemblyBuilder builder) {
+    public static void assembleForBlock(@Nonnull AssemblyBuilder builder) {
         final AssemblyStepLocation stepLocation = builder.getStep().getLocation();
 
         // Get our assembly context for this assembly.
@@ -102,7 +104,7 @@ public final class SourceNodesImpl {
      * @param builder
      *            an assembly builder
      */
-    public static void assembleIfBlock(AssemblyBuilder builder) {
+    public static void assembleIfBlock(@Nonnull AssemblyBuilder builder) {
         final AssemblyStepLocation stepLocation = builder.getStep().getLocation();
 
         // Get our assembly context for this assembly.
@@ -127,7 +129,7 @@ public final class SourceNodesImpl {
      * @param builder
      *            an assembly builder
      */
-    public static void assembleImplicitNext(AssemblyBuilder builder) {
+    public static void assembleImplicitNext(@Nonnull AssemblyBuilder builder) {
         final M68KAssemblyContext context = M68KAssemblyContext.getAssemblyContext(builder);
         NextDirective.assembleCore(context);
     }
@@ -140,7 +142,7 @@ public final class SourceNodesImpl {
      * @throws IOException
      *             an I/O exception occurred while assembling the logical line
      */
-    public static void assembleLogicalLine(AssemblyBuilder builder) throws IOException {
+    public static void assembleLogicalLine(@Nonnull AssemblyBuilder builder) throws IOException {
         // Get our assembly context for this assembly.
         final M68KAssemblyContext context = M68KAssemblyContext.getAssemblyContext(builder);
 
@@ -171,7 +173,7 @@ public final class SourceNodesImpl {
      * @param builder
      *            an assembly builder
      */
-    public static void assembleMacroBlock(AssemblyBuilder builder) {
+    public static void assembleMacroBlock(@Nonnull AssemblyBuilder builder) {
         final AssemblyStepLocation stepLocation = builder.getStep().getLocation();
 
         // Get our assembly context for this assembly.
@@ -196,10 +198,10 @@ public final class SourceNodesImpl {
      * @param builder
      *            an assembly builder
      */
-    public static void assembleNamespaceBlock(final AssemblyBuilder builder) {
+    public static void assembleNamespaceBlock(@Nonnull final AssemblyBuilder builder) {
         builder.enterComposite(true, new ScopedEffectBlockEvents() {
             @Override
-            protected void cancelEffect() {
+            void cancelEffect() {
                 builder.exitNamespace();
             }
         });
@@ -211,7 +213,7 @@ public final class SourceNodesImpl {
      * @param builder
      *            an assembly builder
      */
-    public static void assembleObjBlock(AssemblyBuilder builder) {
+    public static void assembleObjBlock(@Nonnull AssemblyBuilder builder) {
         final AssemblyStepLocation stepLocation = builder.getStep().getLocation();
 
         // Get our assembly context for this assembly.
@@ -237,7 +239,7 @@ public final class SourceNodesImpl {
      * @param builder
      *            an assembly builder
      */
-    public static void assembleReptBlock(AssemblyBuilder builder) {
+    public static void assembleReptBlock(@Nonnull AssemblyBuilder builder) {
         final AssemblyStepLocation stepLocation = builder.getStep().getLocation();
 
         // Get our assembly context for this assembly.
@@ -254,7 +256,7 @@ public final class SourceNodesImpl {
      * @param builder
      *            an assembly builder
      */
-    public static void assembleReptBody(AssemblyBuilder builder) {
+    public static void assembleReptBody(@Nonnull AssemblyBuilder builder) {
         // Get our assembly context for this assembly.
         final M68KAssemblyContext context = M68KAssemblyContext.getAssemblyContext(builder);
 
@@ -273,10 +275,10 @@ public final class SourceNodesImpl {
      * @param builder
      *            an assembly builder
      */
-    public static void assembleTransformBlock(final AssemblyBuilder builder) {
+    public static void assembleTransformBlock(@Nonnull final AssemblyBuilder builder) {
         builder.enterComposite(true, new ScopedEffectBlockEvents() {
             @Override
-            protected void cancelEffect() throws IOException {
+            void cancelEffect() throws IOException {
                 builder.exitTransformationBlock();
             }
         });
@@ -288,7 +290,7 @@ public final class SourceNodesImpl {
      * @param builder
      *            an assembly builder
      */
-    public static void assembleWhileBlock(AssemblyBuilder builder) {
+    public static void assembleWhileBlock(@Nonnull AssemblyBuilder builder) {
         final AssemblyStepLocation stepLocation = builder.getStep().getLocation();
 
         // Get our assembly context for this assembly.
@@ -309,8 +311,8 @@ public final class SourceNodesImpl {
         builder.enterBlock(sourceLocations, whileBlockState, false, null);
     }
 
-    private static void assembleMnemonic(final M68KAssemblyContext context, final Symbol mnemonicSymbol,
-            final boolean builtInMnemonic) throws IOException {
+    private static void assembleMnemonic(@Nonnull M68KAssemblyContext context, @CheckForNull Symbol mnemonicSymbol,
+            boolean builtInMnemonic) throws IOException {
         final Mnemonic mnemonic;
         if (mnemonicSymbol != null && mnemonicSymbol.getValue() != null) {
             mnemonic = (Mnemonic) mnemonicSymbol.getValue();

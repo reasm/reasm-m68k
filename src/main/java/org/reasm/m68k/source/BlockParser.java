@@ -1,11 +1,14 @@
 package org.reasm.m68k.source;
 
+import javax.annotation.Nonnull;
+
 import org.reasm.source.SourceNode;
 
 import ca.fragag.text.CharSequenceReader;
 
 interface BlockParser {
 
-    SourceNode parseBlock(CharSequenceReader<?> reader, LogicalLine firstLine, String blockMnemonic);
+    @Nonnull
+    SourceNode parseBlock(@Nonnull CharSequenceReader<?> reader, @Nonnull LogicalLine firstLine, @Nonnull String blockMnemonic);
 
 }

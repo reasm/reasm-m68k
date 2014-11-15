@@ -2,6 +2,9 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.messages.AddressingModeNotAllowedHereErrorMessage;
 import org.reasm.m68k.messages.DivisionRemainderDiscardedWarningMessage;
 import org.reasm.m68k.messages.MultiplicationResultUndefinedWarningMessage;
@@ -12,23 +15,32 @@ import org.reasm.m68k.messages.MultiplicationResultUndefinedWarningMessage;
  *
  * @author Francis Gagné
  */
+@Immutable
 class MultiplyDivideInstruction extends TwoOperandIntegerInstruction {
 
+    @Immutable
     private enum Operation {
         MULX, DIVX, DIVXL
     }
 
+    @Nonnull
     static final MultiplyDivideInstruction DIVS = new MultiplyDivideInstruction(Operation.DIVX, 1);
+    @Nonnull
     static final MultiplyDivideInstruction DIVSL = new MultiplyDivideInstruction(Operation.DIVXL, 1);
+    @Nonnull
     static final MultiplyDivideInstruction DIVU = new MultiplyDivideInstruction(Operation.DIVX, 0);
+    @Nonnull
     static final MultiplyDivideInstruction DIVUL = new MultiplyDivideInstruction(Operation.DIVXL, 0);
+    @Nonnull
     static final MultiplyDivideInstruction MULS = new MultiplyDivideInstruction(Operation.MULX, 1);
+    @Nonnull
     static final MultiplyDivideInstruction MULU = new MultiplyDivideInstruction(Operation.MULX, 0);
 
+    @Nonnull
     private final Operation operation;
     private final int signed;
 
-    private MultiplyDivideInstruction(Operation operation, int signed) {
+    private MultiplyDivideInstruction(@Nonnull Operation operation, int signed) {
         this.operation = operation;
         this.signed = signed;
     }

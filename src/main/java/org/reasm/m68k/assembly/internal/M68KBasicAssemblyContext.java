@@ -1,5 +1,8 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.reasm.m68k.InstructionSet;
 
 abstract class M68KBasicAssemblyContext {
@@ -10,6 +13,7 @@ abstract class M68KBasicAssemblyContext {
     long programCounter;
     InstructionSet instructionSet;
 
-    abstract GeneralPurposeRegister getRegisterAliasByName(String identifier);
+    @CheckForNull
+    abstract GeneralPurposeRegister getRegisterAliasByName(@Nonnull String identifier);
 
 }

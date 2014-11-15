@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -28,15 +31,24 @@ import org.reasm.source.SourceFile;
 @RunWith(Parameterized.class)
 public class IncbinIncludeTest extends BaseProgramsTest {
 
+    @Nonnull
     private static final IOErrorMessage FILE_0_NOT_FOUND = new IOErrorMessage(new FileNotFoundException("0"));
+    @Nonnull
     private static final IOErrorMessage FILE_0_0_NOT_FOUND = new IOErrorMessage(new FileNotFoundException("0.0"));
+    @Nonnull
     private static final IOErrorMessage FILE_A_NOT_FOUND = new IOErrorMessage(new FileNotFoundException("A"));
+    @Nonnull
     static final byte[] FILE_B = new byte[] { 1, 2, 3, 4 };
+    @Nonnull
     static final SourceFile FILE_C = new SourceFile(" DC.B $77", "C");
+    @Nonnull
     private static final byte[] FILE_C_OUTPUT = new byte[] { 0x77 };
+    @Nonnull
     static final SourceFile FILE_D = new SourceFile(" LPSTOP #$1234", "D");
+    @Nonnull
     private static final byte[] FILE_D_OUTPUT = new byte[] { (byte) 0xF8, 0x00, 0x01, (byte) 0xC0, 0x12, 0x34 };
 
+    @Nonnull
     private static final FileFetcher FILE_FETCHER = new FileFetcher() {
         @Override
         public byte[] fetchBinaryFile(String filePath) throws IOException {
@@ -66,6 +78,7 @@ public class IncbinIncludeTest extends BaseProgramsTest {
         }
     };
 
+    @Nonnull
     private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
     static {
@@ -119,16 +132,18 @@ public class IncbinIncludeTest extends BaseProgramsTest {
      *
      * @return the test data
      */
+    @Nonnull
     @Parameters
     public static List<Object[]> data() {
         return TEST_DATA;
     }
 
-    private static void addDataItem(String code, int steps, byte[] output) {
+    private static void addDataItem(@Nonnull String code, int steps, @Nonnull byte[] output) {
         addDataItem(code, steps, output, (AssemblyMessage) null);
     }
 
-    private static void addDataItem(String code, int steps, byte[] output, AssemblyMessage expectedMessage) {
+    private static void addDataItem(@Nonnull String code, int steps, @Nonnull byte[] output,
+            @CheckForNull AssemblyMessage expectedMessage) {
         TEST_DATA.add(new Object[] { code, steps, output, expectedMessage });
     }
 
@@ -144,7 +159,7 @@ public class IncbinIncludeTest extends BaseProgramsTest {
      * @param expectedMessage
      *            an {@link AssemblyMessage} that is expected to be generated while assembling the code
      */
-    public IncbinIncludeTest(String code, int steps, byte[] output, AssemblyMessage expectedMessage) {
+    public IncbinIncludeTest(@Nonnull String code, int steps, @Nonnull byte[] output, @CheckForNull AssemblyMessage expectedMessage) {
         super(code, steps, output, M68KArchitecture.MC68000, expectedMessage, null, null);
     }
 
@@ -153,6 +168,7 @@ public class IncbinIncludeTest extends BaseProgramsTest {
         return super.getEnvironment().addArchitecture(M68KArchitecture.CPU32);
     }
 
+    @Nonnull
     @Override
     protected FileFetcher getFileFetcher() {
         return FILE_FETCHER;

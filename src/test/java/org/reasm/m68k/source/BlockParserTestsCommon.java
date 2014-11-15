@@ -9,6 +9,9 @@ import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.hamcrest.Matcher;
 import org.reasm.m68k.parseerrors.UnclosedBlockParseError;
 import org.reasm.source.CompositeSourceNode;
@@ -19,11 +22,14 @@ import ca.fragag.text.Document;
 
 final class BlockParserTestsCommon {
 
+    @Nonnull
     static final Matcher<Object> COMPLETE_BLOCK = is(nullValue());
+    @Nonnull
     static final Matcher<Object> INCOMPLETE_BLOCK = hasType(UnclosedBlockParseError.class);
 
-    static void parseBasicBlock(String code, Class<?> blockType, Class<?> bodyType,
-            Matcher<? super ParseError> blockParseErrorMatcher, Matcher<? super SourceNode> thirdChildNodeMatcher) {
+    static void parseBasicBlock(@Nonnull String code, @Nonnull Class<?> blockType, @Nonnull Class<?> bodyType,
+            @Nonnull Matcher<? super ParseError> blockParseErrorMatcher,
+            @CheckForNull Matcher<? super SourceNode> thirdChildNodeMatcher) {
         SourceNode node = Parser.parse(new Document(code));
         List<SourceNode> childNodes = ((CompositeSourceNode) node).getChildNodes();
         assertThat(childNodes.size(), is(1));

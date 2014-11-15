@@ -19,27 +19,35 @@ import ca.fragag.Consumer;
 public final class ConfigurationOptions {
 
     /** The key used in a {@link Configuration} for ConfigurationOptions objects. */
+    @Nonnull
     public static final Object KEY = new Object();
 
     /** The option key for {@link #automaticEven()}. Value type: {@link Boolean}. */
+    @Nonnull
     public static final String AUTOMATIC_EVEN = "automaticEven";
 
     /** The option key for {@link #optimizeCmpiToTst()}. Value type: {@link Boolean}. */
+    @Nonnull
     public static final String OPTIMIZE_CMPI_TO_TST = "optimizeCmpiToTst";
 
     /** The option key for {@link #optimizeMoveToMoveq()}. Value type: {@link Boolean}. */
+    @Nonnull
     public static final String OPTIMIZE_MOVE_TO_MOVEQ = "optimizeMoveToMoveq";
 
     /** The option key for {@link #optimizeToAddqSubq()}. Value type: {@link Boolean}. */
+    @Nonnull
     public static final String OPTIMIZE_TO_ADDQ_SUBQ = "optimizeToAddqSubq";
 
     /** The option key for {@link #optimizeUnsizedAbsoluteAddressingToPcRelative()}. Value type: {@link Boolean}. */
+    @Nonnull
     public static final String OPTIMIZE_UNSIZED_ABSOLUTE_ADDRESSING_TO_PC_RELATIVE = "optimizeUnsizedAbsoluteAddressingToPcRelative";
 
     /** The option key for {@link #optimizeUnsizedBranches()}. Value type: {@link Boolean}. */
+    @Nonnull
     public static final String OPTIMIZE_UNSIZED_BRANCHES = "optimizeUnsizedBranches";
 
     /** The option key for {@link #optimizeZeroDisplacement()}. Value type: {@link Boolean}. */
+    @Nonnull
     public static final String OPTIMIZE_ZERO_DISPLACEMENT = "optimizeZeroDisplacement";
 
     /**

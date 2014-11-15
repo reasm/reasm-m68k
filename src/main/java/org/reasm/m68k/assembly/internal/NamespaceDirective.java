@@ -1,5 +1,8 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.messages.DirectiveRequiresLabelErrorMessage;
 
 /**
@@ -7,15 +10,17 @@ import org.reasm.messages.DirectiveRequiresLabelErrorMessage;
  *
  * @author Francis Gagné
  */
+@Immutable
 class NamespaceDirective extends Mnemonic {
 
+    @Nonnull
     static final NamespaceDirective NAMESPACE = new NamespaceDirective();
 
     private NamespaceDirective() {
     }
 
     @Override
-    protected void assemble(M68KAssemblyContext context) {
+    void assemble(M68KAssemblyContext context) {
         context.sizeNotAllowed();
         context.requireNumberOfOperands(0);
 

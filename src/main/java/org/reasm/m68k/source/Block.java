@@ -1,5 +1,9 @@
 package org.reasm.m68k.source;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.AssemblyBuilder;
 import org.reasm.source.CompositeSourceNode;
 import org.reasm.source.ParseError;
@@ -10,6 +14,7 @@ import org.reasm.source.SourceNode;
  *
  * @author Francis Gagné
  */
+@Immutable
 public final class Block extends CompositeSourceNode {
 
     /**
@@ -20,7 +25,7 @@ public final class Block extends CompositeSourceNode {
      * @param parseError
      *            the parse error on the block
      */
-    public Block(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
+    public Block(@Nonnull Iterable<? extends SourceNode> childNodes, @CheckForNull ParseError parseError) {
         super(childNodes, parseError);
     }
 

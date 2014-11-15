@@ -2,6 +2,9 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.AssemblyMessage;
 import org.reasm.Value;
 import org.reasm.m68k.messages.AlignmentMustNotBeZeroOrNegativeErrorMessage;
@@ -14,10 +17,13 @@ import com.google.common.primitives.UnsignedLongs;
  *
  * @author Francis Gagné
  */
+@Immutable
 class CnopDirective extends Mnemonic {
 
+    @Nonnull
     static final CnopDirective CNOP = new CnopDirective();
 
+    @Nonnull
     private static final CardinalValueVisitor.ErrorFactory OFFSET_NEGATIVE_VALUE_ERROR_FACTORY = new CardinalValueVisitor.ErrorFactory() {
         @Override
         public AssemblyMessage createMessage() {
@@ -25,6 +31,7 @@ class CnopDirective extends Mnemonic {
         }
     };
 
+    @Nonnull
     private static final CardinalValueVisitor.ErrorFactory ALIGNMENT_NEGATIVE_VALUE_ERROR_FACTORY = new CardinalValueVisitor.ErrorFactory() {
         @Override
         public AssemblyMessage createMessage() {

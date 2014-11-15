@@ -2,20 +2,25 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * The <code>EXG</code> instruction.
  *
  * @author Francis Gagné
  */
+@Immutable
 class ExgInstruction extends TwoFixedEaInstruction {
 
+    @Nonnull
     static final ExgInstruction EXG = new ExgInstruction();
 
     private static final int OPMODE_DATA_REGISTERS = 0b01000 << 3;
     private static final int OPMODE_ADDRESS_REGISTERS = 0b01001 << 3;
     private static final int OPMODE_DATA_REGISTER_AND_ADDRESS_REGISTER = 0b10001 << 3;
 
-    private static void encode(M68KAssemblyContext context, int opmode, int registerRx, int registerRy) throws IOException {
+    private static void encode(@Nonnull M68KAssemblyContext context, int opmode, int registerRx, int registerRy) throws IOException {
         context.appendWord((short) (0b11000001_00000000 | registerRx << 9 | opmode | registerRy));
     }
 

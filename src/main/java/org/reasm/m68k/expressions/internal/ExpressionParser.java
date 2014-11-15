@@ -28,6 +28,7 @@ import com.google.common.primitives.UnsignedLongs;
  */
 public final class ExpressionParser {
 
+    @Nonnull
     private static final ThreadLocal<ObjectPool<StringBuilder>> STRING_BUILDER_POOL = new ThreadLocal<ObjectPool<StringBuilder>>() {
 
         @Override
@@ -49,6 +50,7 @@ public final class ExpressionParser {
 
     };
 
+    @Nonnull
     private static final Expression[] NO_ARGUMENTS = new Expression[0];
 
     /**

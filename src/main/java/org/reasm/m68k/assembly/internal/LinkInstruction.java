@@ -2,13 +2,18 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * The <code>LINK</code> instruction.
  *
  * @author Francis Gagné
  */
+@Immutable
 class LinkInstruction extends TwoFixedEaInstruction {
 
+    @Nonnull
     static final LinkInstruction LINK = new LinkInstruction();
 
     private LinkInstruction() {

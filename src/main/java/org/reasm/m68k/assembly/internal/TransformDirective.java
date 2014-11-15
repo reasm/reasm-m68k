@@ -2,14 +2,24 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.Environment;
 import org.reasm.OutputTransformation;
 import org.reasm.OutputTransformationFactory;
 import org.reasm.messages.InvalidTransformationArgumentsErrorMessage;
 import org.reasm.messages.UnknownTransformationMethodErrorMessage;
 
-final class TransformDirective extends Mnemonic {
+/**
+ * The <code>TRANSFORM</code> directive.
+ *
+ * @author Francis Gagné
+ */
+@Immutable
+class TransformDirective extends Mnemonic {
 
+    @Nonnull
     static final TransformDirective TRANSFORM = new TransformDirective();
 
     private TransformDirective() {

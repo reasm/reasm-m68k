@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -23,6 +26,7 @@ import org.reasm.m68k.messages.ZeroDistanceShortBranchErrorMessage;
 @RunWith(Parameterized.class)
 public class OptimizeUnsizedBranchesTest extends BaseInstructionsTest {
 
+    @Nonnull
     private static final List<Object[]> TEST_DATA = new ArrayList<>();
 
     static {
@@ -84,24 +88,26 @@ public class OptimizeUnsizedBranchesTest extends BaseInstructionsTest {
      *
      * @return the test data
      */
+    @Nonnull
     @Parameters
     public static List<Object[]> data() {
         return TEST_DATA;
     }
 
-    private static void addDataItem(String code, short[] output) {
+    private static void addDataItem(@Nonnull String code, @Nonnull short[] output) {
         addDataItem(code, output, M68KArchitecture.MC68000, (AssemblyMessage) null);
     }
 
-    private static void addDataItem(String code, short[] output, AssemblyMessage expectedMessage) {
+    private static void addDataItem(@Nonnull String code, @Nonnull short[] output, @CheckForNull AssemblyMessage expectedMessage) {
         addDataItem(code, output, M68KArchitecture.MC68000, expectedMessage);
     }
 
-    private static void addDataItem(String code, short[] output, M68KArchitecture architecture) {
+    private static void addDataItem(@Nonnull String code, @Nonnull short[] output, @Nonnull M68KArchitecture architecture) {
         addDataItem(code, output, architecture, (AssemblyMessage) null);
     }
 
-    private static void addDataItem(String code, short[] output, M68KArchitecture architecture, AssemblyMessage expectedMessage) {
+    private static void addDataItem(@Nonnull String code, @Nonnull short[] output, @Nonnull M68KArchitecture architecture,
+            @CheckForNull AssemblyMessage expectedMessage) {
         TEST_DATA.add(new Object[] { code, output, architecture, expectedMessage });
     }
 
@@ -117,10 +123,12 @@ public class OptimizeUnsizedBranchesTest extends BaseInstructionsTest {
      * @param expectedMessage
      *            an {@link AssemblyMessage} that is expected to be generated while assembling the line of code
      */
-    public OptimizeUnsizedBranchesTest(String code, short[] output, M68KArchitecture architecture, AssemblyMessage expectedMessage) {
+    public OptimizeUnsizedBranchesTest(@Nonnull String code, @Nonnull short[] output, @Nonnull M68KArchitecture architecture,
+            @CheckForNull AssemblyMessage expectedMessage) {
         super(code, output, architecture, expectedMessage, null);
     }
 
+    @Nonnull
     @Override
     protected Map<String, Object> getM68KConfigurationOptions() {
         final HashMap<String, Object> m68kOptions = new HashMap<>();

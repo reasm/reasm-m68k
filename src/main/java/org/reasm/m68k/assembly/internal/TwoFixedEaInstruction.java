@@ -2,6 +2,9 @@ package org.reasm.m68k.assembly.internal;
 
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.InstructionSet;
 
 /**
@@ -9,24 +12,27 @@ import org.reasm.m68k.InstructionSet;
  *
  * @author Francis Gagné
  */
+@Immutable
 abstract class TwoFixedEaInstruction extends TwoEaInstruction {
 
+    @Nonnull
     private final Set<AddressingMode> validAddressingModesForFirstOperand;
+    @Nonnull
     private final Set<AddressingMode> validAddressingModesForSecondOperand;
 
-    TwoFixedEaInstruction(Set<AddressingMode> validAddressingModesForFirstOperand,
-            Set<AddressingMode> validAddressingModesForSecondOperand) {
+    TwoFixedEaInstruction(@Nonnull Set<AddressingMode> validAddressingModesForFirstOperand,
+            @Nonnull Set<AddressingMode> validAddressingModesForSecondOperand) {
         this.validAddressingModesForFirstOperand = validAddressingModesForFirstOperand;
         this.validAddressingModesForSecondOperand = validAddressingModesForSecondOperand;
     }
 
     @Override
-    protected Set<AddressingMode> getValidAddressingModesForDestinationOperand(InstructionSet instructionSet, EffectiveAddress ea0) {
+    final Set<AddressingMode> getValidAddressingModesForDestinationOperand(InstructionSet instructionSet, EffectiveAddress ea0) {
         return this.validAddressingModesForSecondOperand;
     }
 
     @Override
-    protected Set<AddressingMode> getValidAddressingModesForSourceOperand(InstructionSet instructionSet) {
+    final Set<AddressingMode> getValidAddressingModesForSourceOperand(InstructionSet instructionSet) {
         return this.validAddressingModesForFirstOperand;
     }
 

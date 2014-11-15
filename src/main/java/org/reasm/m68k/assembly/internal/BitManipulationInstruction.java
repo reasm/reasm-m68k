@@ -3,26 +3,34 @@ package org.reasm.m68k.assembly.internal;
 import java.io.IOException;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import org.reasm.m68k.messages.ValueOutOfRangeErrorMessage;
 
 class BitManipulationInstruction extends TwoOperandIntegerInstruction {
 
+    @Nonnull
     static final BitManipulationInstruction BCHG = new BitManipulationInstruction(0b01 << 6, AddressingModeCategory.DATA_ALTERABLE);
+    @Nonnull
     static final BitManipulationInstruction BCLR = new BitManipulationInstruction(0b10 << 6, AddressingModeCategory.DATA_ALTERABLE);
+    @Nonnull
     static final BitManipulationInstruction BSET = new BitManipulationInstruction(0b11 << 6, AddressingModeCategory.DATA_ALTERABLE);
+    @Nonnull
     static final BitManipulationInstruction BTST = new BitManipulationInstruction(0b00 << 6, AddressingModeCategory.DATA,
             AddressingModeCategory.DATA_EXCEPT_IMMEDIATE_DATA);
 
     private final int opcode;
+    @Nonnull
     private final Set<AddressingMode> validAddressingModesForDestinationDynamicForm;
+    @Nonnull
     private final Set<AddressingMode> validAddressingModesForDestinationStaticForm;
 
-    private BitManipulationInstruction(int opcode, Set<AddressingMode> validAddressingModesForDestination) {
+    private BitManipulationInstruction(int opcode, @Nonnull Set<AddressingMode> validAddressingModesForDestination) {
         this(opcode, validAddressingModesForDestination, validAddressingModesForDestination);
     }
 
-    private BitManipulationInstruction(int opcode, Set<AddressingMode> validAddressingModesForDestinationDynamicForm,
-            Set<AddressingMode> validAddressingModesForDestinationStaticForm) {
+    private BitManipulationInstruction(int opcode, @Nonnull Set<AddressingMode> validAddressingModesForDestinationDynamicForm,
+            @Nonnull Set<AddressingMode> validAddressingModesForDestinationStaticForm) {
         this.opcode = opcode;
         this.validAddressingModesForDestinationDynamicForm = validAddressingModesForDestinationDynamicForm;
         this.validAddressingModesForDestinationStaticForm = validAddressingModesForDestinationStaticForm;

@@ -4,13 +4,11 @@ import java.util.Arrays;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
 
 import org.reasm.Function;
 import org.reasm.expressions.*;
 import org.reasm.messages.WrongNumberOfArgumentsErrorMessage;
 
-@Immutable
 final class UserFunction implements Function {
 
     @Nonnull

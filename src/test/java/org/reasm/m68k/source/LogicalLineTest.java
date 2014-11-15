@@ -3,6 +3,8 @@ package org.reasm.m68k.source;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import javax.annotation.Nonnull;
+
 import org.junit.Test;
 import org.reasm.SubstringBounds;
 
@@ -13,6 +15,7 @@ import org.reasm.SubstringBounds;
  */
 public class LogicalLineTest {
 
+    @Nonnull
     private static final LogicalLine LOGICAL_LINE = new LogicalLine(42, null, new SubstringBounds[0], new SubstringBounds(1, 5),
             new SubstringBounds[] { new SubstringBounds(6, 9), new SubstringBounds(12, 15), new SubstringBounds(17, 20),
                     new SubstringBounds(23, 26), new SubstringBounds(28, 31), new SubstringBounds(34, 37),

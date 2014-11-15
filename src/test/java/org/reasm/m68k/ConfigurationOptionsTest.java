@@ -8,6 +8,8 @@ import static org.junit.Assert.fail;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,9 +25,10 @@ public class ConfigurationOptionsTest {
     private final class InvalidEntriesConsumer implements Consumer<Map.Entry<String, Object>> {
 
         private boolean gotExpectedEntry;
+        @Nonnull
         private final String key;
 
-        InvalidEntriesConsumer(String key) {
+        InvalidEntriesConsumer(@Nonnull String key) {
             this.key = key;
         }
 
@@ -46,6 +49,7 @@ public class ConfigurationOptionsTest {
     /**
      * A {@link Consumer} of {@link ConfigurationOptions} map entries that {@linkplain Assert#fail(String) fails} when it is called.
      */
+    @Nonnull
     public static final Consumer<Map.Entry<String, Object>> FAILING_CONSUMER = new Consumer<Map.Entry<String, Object>>() {
         @Override
         public void accept(Map.Entry<String, Object> entry) {
@@ -53,6 +57,7 @@ public class ConfigurationOptionsTest {
         }
     };
 
+    @Nonnull
     static final Object AN_OBJECT = new Object();
 
     private static void automaticEven(boolean value) {
@@ -60,7 +65,7 @@ public class ConfigurationOptionsTest {
         assertThat(configurationOptions.automaticEven(), is(value));
     }
 
-    private static ConfigurationOptions invalidOption(String option, InvalidEntriesConsumer invalidEntriesConsumer) {
+    private static ConfigurationOptions invalidOption(@Nonnull String option, @Nonnull InvalidEntriesConsumer invalidEntriesConsumer) {
         final Map<String, Object> optionsMap = new HashMap<>();
         optionsMap.put(option, AN_OBJECT);
         final ConfigurationOptions configurationOptions = ConfigurationOptions.create(optionsMap, invalidEntriesConsumer);
@@ -98,7 +103,7 @@ public class ConfigurationOptionsTest {
         assertThat(configurationOptions.optimizeZeroDisplacement(), is(value));
     }
 
-    private static ConfigurationOptions validOption(String option, Object value) {
+    private static ConfigurationOptions validOption(@Nonnull String option, @Nonnull Object value) {
         final Map<String, Object> optionsMap = new HashMap<>();
         optionsMap.put(option, value);
         return ConfigurationOptions.create(optionsMap, FAILING_CONSUMER);

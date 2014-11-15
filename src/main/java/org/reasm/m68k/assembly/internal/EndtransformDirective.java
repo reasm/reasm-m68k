@@ -2,11 +2,21 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.messages.EndtransformWithoutTransformErrorMessage;
 import org.reasm.m68k.source.TransformBlock;
 
-final class EndtransformDirective extends Mnemonic {
+/**
+ * The <code>ENDTRANSFORM</code> directive.
+ *
+ * @author Francis Gagné
+ */
+@Immutable
+class EndtransformDirective extends Mnemonic {
 
+    @Nonnull
     static final EndtransformDirective ENDTRANSFORM = new EndtransformDirective();
 
     private EndtransformDirective() {

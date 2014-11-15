@@ -44,25 +44,42 @@ import com.google.common.collect.ImmutableMap;
  */
 public abstract class BaseProgramsTest {
 
+    @Nonnull
     static final byte[] NO_DATA = new byte[0];
+    @Nonnull
     static final UserSymbolMatcher<?>[] NO_SYMBOLS = new UserSymbolMatcher[0];
 
+    @Nonnull
     static final AssemblyMessage WRONG_NUMBER_OF_OPERANDS = new WrongNumberOfOperandsErrorMessage();
+    @Nonnull
     static final AssemblyMessage NOT_SUPPORTED_ON_ARCHITECTURE = new NotSupportedOnArchitectureErrorMessage();
+    @Nonnull
     static final AssemblyMessage INVALID_SIZE_ATTRIBUTE_EMPTY = new InvalidSizeAttributeErrorMessage("");
+    @Nonnull
     static final AssemblyMessage INVALID_SIZE_ATTRIBUTE_B = new InvalidSizeAttributeErrorMessage("B");
+    @Nonnull
     static final AssemblyMessage INVALID_SIZE_ATTRIBUTE_W = new InvalidSizeAttributeErrorMessage("W");
+    @Nonnull
     static final AssemblyMessage INVALID_SIZE_ATTRIBUTE_L = new InvalidSizeAttributeErrorMessage("L");
+    @Nonnull
     static final AssemblyMessage INVALID_SIZE_ATTRIBUTE_Z = new InvalidSizeAttributeErrorMessage("Z");
+    @Nonnull
     static final AssemblyMessage SIZE_ATTRIBUTE_NOT_ALLOWED = new SizeAttributeNotAllowedErrorMessage();
+    @Nonnull
     static final AssemblyMessage UNDEFINED_SYMBOL = new UnresolvedSymbolReferenceErrorMessage("UNDEFINED");
 
+    @Nonnull
     private final String code;
     private final int steps;
+    @Nonnull
     private final byte[] output;
+    @Nonnull
     private final M68KArchitecture architecture;
+    @CheckForNull
     private final AssemblyMessage expectedMessage;
+    @CheckForNull
     private final AssemblyMessage[] expectedMessages;
+    @CheckForNull
     private final UserSymbolMatcher<?>[] symbolMatchers;
 
     /**
@@ -85,8 +102,9 @@ public abstract class BaseProgramsTest {
      *            an array of {@link UserSymbolMatcher UserSymbolMatchers} that match the {@link UserSymbol UserSymbols} that are
      *            expected to be generated while assembling the code, or <code>null</code> to omit checking the generated symbols
      */
-    public BaseProgramsTest(String code, int steps, byte[] output, M68KArchitecture architecture, AssemblyMessage expectedMessage,
-            AssemblyMessage[] expectedMessages, UserSymbolMatcher<?>[] symbolMatchers) {
+    public BaseProgramsTest(@Nonnull String code, int steps, @Nonnull byte[] output, @Nonnull M68KArchitecture architecture,
+            @CheckForNull AssemblyMessage expectedMessage, @CheckForNull AssemblyMessage[] expectedMessages,
+            @CheckForNull UserSymbolMatcher<?>[] symbolMatchers) {
         this.code = code;
         this.steps = steps;
         this.output = output;

@@ -2,6 +2,9 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.ConfigurationOptions;
 import org.reasm.m68k.messages.DataForAddqSubqOutOfRangeErrorMessage;
 
@@ -11,6 +14,7 @@ import org.reasm.m68k.messages.DataForAddqSubqOutOfRangeErrorMessage;
  *
  * @author Francis Gagné
  */
+@Immutable
 class AddAndCmpEorOrSubForms {
 
     /**
@@ -19,6 +23,7 @@ class AddAndCmpEorOrSubForms {
      *
      * @author Francis Gagné
      */
+    @Immutable
     static final class AddSubForms extends AddAndCmpEorOrSubForms {
 
         private final int quickOpcode;
@@ -64,8 +69,8 @@ class AddAndCmpEorOrSubForms {
          * @throws IOException
          *             an I/O exception occurred while encoding the instruction
          */
-        final boolean encodeQuick(M68KAssemblyContext context, InstructionSize size, EffectiveAddress ea0, EffectiveAddress ea1,
-                boolean force) throws IOException {
+        final boolean encodeQuick(@Nonnull M68KAssemblyContext context, @Nonnull InstructionSize size,
+                @Nonnull EffectiveAddress ea0, @Nonnull EffectiveAddress ea1, boolean force) throws IOException {
             if (ea0.isImmediateData() && (context.optimizeToAddqSubq || force)) {
                 final int immediateData;
 
@@ -103,11 +108,17 @@ class AddAndCmpEorOrSubForms {
 
     }
 
+    @Nonnull
     static final AddSubForms ADD = new AddSubForms(0b1101 << 12, 0b00000110 << 8, 0b0 << 8);
+    @Nonnull
     static final AddAndCmpEorOrSubForms AND = new AddAndCmpEorOrSubForms(0b1100 << 12, 0b00000010 << 8);
+    @Nonnull
     static final AddAndCmpEorOrSubForms CMP = new AddAndCmpEorOrSubForms(0b1011 << 12, 0b00001100 << 8);
+    @Nonnull
     static final AddAndCmpEorOrSubForms EOR = new AddAndCmpEorOrSubForms(0b1011 << 12 | 1 << 8, 0b00001010 << 8);
+    @Nonnull
     static final AddAndCmpEorOrSubForms OR = new AddAndCmpEorOrSubForms(0b1000 << 12, 0b00000000 << 8);
+    @Nonnull
     static final AddSubForms SUB = new AddSubForms(0b1001 << 12, 0b00000100 << 8, 0b1 << 8);
 
     private final int baseOpcode;
@@ -140,7 +151,7 @@ class AddAndCmpEorOrSubForms {
      * @throws IOException
      *             an I/O exception occurred while encoding the instruction
      */
-    boolean assembleImmediateToCcrSr(M68KAssemblyContext context, InstructionSize size) throws IOException {
+    boolean assembleImmediateToCcrSr(@Nonnull M68KAssemblyContext context, @Nonnull InstructionSize size) throws IOException {
         boolean isCcr = false;
         if (Mnemonic.parseSpecialRegister(context, 1, "SR") || (isCcr = Mnemonic.parseSpecialRegister(context, 1, "CCR"))) {
             final InstructionSize validSize = isCcr ? InstructionSize.BYTE : InstructionSize.WORD;
@@ -181,8 +192,8 @@ class AddAndCmpEorOrSubForms {
      * @throws IOException
      *             an I/O exception occurred while encoding the instruction
      */
-    boolean encodeBase(M68KAssemblyContext context, InstructionSize size, EffectiveAddress ea0, EffectiveAddress ea1,
-            boolean allowMemoryToRegister) throws IOException {
+    boolean encodeBase(@Nonnull M68KAssemblyContext context, @Nonnull InstructionSize size, @Nonnull EffectiveAddress ea0,
+            @Nonnull EffectiveAddress ea1, boolean allowMemoryToRegister) throws IOException {
         final EffectiveAddress eaOutput;
         if (allowMemoryToRegister && (ea1.isDataRegisterDirect() || ea1.isAddressRegisterDirect())) {
             eaOutput = ea0;
@@ -244,8 +255,8 @@ class AddAndCmpEorOrSubForms {
      * @throws IOException
      *             an I/O exception occurred while encoding the instruction
      */
-    boolean encodeImmediate(M68KAssemblyContext context, InstructionSize size, EffectiveAddress ea0, EffectiveAddress ea1)
-            throws IOException {
+    boolean encodeImmediate(@Nonnull M68KAssemblyContext context, @Nonnull InstructionSize size, @Nonnull EffectiveAddress ea0,
+            @Nonnull EffectiveAddress ea1) throws IOException {
         if (ea0.isImmediateData()) {
             // ea0 contains the immediate operand. ea1 contains the destination.
             ea0.word0 = ea1.word0;
@@ -277,8 +288,8 @@ class AddAndCmpEorOrSubForms {
      * @throws IOException
      *             an I/O exception occurred while encoding the instruction
      */
-    boolean encodeQuick(M68KAssemblyContext context, InstructionSize size, EffectiveAddress ea0, EffectiveAddress ea1)
-            throws IOException {
+    boolean encodeQuick(@Nonnull M68KAssemblyContext context, @Nonnull InstructionSize size, @Nonnull EffectiveAddress ea0,
+            @Nonnull EffectiveAddress ea1) throws IOException {
         return false;
     }
 

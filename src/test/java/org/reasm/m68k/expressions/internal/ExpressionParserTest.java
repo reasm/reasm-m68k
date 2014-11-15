@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 
 import org.hamcrest.Matcher;
 import org.junit.Test;
@@ -44,6 +45,7 @@ public class ExpressionParserTest {
      *
      * @author Francis Gagné
      */
+    @Immutable
     public static class DataItem {
 
         @Nonnull
@@ -93,33 +95,52 @@ public class ExpressionParserTest {
 
     }
 
+    @Nonnull
     private static final ValueExpression VALUE_UINT_0 = new ValueExpression(new UnsignedIntValue(0));
+    @Nonnull
     private static final ValueExpression VALUE_UINT_3 = new ValueExpression(new UnsignedIntValue(3));
+    @Nonnull
     private static final ValueExpression VALUE_UINT_123456789 = new ValueExpression(new UnsignedIntValue(123456789));
+    @Nonnull
     private static final ValueExpression VALUE_UINT_1234567890123456789 = new ValueExpression(new UnsignedIntValue(
             1234567890123456789L));
+    @Nonnull
     private static final ValueExpression VALUE_UINT_18446744073709551615 = new ValueExpression(new UnsignedIntValue(-1));
+    @Nonnull
     private static final ValueExpression VALUE_UINT_5097733592125636885 = new ValueExpression(new UnsignedIntValue(
             5097733592125636885L));
 
+    @Nonnull
     private static final ValueExpression VALUE_FLOAT_3_POINT_5 = new ValueExpression(new FloatValue(3.5));
 
+    @Nonnull
     private static final ValueExpression VALUE_STRING_EMPTY = new ValueExpression(new StringValue(""));
+    @Nonnull
     private static final ValueExpression VALUE_STRING_ABCDEF = new ValueExpression(new StringValue("abcdef"));
+    @Nonnull
     private static final ValueExpression VALUE_STRING_BACKSLASH = new ValueExpression(new StringValue("\\"));
 
+    @Nonnull
     private static final IdentifierExpression IDENTIFIER_A = new IdentifierExpression("a", DummySymbolLookup.DEFAULT);
+    @Nonnull
     private static final IdentifierExpression IDENTIFIER_B = new IdentifierExpression("b", DummySymbolLookup.DEFAULT);
+    @Nonnull
     private static final IdentifierExpression IDENTIFIER_C = new IdentifierExpression("c", DummySymbolLookup.DEFAULT);
+    @Nonnull
     private static final IdentifierExpression IDENTIFIER_D = new IdentifierExpression("d", DummySymbolLookup.DEFAULT);
+    @Nonnull
     private static final IdentifierExpression IDENTIFIER_E = new IdentifierExpression("e", DummySymbolLookup.DEFAULT);
+    @Nonnull
     private static final IdentifierExpression IDENTIFIER_FOO = new IdentifierExpression("foo", DummySymbolLookup.DEFAULT);
 
+    @Nonnull
     private static final AssemblyMessage[] DONT_CHECK_ASSEMBLY_MESSAGES = null;
 
+    @Nonnull
     private static final UnrecognizedEscapeSequenceWarningMessage UNRECOGNIZED_ESCAPE_SEQUENCE_WARNING_MESSAGE = new UnrecognizedEscapeSequenceWarningMessage(
             'z');
 
+    @Nonnull
     private static final Object[][] TEST_DATA_ARRAY = new Object[][] {
             // Empty string
             { new DataItem("", 0, null) },
@@ -600,6 +621,7 @@ public class ExpressionParserTest {
 
     };
 
+    @Nonnull
     private static final List<Object[]> TEST_DATA_LIST = Arrays.asList(TEST_DATA_ARRAY);
 
     @Nonnull

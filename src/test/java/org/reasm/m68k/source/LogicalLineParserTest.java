@@ -33,10 +33,14 @@ import ca.fragag.text.GenericCharSequenceReader;
 @SuppressWarnings("javadoc")
 public class LogicalLineParserTest {
 
+    @Nonnull
     private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
+    @Nonnull
     private static final SubstringBounds[] NO_LABELS = new SubstringBounds[0];
+    @Nonnull
     private static final SubstringBounds[] NO_OPERANDS = NO_LABELS;
+    @Nonnull
     private static final int[] NO_CONTINUATION_CHARACTERS = new int[0];
 
     static {

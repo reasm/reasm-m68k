@@ -2,6 +2,8 @@ package org.reasm.m68k.parseerrors;
 
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
+
 import org.reasm.source.ParseError;
 
 /**
@@ -18,7 +20,7 @@ public class ElseOrElseIfAfterElseParseError extends ParseError {
      * @param mnemonic
      *            the mnemonic of the offending clause
      */
-    public ElseOrElseIfAfterElseParseError(String mnemonic) {
+    public ElseOrElseIfAfterElseParseError(@Nonnull String mnemonic) {
         super(Objects.requireNonNull(mnemonic, "mnemonic") + " clause after an ELSE clause");
     }
 

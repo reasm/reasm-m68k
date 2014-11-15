@@ -2,6 +2,10 @@ package org.reasm.m68k.source;
 
 import java.util.ArrayList;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.assembly.internal.Mnemonics;
 import org.reasm.m68k.parseerrors.UnclosedBlockParseError;
 import org.reasm.source.ParseError;
@@ -10,8 +14,10 @@ import org.reasm.source.SourceNode;
 
 import ca.fragag.text.CharSequenceReader;
 
+@Immutable
 class BasicBlockParser implements BlockParser {
 
+    @Nonnull
     static final BasicBlockParser DO = new BasicBlockParser(Mnemonics.UNTIL) {
         @Override
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
@@ -19,6 +25,7 @@ class BasicBlockParser implements BlockParser {
         }
     };
 
+    @Nonnull
     static final BasicBlockParser FOR = new BasicBlockParser(Mnemonics.NEXT) {
         @Override
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
@@ -31,6 +38,7 @@ class BasicBlockParser implements BlockParser {
         };
     };
 
+    @Nonnull
     static final BasicBlockParser MACRO = new BasicBlockParser(Mnemonics.ENDM) {
         @Override
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
@@ -43,6 +51,7 @@ class BasicBlockParser implements BlockParser {
         }
     };
 
+    @Nonnull
     static final BasicBlockParser NAMESPACE = new BasicBlockParser(Mnemonics.ENDNS) {
         @Override
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
@@ -50,6 +59,7 @@ class BasicBlockParser implements BlockParser {
         }
     };
 
+    @Nonnull
     static final BasicBlockParser REPT = new BasicBlockParser(Mnemonics.ENDR) {
         @Override
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
@@ -62,6 +72,7 @@ class BasicBlockParser implements BlockParser {
         }
     };
 
+    @Nonnull
     static final BasicBlockParser TRANSFORM = new BasicBlockParser(Mnemonics.ENDTRANSFORM) {
         @Override
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
@@ -69,6 +80,7 @@ class BasicBlockParser implements BlockParser {
         }
     };
 
+    @Nonnull
     static final BasicBlockParser WHILE = new BasicBlockParser(Mnemonics.ENDW) {
         @Override
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
@@ -76,9 +88,10 @@ class BasicBlockParser implements BlockParser {
         }
     };
 
+    @Nonnull
     private final String endingDirective;
 
-    BasicBlockParser(String endingDirective) {
+    BasicBlockParser(@Nonnull String endingDirective) {
         this.endingDirective = endingDirective;
     }
 
@@ -112,15 +125,17 @@ class BasicBlockParser implements BlockParser {
         return this.createBlock(nodes, new UnclosedBlockParseError(blockMnemonic));
     }
 
-    SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
+    @Nonnull
+    SourceNode createBlock(@Nonnull Iterable<? extends SourceNode> childNodes, @CheckForNull ParseError parseError) {
         return new Block(childNodes, parseError);
     }
 
-    SourceNode createBodyBlock(Iterable<? extends SourceNode> childNodes) {
+    @Nonnull
+    SourceNode createBodyBlock(@Nonnull Iterable<? extends SourceNode> childNodes) {
         return new SimpleCompositeSourceNode(childNodes);
     }
 
-    void missingEndDirective(@SuppressWarnings("unused") ArrayList<SourceNode> nodes) {
+    void missingEndDirective(@Nonnull @SuppressWarnings("unused") ArrayList<SourceNode> nodes) {
     }
 
 }

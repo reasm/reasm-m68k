@@ -1,5 +1,8 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.reasm.AssemblyMessage;
 import org.reasm.m68k.M68KArchitecture;
 import org.reasm.m68k.messages.AddressingModeNotAllowedHereErrorMessage;
@@ -15,14 +18,21 @@ import org.reasm.m68k.messages.TrapVectorOutOfRangeErrorMessage;
  */
 public abstract class BaseInstructionsTest extends BaseProgramsTest {
 
+    @Nonnull
     static final short[] NO_DATA = new short[0];
+    @Nonnull
     static final AssemblyMessage ADDRESSING_MODE_NOT_ALLOWED_HERE = new AddressingModeNotAllowedHereErrorMessage();
+    @Nonnull
     static final AssemblyMessage BREAKPOINT_NUMBER_OUT_OF_RANGE = new BreakpointNumberOutOfRangeErrorMessage();
+    @Nonnull
     static final AssemblyMessage BRANCH_TARGET_OUT_OF_RANGE = new BranchTargetOutOfRangeErrorMessage();
+    @Nonnull
     static final AssemblyMessage LABEL_EXPECTED = new LabelExpectedErrorMessage();
+    @Nonnull
     static final AssemblyMessage TRAP_VECTOR_OUT_OF_RANGE = new TrapVectorOutOfRangeErrorMessage();
 
-    private static byte[] wordsToBytes(short[] words) {
+    @Nonnull
+    private static byte[] wordsToBytes(@Nonnull short[] words) {
         final byte[] bytes = new byte[words.length * 2];
 
         for (int i = 0; i < words.length; i++) {
@@ -48,8 +58,8 @@ public abstract class BaseInstructionsTest extends BaseProgramsTest {
      *            an array of {@link AssemblyMessage} that are expected to be generated while assembling the line of code. Takes
      *            priority over <code>expectedMessage</code>.
      */
-    public BaseInstructionsTest(String code, short[] output, M68KArchitecture architecture, AssemblyMessage expectedMessage,
-            AssemblyMessage[] expectedMessages) {
+    public BaseInstructionsTest(@Nonnull String code, @Nonnull short[] output, @Nonnull M68KArchitecture architecture,
+            @CheckForNull AssemblyMessage expectedMessage, @CheckForNull AssemblyMessage[] expectedMessages) {
         super(code, 2, wordsToBytes(output), architecture, expectedMessage, expectedMessages, null);
     }
 

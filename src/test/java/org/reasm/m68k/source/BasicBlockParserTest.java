@@ -15,6 +15,9 @@ import static org.reasm.m68k.source.BlockParserTestsCommon.INCOMPLETE_BLOCK;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.reasm.AssemblyBuilder;
@@ -35,6 +38,7 @@ import ca.fragag.text.DocumentReader;
  */
 public class BasicBlockParserTest {
 
+    @Nonnull
     static final SourceNode MISSING_END_DIRECTIVE = new SourceNode(0, null) {
         @Override
         protected void assembleCore(AssemblyBuilder builder) {
@@ -42,6 +46,7 @@ public class BasicBlockParserTest {
         }
     };
 
+    @Nonnull
     private static final BasicBlockParser TEST_BLOCK_PARSER = new BasicBlockParser("ENDBLOCK") {
         @Override
         void missingEndDirective(ArrayList<SourceNode> nodes) {
@@ -49,12 +54,13 @@ public class BasicBlockParserTest {
         };
     };
 
-    private static void parseBasicBlock(String code, Class<?> blockType, Class<?> bodyType,
-            Matcher<? super ParseError> blockParseErrorMatcher, Matcher<? super SourceNode> thirdChildNodeMatcher) {
+    private static void parseBasicBlock(@Nonnull String code, @Nonnull Class<?> blockType, @Nonnull Class<?> bodyType,
+            @Nonnull Matcher<? super ParseError> blockParseErrorMatcher,
+            @CheckForNull Matcher<? super SourceNode> thirdChildNodeMatcher) {
         BlockParserTestsCommon.parseBasicBlock(code, blockType, bodyType, blockParseErrorMatcher, thirdChildNodeMatcher);
     }
 
-    private static List<SourceNode> parseBlock(String code, Matcher<? super ParseError> blockParseErrorMatcher) {
+    private static List<SourceNode> parseBlock(@Nonnull String code, @Nonnull Matcher<? super ParseError> blockParseErrorMatcher) {
         final DocumentReader reader = new DocumentReader(new Document(code), 7);
         final LogicalLine firstLine = new LogicalLine(7, null, new SubstringBounds[0], new SubstringBounds(1, 6),
                 new SubstringBounds[0], null, new int[0]);
@@ -79,7 +85,7 @@ public class BasicBlockParserTest {
         return childNodes;
     }
 
-    private static CompositeSourceNode parseCompleteBlock(String code) {
+    private static CompositeSourceNode parseCompleteBlock(@Nonnull String code) {
         final List<SourceNode> childNodes = parseBlock(code, COMPLETE_BLOCK);
 
         final SourceNode blockEnd = childNodes.get(2);
@@ -90,12 +96,12 @@ public class BasicBlockParserTest {
         return (CompositeSourceNode) childNodes.get(1);
     }
 
-    private static void parseForBlock(String code, Matcher<? super ParseError> blockParseErrorMatcher,
-            Matcher<? super SourceNode> thirdChildNodeMatcher) {
+    private static void parseForBlock(@Nonnull String code, @Nonnull Matcher<? super ParseError> blockParseErrorMatcher,
+            @CheckForNull Matcher<? super SourceNode> thirdChildNodeMatcher) {
         parseBasicBlock(code, ForBlock.class, SimpleCompositeSourceNode.class, blockParseErrorMatcher, thirdChildNodeMatcher);
     }
 
-    private static CompositeSourceNode parseIncompleteBlock(String code) {
+    private static CompositeSourceNode parseIncompleteBlock(@Nonnull String code) {
         final Matcher<Object> blockParseErrorMatcher = both(INCOMPLETE_BLOCK).and(
                 hasProperty("startingDirective", equalTo("BLOCK")));
         final List<SourceNode> childNodes = parseBlock(code, blockParseErrorMatcher);
@@ -108,28 +114,28 @@ public class BasicBlockParserTest {
         return (CompositeSourceNode) childNodes.get(1);
     }
 
-    private static void parseMacroBlock(String code, Matcher<? super ParseError> blockParseErrorMatcher,
-            Matcher<? super SourceNode> thirdChildNodeMatcher) {
+    private static void parseMacroBlock(@Nonnull String code, @Nonnull Matcher<? super ParseError> blockParseErrorMatcher,
+            @CheckForNull Matcher<? super SourceNode> thirdChildNodeMatcher) {
         parseBasicBlock(code, MacroBlock.class, MacroBody.class, blockParseErrorMatcher, thirdChildNodeMatcher);
     }
 
-    private static void parseNamespaceBlock(String code, Matcher<? super ParseError> blockParseErrorMatcher,
-            Matcher<? super SourceNode> thirdChildNodeMatcher) {
+    private static void parseNamespaceBlock(@Nonnull String code, @Nonnull Matcher<? super ParseError> blockParseErrorMatcher,
+            @CheckForNull Matcher<? super SourceNode> thirdChildNodeMatcher) {
         parseBasicBlock(code, NamespaceBlock.class, SimpleCompositeSourceNode.class, blockParseErrorMatcher, thirdChildNodeMatcher);
     }
 
-    private static void parseReptBlock(String code, Matcher<? super ParseError> blockParseErrorMatcher,
-            Matcher<? super SourceNode> thirdChildNodeMatcher) {
+    private static void parseReptBlock(@Nonnull String code, @Nonnull Matcher<? super ParseError> blockParseErrorMatcher,
+            @CheckForNull Matcher<? super SourceNode> thirdChildNodeMatcher) {
         parseBasicBlock(code, ReptBlock.class, ReptBody.class, blockParseErrorMatcher, thirdChildNodeMatcher);
     }
 
-    private static void parseTransformBlock(String code, Matcher<? super ParseError> blockParseErrorMatcher,
-            Matcher<? super SourceNode> thirdChildNodeMatcher) {
+    private static void parseTransformBlock(@Nonnull String code, @Nonnull Matcher<? super ParseError> blockParseErrorMatcher,
+            @CheckForNull Matcher<? super SourceNode> thirdChildNodeMatcher) {
         parseBasicBlock(code, TransformBlock.class, SimpleCompositeSourceNode.class, blockParseErrorMatcher, thirdChildNodeMatcher);
     }
 
-    private static void parseWhileBlock(String code, Matcher<? super ParseError> blockParseErrorMatcher,
-            Matcher<? super SourceNode> thirdChildNodeMatcher) {
+    private static void parseWhileBlock(@Nonnull String code, @Nonnull Matcher<? super ParseError> blockParseErrorMatcher,
+            @CheckForNull Matcher<? super SourceNode> thirdChildNodeMatcher) {
         parseBasicBlock(code, WhileBlock.class, SimpleCompositeSourceNode.class, blockParseErrorMatcher, thirdChildNodeMatcher);
     }
 

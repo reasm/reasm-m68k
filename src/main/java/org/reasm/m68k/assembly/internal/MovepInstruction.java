@@ -5,14 +5,26 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.InstructionSet;
 
+/**
+ * The <code>MOVEP</code> instruction.
+ *
+ * @author Francis Gagné
+ */
+@Immutable
 class MovepInstruction extends TwoEaInstruction {
 
+    @Nonnull
     static final MovepInstruction MOVEP = new MovepInstruction();
 
+    @Nonnull
     private static final Set<AddressingMode> ADDRESS_REGISTER_INDIRECT_WITH_DISPLACEMENT = Collections.unmodifiableSet(EnumSet
             .of(AddressingMode.ADDRESS_REGISTER_INDIRECT_WITH_DISPLACEMENT));
+    @Nonnull
     private static final Set<AddressingMode> DATA_REGISTER_DIRECT_OR_ADDRESS_REGISTER_INDIRECT_WITH_DISPLACEMENT = Collections
             .unmodifiableSet(EnumSet.of(AddressingMode.DATA_REGISTER_DIRECT,
                     AddressingMode.ADDRESS_REGISTER_INDIRECT_WITH_DISPLACEMENT));
@@ -20,8 +32,8 @@ class MovepInstruction extends TwoEaInstruction {
     @Override
     void assemble(M68KAssemblyContext context, InstructionSize size, EffectiveAddress ea0, EffectiveAddress ea1) throws IOException {
         final EffectiveAddress eaOutput;
-        int mode;
         final int dataRegister;
+        int mode;
         if (ea0.isAddressRegisterIndirectWithDisplacement() && ea1.isDataRegisterDirect()) {
             eaOutput = ea0;
             dataRegister = ea1.getRegister();

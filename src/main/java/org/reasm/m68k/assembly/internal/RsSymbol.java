@@ -1,5 +1,7 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.Nonnull;
+
 import org.reasm.SignedIntValue;
 import org.reasm.Symbol;
 import org.reasm.SymbolType;
@@ -11,7 +13,7 @@ import org.reasm.Value;
  *
  * @author Francis Gagné
  */
-class RsSymbol extends Symbol {
+final class RsSymbol extends Symbol {
 
     private long longValue;
     private boolean signed;
@@ -21,6 +23,7 @@ class RsSymbol extends Symbol {
         super("__RS", SymbolType.VARIABLE);
     }
 
+    @Nonnull
     @Override
     public final Value getValue() {
         if (this.value == null) {

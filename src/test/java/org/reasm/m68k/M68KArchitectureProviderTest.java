@@ -6,6 +6,8 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Iterator;
 
+import javax.annotation.Nonnull;
+
 import org.junit.Test;
 import org.reasm.Architecture;
 
@@ -16,6 +18,7 @@ import org.reasm.Architecture;
  */
 public class M68KArchitectureProviderTest {
 
+    @Nonnull
     private static final M68KArchitectureProvider M68K_ARCHITECTURE_PROVIDER = new M68KArchitectureProvider();
 
     /**

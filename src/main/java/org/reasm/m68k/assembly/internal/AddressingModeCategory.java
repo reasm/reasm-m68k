@@ -5,6 +5,8 @@ import static java.util.Collections.unmodifiableSet;
 import java.util.EnumSet;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 /**
  * Defines constants for sets of addressing modes that are allowed in instructions.
  *
@@ -12,26 +14,45 @@ import java.util.Set;
  */
 final class AddressingModeCategory {
 
+    @Nonnull
     public static final Set<AddressingMode> ALL;
+    @Nonnull
     public static final Set<AddressingMode> DATA;
+    @Nonnull
     public static final Set<AddressingMode> MEMORY;
+    @Nonnull
     public static final Set<AddressingMode> CONTROL_WITH_POSTINCREMENT;
+    @Nonnull
     public static final Set<AddressingMode> CONTROL;
 
+    @Nonnull
     public static final Set<AddressingMode> ALTERABLE;
+    @Nonnull
     public static final Set<AddressingMode> DATA_ALTERABLE;
+    @Nonnull
     public static final Set<AddressingMode> MEMORY_ALTERABLE;
+    @Nonnull
     public static final Set<AddressingMode> CONTROL_ALTERABLE_WITH_PREDECREMENT;
+    @Nonnull
     public static final Set<AddressingMode> CONTROL_ALTERABLE;
 
+    @Nonnull
     public static final Set<AddressingMode> DATA_REGISTER_DIRECT;
+    @Nonnull
     public static final Set<AddressingMode> ADDRESS_REGISTER_DIRECT;
+    @Nonnull
     public static final Set<AddressingMode> DATA_OR_ADDRESS_REGISTER_DIRECT;
+    @Nonnull
     public static final Set<AddressingMode> ADDRESS_REGISTER_INDIRECT_WITH_POSTINCREMENT;
+    @Nonnull
     public static final Set<AddressingMode> ADDRESS_REGISTER_INDIRECT_WITH_PREDECREMENT;
+    @Nonnull
     public static final Set<AddressingMode> IMMEDIATE_DATA;
+    @Nonnull
     public static final Set<AddressingMode> DATA_REGISTER_DIRECT_OR_IMMEDIATE_DATA;
+    @Nonnull
     public static final Set<AddressingMode> ALL_EXCEPT_IMMEDIATE_DATA;
+    @Nonnull
     public static final Set<AddressingMode> DATA_EXCEPT_IMMEDIATE_DATA;
 
     static {
@@ -88,26 +109,32 @@ final class AddressingModeCategory {
         DATA_EXCEPT_IMMEDIATE_DATA = unmodifiableSet(dataExceptImmediateData);
     }
 
-    private static <E extends Enum<E>> EnumSet<E> conjunction(EnumSet<E> left, EnumSet<E> right) {
+    @Nonnull
+    private static <E extends Enum<E>> EnumSet<E> conjunction(@Nonnull EnumSet<E> left, @Nonnull EnumSet<E> right) {
         final EnumSet<E> result = EnumSet.copyOf(left);
         result.retainAll(right);
         return result;
     }
 
-    private static <E extends Enum<E>> EnumSet<E> sameWithout(EnumSet<E> baseSet, E excluded) {
+    @Nonnull
+    private static <E extends Enum<E>> EnumSet<E> sameWithout(@Nonnull EnumSet<E> baseSet, @Nonnull E excluded) {
         final EnumSet<E> result = EnumSet.copyOf(baseSet);
         result.remove(excluded);
         return result;
     }
 
-    private static <E extends Enum<E>> EnumSet<E> sameWithout(EnumSet<E> baseSet, E excluded1, E excluded2) {
+    @Nonnull
+    private static <E extends Enum<E>> EnumSet<E> sameWithout(@Nonnull EnumSet<E> baseSet, @Nonnull E excluded1,
+            @Nonnull E excluded2) {
         final EnumSet<E> result = EnumSet.copyOf(baseSet);
         result.remove(excluded1);
         result.remove(excluded2);
         return result;
     }
 
-    private static <E extends Enum<E>> EnumSet<E> sameWithout(EnumSet<E> baseSet, E excluded1, E excluded2, E excluded3) {
+    @Nonnull
+    private static <E extends Enum<E>> EnumSet<E> sameWithout(@Nonnull EnumSet<E> baseSet, @Nonnull E excluded1,
+            @Nonnull E excluded2, @Nonnull E excluded3) {
         final EnumSet<E> result = EnumSet.copyOf(baseSet);
         result.remove(excluded1);
         result.remove(excluded2);

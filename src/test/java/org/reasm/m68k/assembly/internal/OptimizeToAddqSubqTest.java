@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -19,6 +21,7 @@ import org.reasm.m68k.M68KArchitecture;
 @RunWith(Parameterized.class)
 public class OptimizeToAddqSubqTest extends BaseInstructionsTest {
 
+    @Nonnull
     private static final List<Object[]> TEST_DATA = new ArrayList<>();
 
     static {
@@ -91,12 +94,13 @@ public class OptimizeToAddqSubqTest extends BaseInstructionsTest {
      *
      * @return the test data
      */
+    @Nonnull
     @Parameters
     public static List<Object[]> data() {
         return TEST_DATA;
     }
 
-    private static void addDataItem(String code, short[] output) {
+    private static void addDataItem(@Nonnull String code, @Nonnull short[] output) {
         TEST_DATA.add(new Object[] { code, output });
     }
 
@@ -108,10 +112,11 @@ public class OptimizeToAddqSubqTest extends BaseInstructionsTest {
      * @param output
      *            the generated opcode for the instruction
      */
-    public OptimizeToAddqSubqTest(String code, short[] output) {
+    public OptimizeToAddqSubqTest(@Nonnull String code, @Nonnull short[] output) {
         super(code, output, M68KArchitecture.MC68000, null, null);
     }
 
+    @Nonnull
     @Override
     protected Map<String, Object> getM68KConfigurationOptions() {
         final HashMap<String, Object> m68kOptions = new HashMap<>();

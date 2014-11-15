@@ -3,6 +3,9 @@ package org.reasm.m68k.assembly.internal;
 import java.io.IOException;
 import java.util.EnumMap;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.AssemblyMessage;
 import org.reasm.SymbolContext;
 import org.reasm.SymbolType;
@@ -16,8 +19,10 @@ import com.google.common.primitives.UnsignedLongs;
  *
  * @author Francis Gagné
  */
+@Immutable
 abstract class DsRsDirective extends Mnemonic {
 
+    @Nonnull
     static final DsRsDirective DS = new DsRsDirective() {
         @Override
         void assemble(M68KAssemblyContext context, long count, long itemSize) throws IOException {
@@ -38,6 +43,7 @@ abstract class DsRsDirective extends Mnemonic {
         }
     };
 
+    @Nonnull
     static final DsRsDirective RS = new DsRsDirective() {
         @Override
         void assemble(M68KAssemblyContext context, long count, long itemSize) throws IOException {
@@ -56,6 +62,7 @@ abstract class DsRsDirective extends Mnemonic {
         }
     };
 
+    @Nonnull
     private static final CardinalValueVisitor.ErrorFactory NEGATIVE_VALUE_ERROR_FACTORY = new CardinalValueVisitor.ErrorFactory() {
         @Override
         public AssemblyMessage createMessage() {
@@ -63,6 +70,7 @@ abstract class DsRsDirective extends Mnemonic {
         }
     };
 
+    @Nonnull
     private static final EnumMap<InstructionSize, Long> ITEM_SIZE_BY_INSTRUCTION_SIZE = new EnumMap<>(InstructionSize.class);
 
     static {
@@ -103,8 +111,8 @@ abstract class DsRsDirective extends Mnemonic {
         }
     }
 
-    abstract void assemble(M68KAssemblyContext context, long count, long itemSize) throws IOException;
+    abstract void assemble(@Nonnull M68KAssemblyContext context, long count, long itemSize) throws IOException;
 
-    abstract void automaticEven(M68KAssemblyContext context) throws IOException;
+    abstract void automaticEven(@Nonnull M68KAssemblyContext context) throws IOException;
 
 }

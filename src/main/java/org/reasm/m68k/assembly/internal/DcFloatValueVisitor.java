@@ -2,6 +2,8 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+
 import org.reasm.Function;
 import org.reasm.StringValue;
 import org.reasm.Value;
@@ -20,11 +22,13 @@ final class DcFloatValueVisitor implements DcValueVisitor {
         return value;
     }
 
+    @Nonnull
     private final M68KAssemblyContext context;
-    private InstructionSize size;
+    @Nonnull
+    private InstructionSize size = InstructionSize.DEFAULT;
     private double output;
 
-    DcFloatValueVisitor(M68KAssemblyContext context) {
+    DcFloatValueVisitor(@Nonnull M68KAssemblyContext context) {
         this.context = context;
     }
 

@@ -12,6 +12,8 @@ import static org.reasm.m68k.source.BlockParserTestsCommon.INCOMPLETE_BLOCK;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.reasm.m68k.parseerrors.ElseOrElseIfAfterElseParseError;
@@ -29,7 +31,7 @@ import ca.fragag.text.Document;
  */
 public class IfBlockParserTest {
 
-    private static void parseIfBlock(String code, Matcher<Object> blockParseErrorMatcher, int numberOfChildNodes) {
+    private static void parseIfBlock(@Nonnull String code, @Nonnull Matcher<Object> blockParseErrorMatcher, int numberOfChildNodes) {
         SourceNode node = Parser.parse(new Document(code));
         assertThat(node.getParseError(), is(nullValue()));
         List<SourceNode> childNodes = ((CompositeSourceNode) node).getChildNodes();

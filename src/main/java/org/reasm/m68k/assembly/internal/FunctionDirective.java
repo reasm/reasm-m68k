@@ -2,6 +2,8 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+
 import org.reasm.FunctionValue;
 import org.reasm.SymbolContext;
 import org.reasm.SymbolType;
@@ -11,8 +13,14 @@ import org.reasm.m68k.expressions.internal.TokenType;
 import org.reasm.m68k.messages.FunctionParameterIsNotSimpleIdentifierErrorMessage;
 import org.reasm.messages.DirectiveRequiresLabelErrorMessage;
 
-final class FunctionDirective extends Mnemonic {
+/**
+ * The <code>FUNCTION</code> directive.
+ *
+ * @author Francis Gagné
+ */
+class FunctionDirective extends Mnemonic {
 
+    @Nonnull
     static final FunctionDirective FUNCTION = new FunctionDirective();
 
     private FunctionDirective() {

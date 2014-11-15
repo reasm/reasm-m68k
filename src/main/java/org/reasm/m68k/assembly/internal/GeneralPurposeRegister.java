@@ -1,5 +1,7 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
 @Immutable
@@ -7,9 +9,11 @@ enum GeneralPurposeRegister {
 
     D0, D1, D2, D3, D4, D5, D6, D7, A0, A1, A2, A3, A4, A5, A6, A7;
 
+    @Nonnull
     private static final GeneralPurposeRegister[] VALUES = GeneralPurposeRegister.values();
 
-    static GeneralPurposeRegister identify(String identifier) {
+    @CheckForNull
+    static GeneralPurposeRegister identify(@Nonnull String identifier) {
         if (identifier.length() == 2) {
             final char ch = identifier.charAt(0);
             final boolean isDataRegister = equalsAsciiCaseInsensitive(ch, 'D');

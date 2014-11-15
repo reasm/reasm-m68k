@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import javax.annotation.Nonnull;
+
 import org.reasm.Assembly;
 import org.reasm.AssemblyCompletionStatus;
 import org.reasm.Configuration;
@@ -28,11 +30,17 @@ import ca.fragag.testhelpers.ObjectHashCodeEqualsContract;
  */
 public class UserFunctionTest extends ObjectHashCodeEqualsContract {
 
+    @Nonnull
     private static final Object MAIN_OBJECT;
+    @Nonnull
     private static final Object OTHER_EQUAL_OBJECT;
+    @Nonnull
     private static final Object ANOTHER_EQUAL_OBJECT;
+    @Nonnull
     private static final Object DIFFERENT_OBJECT_0;
+    @Nonnull
     private static final Object DIFFERENT_OBJECT_1;
+    @Nonnull
     private static final Object DIFFERENT_OBJECT_2;
 
     static {
@@ -99,7 +107,8 @@ public class UserFunctionTest extends ObjectHashCodeEqualsContract {
         DIFFERENT_OBJECT_2 = getFunction(assembly, "F");
     }
 
-    private static Object getFunction(Assembly assembly, String symbolName) {
+    @Nonnull
+    private static Object getFunction(@Nonnull Assembly assembly, @Nonnull String symbolName) {
         final Object symbolValue = assembly.resolveSymbolReference(SymbolContext.VALUE, symbolName, false, false, null, null)
                 .getValue();
         assertThat(symbolValue, HasType.hasType(FunctionValue.class));

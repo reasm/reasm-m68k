@@ -1,16 +1,21 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.AssemblyErrorMessage;
 import org.reasm.m68k.messages.DephaseWithoutPhaseErrorMessage;
 import org.reasm.m68k.messages.ObjendWithoutObjErrorMessage;
 
 /**
- * The <code>OBJEND</code> (a.k.a. <code>DEPHASE</code>) directive.
+ * The <code>OBJEND</code> and <code>DEPHASE</code> directives.
  *
  * @author Francis Gagné
  */
+@Immutable
 abstract class ObjendDirective extends Mnemonic {
 
+    @Nonnull
     static final ObjendDirective DEPHASE = new ObjendDirective() {
         @Override
         AssemblyErrorMessage createWrongContextErrorMessage() {
@@ -18,6 +23,7 @@ abstract class ObjendDirective extends Mnemonic {
         }
     };
 
+    @Nonnull
     static final ObjendDirective OBJEND = new ObjendDirective() {
         @Override
         AssemblyErrorMessage createWrongContextErrorMessage() {
@@ -26,7 +32,7 @@ abstract class ObjendDirective extends Mnemonic {
     };
 
     @Override
-    protected void assemble(M68KAssemblyContext context) {
+    void assemble(M68KAssemblyContext context) {
         context.sizeNotAllowed();
         context.requireNumberOfOperands(0);
 
@@ -36,6 +42,7 @@ abstract class ObjendDirective extends Mnemonic {
         }
     }
 
+    @Nonnull
     abstract AssemblyErrorMessage createWrongContextErrorMessage();
 
 }

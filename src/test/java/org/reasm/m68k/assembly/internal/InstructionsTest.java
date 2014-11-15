@@ -3,6 +3,9 @@ package org.reasm.m68k.assembly.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -18,12 +21,18 @@ import org.reasm.m68k.messages.*;
 @RunWith(Parameterized.class)
 public class InstructionsTest extends BaseInstructionsTest {
 
+    @Nonnull
     private static final AssemblyMessage DATA_FOR_ADDQ_SUBQ_OUT_OF_RANGE = new DataForAddqSubqOutOfRangeErrorMessage();
+    @Nonnull
     private static final AssemblyMessage MOVEM_REQUIRES_A_REGISTER_LIST_IN_EXACTLY_ONE_OPERAND = new MovemRequiresARegisterListInExactlyOneOperandErrorMessage();
+    @Nonnull
     private static final AssemblyMessage DATA_FOR_MOVEQ_WILL_BE_SIGN_EXTENDED = new DataForMoveqWillBeSignExtendedWarningMessage();
+    @Nonnull
     private static final AssemblyMessage DATA_FOR_MOVEQ_OUT_OF_RANGE = new DataForMoveqOutOfRangeErrorMessage();
+    @Nonnull
     private static final AssemblyMessage SHIFT_COUNT_OUT_OF_RANGE = new ShiftCountOutOfRangeErrorMessage();
 
+    @Nonnull
     private static final List<Object[]> TEST_DATA = new ArrayList<>();
 
     static {
@@ -1466,32 +1475,36 @@ public class InstructionsTest extends BaseInstructionsTest {
      *
      * @return the test data
      */
+    @Nonnull
     @Parameters
     public static List<Object[]> data() {
         return TEST_DATA;
     }
 
-    private static void addDataItem(String code, short[] output) {
+    private static void addDataItem(@Nonnull String code, @Nonnull short[] output) {
         addDataItem(code, output, M68KArchitecture.MC68000, (AssemblyMessage) null);
     }
 
-    private static void addDataItem(String code, short[] output, AssemblyMessage expectedMessage) {
+    private static void addDataItem(@Nonnull String code, @Nonnull short[] output, @CheckForNull AssemblyMessage expectedMessage) {
         addDataItem(code, output, M68KArchitecture.MC68000, expectedMessage);
     }
 
-    private static void addDataItem(String code, short[] output, AssemblyMessage... expectedMessages) {
+    private static void addDataItem(@Nonnull String code, @Nonnull short[] output,
+            @CheckForNull AssemblyMessage... expectedMessages) {
         addDataItem(code, output, M68KArchitecture.MC68000, expectedMessages);
     }
 
-    private static void addDataItem(String code, short[] output, M68KArchitecture architecture) {
+    private static void addDataItem(@Nonnull String code, @Nonnull short[] output, @Nonnull M68KArchitecture architecture) {
         addDataItem(code, output, architecture, (AssemblyMessage) null);
     }
 
-    private static void addDataItem(String code, short[] output, M68KArchitecture architecture, AssemblyMessage expectedMessage) {
+    private static void addDataItem(@Nonnull String code, @Nonnull short[] output, @Nonnull M68KArchitecture architecture,
+            @CheckForNull AssemblyMessage expectedMessage) {
         TEST_DATA.add(new Object[] { code, output, architecture, expectedMessage, null });
     }
 
-    private static void addDataItem(String code, short[] output, M68KArchitecture architecture, AssemblyMessage... expectedMessages) {
+    private static void addDataItem(@Nonnull String code, @Nonnull short[] output, @Nonnull M68KArchitecture architecture,
+            @CheckForNull AssemblyMessage... expectedMessages) {
         TEST_DATA.add(new Object[] { code, output, architecture, null, expectedMessages });
     }
 
@@ -1510,8 +1523,8 @@ public class InstructionsTest extends BaseInstructionsTest {
      *            an array of {@link AssemblyMessage} that are expected to be generated while assembling the line of code. Takes
      *            priority over expectedMessage.
      */
-    public InstructionsTest(String code, short[] output, M68KArchitecture architecture, AssemblyMessage expectedMessage,
-            AssemblyMessage[] expectedMessages) {
+    public InstructionsTest(@Nonnull String code, @Nonnull short[] output, @Nonnull M68KArchitecture architecture,
+            @CheckForNull AssemblyMessage expectedMessage, @CheckForNull AssemblyMessage[] expectedMessages) {
         super(code, output, architecture, expectedMessage, expectedMessages);
     }
 

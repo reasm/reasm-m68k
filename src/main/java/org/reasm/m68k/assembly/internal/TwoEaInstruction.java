@@ -3,6 +3,9 @@ package org.reasm.m68k.assembly.internal;
 import java.io.IOException;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.InstructionSet;
 
 /**
@@ -12,6 +15,7 @@ import org.reasm.m68k.InstructionSet;
  *
  * @author Francis Gagné
  */
+@Immutable
 abstract class TwoEaInstruction extends TwoOperandIntegerInstruction {
 
     @Override
@@ -30,11 +34,14 @@ abstract class TwoEaInstruction extends TwoOperandIntegerInstruction {
         this.assemble(context, size, ea0, ea1);
     }
 
-    abstract void assemble(M68KAssemblyContext context, InstructionSize size, EffectiveAddress ea0, EffectiveAddress ea1)
-            throws IOException;
+    abstract void assemble(@Nonnull M68KAssemblyContext context, @Nonnull InstructionSize size, @Nonnull EffectiveAddress ea0,
+            @Nonnull EffectiveAddress ea1) throws IOException;
 
-    abstract Set<AddressingMode> getValidAddressingModesForDestinationOperand(InstructionSet instructionSet, EffectiveAddress ea0);
+    @Nonnull
+    abstract Set<AddressingMode> getValidAddressingModesForDestinationOperand(@Nonnull InstructionSet instructionSet,
+            @Nonnull EffectiveAddress ea0);
 
-    abstract Set<AddressingMode> getValidAddressingModesForSourceOperand(InstructionSet instructionSet);
+    @Nonnull
+    abstract Set<AddressingMode> getValidAddressingModesForSourceOperand(@Nonnull InstructionSet instructionSet);
 
 }

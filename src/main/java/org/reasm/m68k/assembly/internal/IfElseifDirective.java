@@ -1,5 +1,8 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.Value;
 import org.reasm.ValueToBooleanVisitor;
 import org.reasm.m68k.messages.ElseifWithoutIfErrorMessage;
@@ -9,8 +12,10 @@ import org.reasm.m68k.messages.ElseifWithoutIfErrorMessage;
  *
  * @author Francis Gagné
  */
+@Immutable
 abstract class IfElseifDirective extends Mnemonic {
 
+    @Nonnull
     static final IfElseifDirective IF = new IfElseifDirective() {
         @Override
         void notInIfBlock(M68KAssemblyContext context) {
@@ -18,15 +23,13 @@ abstract class IfElseifDirective extends Mnemonic {
         }
     };
 
+    @Nonnull
     static final IfElseifDirective ELSEIF = new IfElseifDirective() {
         @Override
         void notInIfBlock(M68KAssemblyContext context) {
             context.addMessage(new ElseifWithoutIfErrorMessage());
         }
     };
-
-    IfElseifDirective() {
-    }
 
     @Override
     void assemble(M68KAssemblyContext context) {
@@ -49,6 +52,6 @@ abstract class IfElseifDirective extends Mnemonic {
         }
     }
 
-    abstract void notInIfBlock(M68KAssemblyContext context);
+    abstract void notInIfBlock(@Nonnull M68KAssemblyContext context);
 
 }

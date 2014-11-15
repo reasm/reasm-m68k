@@ -1,10 +1,20 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.messages.EndifWithoutIfErrorMessage;
 
+/**
+ * The <code>ENDIF</code> and <code>ENDC</code> directives.
+ *
+ * @author Francis Gagné
+ */
+@Immutable
 class EndifDirective extends Mnemonic {
 
-    public static final EndifDirective ENDIF = new EndifDirective();
+    @Nonnull
+    static final EndifDirective ENDIF = new EndifDirective();
 
     private EndifDirective() {
     }

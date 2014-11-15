@@ -3,17 +3,22 @@ package org.reasm.m68k.assembly.internal;
 import java.io.IOException;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * The <code>MOVE</code> instruction.
  *
  * @author Francis Gagné
  */
+@Immutable
 class MoveInstruction extends TwoOperandIntegerInstruction {
 
+    @Nonnull
     static final MoveInstruction MOVE = new MoveInstruction();
 
-    static void assembleBasicMove(M68KAssemblyContext context, InstructionSize size,
-            Set<AddressingMode> validAddressingModesForDestination) throws IOException {
+    static void assembleBasicMove(@Nonnull M68KAssemblyContext context, @Nonnull InstructionSize size,
+            @Nonnull Set<AddressingMode> validAddressingModesForDestination) throws IOException {
         final EffectiveAddress ea0 = context.ea0;
         final EffectiveAddress ea1 = context.ea1;
 
@@ -57,8 +62,8 @@ class MoveInstruction extends TwoOperandIntegerInstruction {
         context.appendEffectiveAddress(ea1, 1);
     }
 
-    private static void assembleMoveSrCcr(M68KAssemblyContext context, int otherOperandIndex, InstructionSize size, boolean isCcr,
-            boolean isDest) throws IOException {
+    private static void assembleMoveSrCcr(@Nonnull M68KAssemblyContext context, int otherOperandIndex,
+            @Nonnull InstructionSize size, boolean isCcr, boolean isDest) throws IOException {
         final EffectiveAddress ea = context.ea0;
 
         // Parse and evaluate the operand that is not the CCR or SR register.
@@ -75,8 +80,8 @@ class MoveInstruction extends TwoOperandIntegerInstruction {
         }
     }
 
-    private static void assembleMoveUsp(M68KAssemblyContext context, int otherOperandIndex, InstructionSize size, boolean isDest)
-            throws IOException {
+    private static void assembleMoveUsp(@Nonnull M68KAssemblyContext context, int otherOperandIndex, @Nonnull InstructionSize size,
+            boolean isDest) throws IOException {
         final EffectiveAddress ea = context.ea0;
 
         // Parse and evaluate the operand that is not the USP register.

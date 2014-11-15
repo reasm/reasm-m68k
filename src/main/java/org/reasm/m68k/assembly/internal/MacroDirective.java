@@ -2,13 +2,23 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.AssemblyStepLocation;
 import org.reasm.SymbolType;
 import org.reasm.messages.DirectiveRequiresLabelErrorMessage;
 import org.reasm.source.SourceLocation;
 
+/**
+ * The <code>MACRO</code> directive.
+ *
+ * @author Francis Gagné
+ */
+@Immutable
 class MacroDirective extends Mnemonic {
 
+    @Nonnull
     static final MacroDirective MACRO = new MacroDirective();
 
     private MacroDirective() {

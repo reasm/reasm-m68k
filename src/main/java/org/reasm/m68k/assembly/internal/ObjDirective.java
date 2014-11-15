@@ -1,19 +1,24 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * The <code>OBJ</code> (a.k.a. <code>PHASE</code>) directive.
  *
  * @author Francis Gagné
  */
+@Immutable
 class ObjDirective extends Mnemonic {
 
+    @Nonnull
     static final ObjDirective OBJ = new ObjDirective();
 
     private ObjDirective() {
     }
 
     @Override
-    protected void assemble(M68KAssemblyContext context) {
+    void assemble(M68KAssemblyContext context) {
         context.sizeNotAllowed();
 
         final Object block = context.getParentBlock();

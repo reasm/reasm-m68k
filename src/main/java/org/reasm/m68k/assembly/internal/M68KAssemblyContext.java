@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.reasm.*;
 import org.reasm.expressions.EvaluationContext;
 import org.reasm.expressions.SymbolLookup;
@@ -31,27 +34,38 @@ import com.google.common.collect.ImmutableList;
 final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Consumer<AssemblyMessage>, CustomAssemblyData,
         SymbolResolutionFallback {
 
+    /**
+     * The key for {@link AssemblyBuilder#getCustomAssemblyData(Object)} and
+     * {@link AssemblyBuilder#setCustomAssemblyData(Object, CustomAssemblyData)}.
+     */
+    @Nonnull
     static final Object KEY = new Object();
 
     /** The symbol context for register aliases. Register aliases can be used in place of a standard register name. */
+    @Nonnull
     static final SymbolContext<GeneralPurposeRegister> REGISTER_ALIAS = new SymbolContext<>(GeneralPurposeRegister.class);
 
     /**
      * The symbol context for register list aliases. Register list aliases can be used where a register list is expected (e.g. in
      * the <code>MOVEM</code> instruction).
      */
+    @Nonnull
     static final SymbolContext<RegisterList> REGISTER_LIST_ALIAS = new SymbolContext<>(RegisterList.class);
 
+    /** The symbol context for mnemonics. */
+    @Nonnull
+    static final SymbolContext<Mnemonic> MNEMONIC = new SymbolContext<>(Mnemonic.class);
+
+    @Nonnull
     private static final ImmutableList<SymbolContext<?>> REGISTER_ALIAS_LOOKUP_CONTEXTS = ImmutableList.of(REGISTER_ALIAS,
             SymbolContext.VALUE);
 
+    @Nonnull
     private static final ImmutableList<SymbolContext<?>> REGISTER_LIST_ALIAS_LOOKUP_CONTEXTS = ImmutableList.of(
             REGISTER_LIST_ALIAS, REGISTER_ALIAS, SymbolContext.VALUE);
 
-    /** The symbol context for mnemonics. */
-    static final SymbolContext<Mnemonic> MNEMONIC = new SymbolContext<>(Mnemonic.class);
-
-    static M68KAssemblyContext getAssemblyContext(AssemblyBuilder builder) {
+    @Nonnull
+    static M68KAssemblyContext getAssemblyContext(@Nonnull AssemblyBuilder builder) {
         M68KAssemblyContext context = (M68KAssemblyContext) builder.getCustomAssemblyData(KEY);
         if (context == null) {
             // If it doesn't exist yet, create it.
@@ -79,6 +93,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         return context;
     }
 
+    @Nonnull
     final AssemblyBuilder builder;
 
     // Configuration options that can be changed during assembly
@@ -97,27 +112,41 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
     int numberOfOperands;
     String mnemonic;
     String attribute;
+    @CheckForNull
     private EvaluationContext evaluationContext;
 
     // Reusable objects
+    @Nonnull
     final LogicalLineReader logicalLineReader = new LogicalLineReader();
+    @Nonnull
     final Tokenizer tokenizer = new Tokenizer();
+    @Nonnull
     final EffectiveAddress ea0 = new EffectiveAddress();
+    @Nonnull
     final EffectiveAddress ea1 = new EffectiveAddress();
+    @Nonnull
     final BranchLabelValueVisitor branchLabelValueVisitor = new BranchLabelValueVisitor(this);
+    @Nonnull
     final CardinalValueVisitor cardinalValueVisitor = new CardinalValueVisitor(this);
+    @Nonnull
     final DcFloatValueVisitor dcFloatValueVisitor = new DcFloatValueVisitor(this);
+    @Nonnull
     final DcIntegerValueVisitor dcIntegerValueVisitor = new DcIntegerValueVisitor(this);
+    @Nonnull
     final IntegerValueVisitor integerValueVisitor = new IntegerValueVisitor(this);
+    @Nonnull
     final StringValueVisitor stringValueVisitor = new StringValueVisitor(this);
 
     // Persistent state
+    @Nonnull
     final Map<AssemblyStepLocation, Object> blockStateMap = new HashMap<>();
+    @Nonnull
     final Map<AssemblyStepLocation, Macro> macrosByDefinitionLocation = new HashMap<>();
     // - Special symbols
+    @Nonnull
     final RsSymbol rs = new RsSymbol();
 
-    M68KAssemblyContext(AssemblyBuilder builder) {
+    M68KAssemblyContext(@Nonnull AssemblyBuilder builder) {
         this.builder = builder;
     }
 
@@ -145,11 +174,11 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         this.addMessage(new InvalidSizeAttributeErrorMessage(this.attribute));
     }
 
-    void addMessage(AssemblyMessage message) {
+    void addMessage(@Nonnull AssemblyMessage message) {
         this.builder.addMessage(message);
     }
 
-    void addTentativeMessage(AssemblyMessage message) {
+    void addTentativeMessage(@Nonnull AssemblyMessage message) {
         this.builder.addTentativeMessage(message);
     }
 
@@ -161,11 +190,11 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         this.builder.appendAssembledData(by);
     }
 
-    void appendEffectiveAddress(EffectiveAddress ea) throws IOException {
+    void appendEffectiveAddress(@Nonnull EffectiveAddress ea) throws IOException {
         this.appendEffectiveAddress(ea, 0);
     }
 
-    void appendEffectiveAddress(EffectiveAddress ea, int firstWord) throws IOException {
+    void appendEffectiveAddress(@Nonnull EffectiveAddress ea, int firstWord) throws IOException {
         for (int i = firstWord; i < ea.numberOfWords; i++) {
             this.appendWord(ea.getWord(i));
         }
@@ -201,6 +230,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         }
     }
 
+    @Nonnull
     SymbolLookup createSymbolLookup() {
         return new M68KSymbolLookup(this, this.builder.getAssembly().getCurrentSymbolLookupContext());
     }
@@ -226,18 +256,21 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         }
     }
 
-    <TValue> void defineSymbol(SymbolContext<TValue> symbolContext, String symbolName, SymbolType symbolType, TValue value) {
+    <TValue> void defineSymbol(@Nonnull SymbolContext<TValue> symbolContext, @Nonnull String symbolName,
+            @Nonnull SymbolType symbolType, @CheckForNull TValue value) {
         final boolean isLocalName = M68KArchitecture.isLocalName(symbolName);
         this.builder.defineSymbol(symbolContext, symbolName, isLocalName, symbolType, value);
     }
 
-    <TValue> void defineSymbols(SymbolContext<TValue> symbolContext, SymbolType symbolType, TValue value) {
+    <TValue> void defineSymbols(@Nonnull SymbolContext<TValue> symbolContext, @Nonnull SymbolType symbolType,
+            @CheckForNull TValue value) {
         for (int i = 0; i < this.numberOfLabels; i++) {
             this.defineSymbol(symbolContext, this.getLabelText(i), symbolType, value);
         }
     }
 
-    DcValueVisitor getDcValueVisitor(InstructionSize size) {
+    @Nonnull
+    DcValueVisitor getDcValueVisitor(@Nonnull InstructionSize size) {
         switch (size) {
         case DEFAULT:
         case BYTE:
@@ -255,17 +288,19 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         }
     }
 
-    void getEffectiveAddress(String operand, Set<AddressingMode> validAddressingModes, InstructionSize size, EffectiveAddress ea) {
+    void getEffectiveAddress(@Nonnull String operand, @Nonnull Set<AddressingMode> validAddressingModes,
+            @Nonnull InstructionSize size, @Nonnull EffectiveAddress ea) {
         this.getEffectiveAddress(operand, validAddressingModes, size, 2, ea);
     }
 
-    void getEffectiveAddress(String operand, Set<AddressingMode> validAddressingModes, InstructionSize size,
-            int offsetToExtensionWords, EffectiveAddress ea) {
+    void getEffectiveAddress(@Nonnull String operand, @Nonnull Set<AddressingMode> validAddressingModes,
+            @Nonnull InstructionSize size, int offsetToExtensionWords, @Nonnull EffectiveAddress ea) {
         this.tokenizer.setCharSequence(operand);
         EffectiveAddress.getEffectiveAddress(this.tokenizer, this.createSymbolLookup(), validAddressingModes, false, size,
                 offsetToExtensionWords, this.getEvaluationContext(), this, this, ea);
     }
 
+    @Nonnull
     EvaluationContext getEvaluationContext() {
         if (this.evaluationContext == null) {
             this.evaluationContext = new EvaluationContext(this.builder.getAssembly(), this.programCounter, this);
@@ -274,15 +309,18 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         return this.evaluationContext;
     }
 
+    @Nonnull
     String getLabelText(int index) {
         this.logicalLineReader.setRange(this.sourceLocation, this.logicalLine, this.logicalLine.getLabelBounds(index));
         return this.logicalLineReader.readToString();
     }
 
-    Symbol getMnemonicSymbolByName(String name) {
+    @CheckForNull
+    Symbol getMnemonicSymbolByName(@Nonnull String name) {
         return this.getSymbolByContextAndName(MNEMONIC, name, Mnemonics.SYMBOL_RESOLUTION_FALLBACK);
     }
 
+    @Nonnull
     String getMnemonicText() {
         final SubstringBounds mnemonicBounds = this.logicalLine.getMnemonicBounds();
         assert mnemonicBounds != null;
@@ -290,15 +328,18 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         return this.logicalLineReader.readToString();
     }
 
+    @Nonnull
     String getOperandText(int index) {
         this.prepareOperandReader(index);
         return this.logicalLineReader.readToString();
     }
 
+    @CheckForNull
     Object getParentBlock() {
         return this.blockStateMap.get(this.step.getLocation().getParent());
     }
 
+    @CheckForNull
     SourceNode getParentNode() {
         final AssemblyStepLocation parent = this.step.getLocation().getParent();
         assert parent != null;
@@ -317,7 +358,8 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         return null;
     }
 
-    Symbol getRegisterAliasOrRegisterListAliasSymbolByName(String name) {
+    @CheckForNull
+    Symbol getRegisterAliasOrRegisterListAliasSymbolByName(@Nonnull String name) {
         final Symbol symbol = this.builder.resolveSymbolReference(REGISTER_LIST_ALIAS_LOOKUP_CONTEXTS, name,
                 M68KArchitecture.isLocalName(name), false, null, null).getSymbol();
 
@@ -328,6 +370,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         return null;
     }
 
+    @Nonnull
     InstructionSize parseInstructionSize() {
         if (this.attribute == null) {
             return InstructionSize.DEFAULT;
@@ -375,6 +418,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         }
     }
 
+    @Nonnull
     InstructionSize parseIntegerInstructionSize() {
         if (this.attribute == null) {
             return InstructionSize.DEFAULT;
@@ -433,7 +477,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         }
     }
 
-    void validateForByteAccess(EffectiveAddress ea) {
+    void validateForByteAccess(@Nonnull EffectiveAddress ea) {
         if (ea.isAddressRegisterDirect()) {
             this.addInvalidSizeAttributeErrorMessage();
         }
@@ -450,13 +494,14 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
         this.defineSymbol(SymbolContext.VALUE, label, SymbolType.CONSTANT, new UnsignedIntValue(this.programCounter));
     }
 
-    private <TValue> Symbol getSymbolByContextAndName(SymbolContext<TValue> context, String name,
-            SymbolResolutionFallback symbolResolutionFallback) {
+    @CheckForNull
+    private <TValue> Symbol getSymbolByContextAndName(@Nonnull SymbolContext<TValue> context, @Nonnull String name,
+            @Nonnull SymbolResolutionFallback symbolResolutionFallback) {
         return this.builder.resolveSymbolReference(context, name, M68KArchitecture.isLocalName(name), false, null,
                 symbolResolutionFallback).getSymbol();
     }
 
-    private void initialize(AssemblyStep step) {
+    private void initialize(@Nonnull AssemblyStep step) {
         this.step = step;
         this.programCounter = step.getProgramCounter();
         this.sourceLocation = step.getLocation().getSourceLocation();

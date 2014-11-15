@@ -3,15 +3,18 @@ package org.reasm.m68k.assembly.internal;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import javax.annotation.Nonnull;
+
 import org.reasm.source.SourceLocation;
 
 final class DynamicSourceLocationIterator implements Iterator<SourceLocation> {
 
+    @Nonnull
     private final Iterator<SourceLocation> iterator;
     private boolean stop;
     private boolean stopAfterNext;
 
-    DynamicSourceLocationIterator(Iterator<SourceLocation> iterator) {
+    DynamicSourceLocationIterator(@Nonnull Iterator<SourceLocation> iterator) {
         this.iterator = iterator;
     }
 

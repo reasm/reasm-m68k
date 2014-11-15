@@ -3,6 +3,9 @@ package org.reasm.m68k.assembly.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -24,6 +27,7 @@ import org.reasm.messages.OutOfMemoryErrorMessage;
 @RunWith(Parameterized.class)
 public class OutputDirectivesTest extends BaseProgramsTest {
 
+    @Nonnull
     private static final List<Object[]> TEST_DATA = new ArrayList<>();
 
     static {
@@ -211,20 +215,21 @@ public class OutputDirectivesTest extends BaseProgramsTest {
      *
      * @return the test data
      */
+    @Nonnull
     @Parameters
     public static List<Object[]> data() {
         return TEST_DATA;
     }
 
-    private static void addDataItem(String code, byte[] output) {
+    private static void addDataItem(@Nonnull String code, @Nonnull byte[] output) {
         addDataItem(code, output, (AssemblyMessage) null);
     }
 
-    private static void addDataItem(String code, byte[] output, AssemblyMessage expectedMessage) {
+    private static void addDataItem(@Nonnull String code, @Nonnull byte[] output, @CheckForNull AssemblyMessage expectedMessage) {
         TEST_DATA.add(new Object[] { code, output, expectedMessage, null });
     }
 
-    private static void addDataItem(String code, byte[] output, AssemblyMessage... expectedMessages) {
+    private static void addDataItem(@Nonnull String code, @Nonnull byte[] output, @CheckForNull AssemblyMessage... expectedMessages) {
         TEST_DATA.add(new Object[] { code, output, null, expectedMessages });
     }
 
@@ -242,7 +247,8 @@ public class OutputDirectivesTest extends BaseProgramsTest {
      *            an array of {@link AssemblyMessage AssemblyMessages} that are expected to be generated while assembling the code.
      *            Takes priority over <code>expectedMessage</code>.
      */
-    public OutputDirectivesTest(String code, byte[] output, AssemblyMessage expectedMessage, AssemblyMessage[] expectedMessages) {
+    public OutputDirectivesTest(@Nonnull String code, @Nonnull byte[] output, @CheckForNull AssemblyMessage expectedMessage,
+            @CheckForNull AssemblyMessage[] expectedMessages) {
         super(code, 2, output, M68KArchitecture.MC68000, expectedMessage, expectedMessages, null);
     }
 

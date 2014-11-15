@@ -2,6 +2,9 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.SymbolType;
 import org.reasm.m68k.messages.RegisterExpectedErrorMessage;
 import org.reasm.messages.DirectiveRequiresLabelErrorMessage;
@@ -11,8 +14,10 @@ import org.reasm.messages.DirectiveRequiresLabelErrorMessage;
  *
  * @author Francis Gagné
  */
-public class EqurDirective extends Mnemonic {
+@Immutable
+class EqurDirective extends Mnemonic {
 
+    @Nonnull
     static final EqurDirective EQUR = new EqurDirective();
 
     private EqurDirective() {

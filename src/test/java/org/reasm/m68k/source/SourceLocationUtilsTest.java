@@ -7,6 +7,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 
+import javax.annotation.Nonnull;
+
 import org.junit.Test;
 import org.reasm.m68k.M68KArchitecture;
 import org.reasm.source.SourceFile;
@@ -20,21 +22,30 @@ import org.reasm.source.SourceNodeRangeReader;
  */
 public class SourceLocationUtilsTest {
 
+    @Nonnull
     private static final SourceFile SOURCE_FILE_A = new SourceFile(" ", "");
+    @Nonnull
     private static final SourceFile SOURCE_FILE_B = new SourceFile("label0: label1: MOVE D0,D1 ; Move D0 to D1", "");
+    @Nonnull
     private static final SourceFile SOURCE_FILE_C = new SourceFile("lab&\nel0: label1: MO&\nVE D&\n0,D1 ; Move D0 to D1", "");
+    @Nonnull
     private static final SourceFile SOURCE_FILE_D = new SourceFile(" IF 1\n ENDIF", "");
+    @Nonnull
     private static final SourceLocation SOURCE_LOCATION_BLOCK = SOURCE_FILE_A.getSourceLocations(M68KArchitecture.MC68000).get(0);
+    @Nonnull
     private static final SourceLocation SOURCE_LOCATION_A = SOURCE_FILE_A.getSourceLocations(M68KArchitecture.MC68000).get(0)
             .getChildSourceLocations().get(0);
+    @Nonnull
     private static final SourceLocation SOURCE_LOCATION_B = SOURCE_FILE_B.getSourceLocations(M68KArchitecture.MC68000).get(0)
             .getChildSourceLocations().get(0);
+    @Nonnull
     private static final SourceLocation SOURCE_LOCATION_C = SOURCE_FILE_C.getSourceLocations(M68KArchitecture.MC68000).get(0)
             .getChildSourceLocations().get(0);
+    @Nonnull
     private static final SourceLocation SOURCE_LOCATION_D = SOURCE_FILE_D.getSourceLocations(M68KArchitecture.MC68000).get(0)
             .getChildSourceLocations().get(0).getChildSourceLocations().get(0);
 
-    private static void advance(SourceNodeRangeReader reader, int count) {
+    private static void advance(@Nonnull SourceNodeRangeReader reader, int count) {
         while (count > 0) {
             reader.advance();
             --count;

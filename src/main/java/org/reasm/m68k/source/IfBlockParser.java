@@ -2,6 +2,9 @@ package org.reasm.m68k.source;
 
 import java.util.ArrayList;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.assembly.internal.Mnemonics;
 import org.reasm.m68k.parseerrors.ElseOrElseIfAfterElseParseError;
 import org.reasm.m68k.parseerrors.UnclosedBlockParseError;
@@ -11,8 +14,10 @@ import org.reasm.source.SourceNode;
 
 import ca.fragag.text.CharSequenceReader;
 
+@Immutable
 final class IfBlockParser implements BlockParser {
 
+    @Nonnull
     public static final IfBlockParser IF = new IfBlockParser();
 
     private IfBlockParser() {

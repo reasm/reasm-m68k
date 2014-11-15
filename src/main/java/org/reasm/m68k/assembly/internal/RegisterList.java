@@ -52,6 +52,7 @@ final class RegisterList {
         return result;
     }
 
+    @Nonnull
     final Set<GeneralPurposeRegister> getRegisters() {
         return this.registers;
     }

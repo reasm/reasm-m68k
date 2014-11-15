@@ -1,5 +1,8 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.Value;
 import org.reasm.ValueToBooleanVisitor;
 
@@ -8,8 +11,10 @@ import org.reasm.ValueToBooleanVisitor;
  *
  * @author Francis Gagné
  */
+@Immutable
 class WhileDirective extends Mnemonic {
 
+    @Nonnull
     static final WhileDirective WHILE = new WhileDirective();
 
     private WhileDirective() {

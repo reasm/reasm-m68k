@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -29,14 +32,20 @@ import org.reasm.testhelpers.UserSymbolMatcher;
 @RunWith(Parameterized.class)
 public class SymbolsTest extends BaseProgramsTest {
 
+    @Nonnull
     private static final UnsignedIntValue UINT_0 = new UnsignedIntValue(0);
+    @Nonnull
     private static final UnsignedIntValue UINT_1 = new UnsignedIntValue(1);
+    @Nonnull
     private static final UnsignedIntValue UINT_2 = new UnsignedIntValue(2);
+    @Nonnull
     private static final RegisterList REGISTER_LIST_D0 = new RegisterList(EnumSet.of(GeneralPurposeRegister.D0));
 
+    @Nonnull
     private static final UserSymbolMatcher<Value> FOO_CONSTANT_UINT_0 = new UserSymbolMatcher<>(SymbolContext.VALUE, "foo",
             SymbolType.CONSTANT, UINT_0);
 
+    @Nonnull
     private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
     static {
@@ -199,21 +208,24 @@ public class SymbolsTest extends BaseProgramsTest {
      *
      * @return the test data
      */
+    @Nonnull
     @Parameters
     public static List<Object[]> data() {
         return TEST_DATA;
     }
 
-    private static void addDataItem(String code, int steps, UserSymbolMatcher<?>[] symbols) {
+    private static void addDataItem(@Nonnull String code, int steps, @Nonnull UserSymbolMatcher<?>[] symbols) {
         addDataItem(code, steps, symbols, (AssemblyMessage) null);
     }
 
-    private static void addDataItem(String code, int steps, UserSymbolMatcher<?>[] symbols, AssemblyMessage expectedMessage) {
+    private static void addDataItem(@Nonnull String code, int steps, @Nonnull UserSymbolMatcher<?>[] symbols,
+            @CheckForNull AssemblyMessage expectedMessage) {
         TEST_DATA.add(new Object[] { code, steps, symbols, expectedMessage, null });
     }
 
     @SuppressWarnings("unused")
-    private static void addDataItem(String code, int steps, UserSymbolMatcher<?>[] symbols, AssemblyMessage... expectedMessages) {
+    private static void addDataItem(@Nonnull String code, int steps, @Nonnull UserSymbolMatcher<?>[] symbols,
+            @CheckForNull AssemblyMessage... expectedMessages) {
         TEST_DATA.add(new Object[] { code, steps, symbols, null, expectedMessages });
     }
 
@@ -232,8 +244,8 @@ public class SymbolsTest extends BaseProgramsTest {
      *            an array of {@link AssemblyMessage AssemblyMessages} that are expected to be generated while assembling the code.
      *            Takes priority over <code>expectedMessage</code>.
      */
-    public SymbolsTest(String code, int steps, UserSymbolMatcher<?>[] symbolMatchers, AssemblyMessage expectedMessage,
-            AssemblyMessage[] expectedMessages) {
+    public SymbolsTest(@Nonnull String code, int steps, @Nonnull UserSymbolMatcher<?>[] symbolMatchers,
+            @CheckForNull AssemblyMessage expectedMessage, @CheckForNull AssemblyMessage[] expectedMessages) {
         super(code, steps, NO_DATA, M68KArchitecture.MC68000, expectedMessage, expectedMessages, symbolMatchers);
     }
 

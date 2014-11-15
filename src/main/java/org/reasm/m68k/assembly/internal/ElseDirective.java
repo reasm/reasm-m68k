@@ -2,6 +2,9 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.messages.ElseWithoutIfErrorMessage;
 
 /**
@@ -9,8 +12,10 @@ import org.reasm.m68k.messages.ElseWithoutIfErrorMessage;
  *
  * @author Francis Gagné
  */
+@Immutable
 class ElseDirective extends Mnemonic {
 
+    @Nonnull
     static final ElseDirective ELSE = new ElseDirective();
 
     private ElseDirective() {

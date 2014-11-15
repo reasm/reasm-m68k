@@ -2,14 +2,24 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.messages.DataForMoveqOutOfRangeErrorMessage;
 import org.reasm.m68k.messages.DataForMoveqWillBeSignExtendedWarningMessage;
 
+/**
+ * The <code>MOVEQ</code> instruction.
+ *
+ * @author Francis Gagné
+ */
+@Immutable
 class MoveqInstruction extends TwoFixedEaInstruction {
 
+    @Nonnull
     static final MoveqInstruction MOVEQ = new MoveqInstruction();
 
-    static void encode(M68KAssemblyContext context, int immediateData, int dataRegister) throws IOException {
+    static void encode(@Nonnull M68KAssemblyContext context, int immediateData, int dataRegister) throws IOException {
         context.appendWord((short) (0b01110000_00000000 | dataRegister << 9 | immediateData & 0xFF));
     }
 
@@ -37,7 +47,7 @@ class MoveqInstruction extends TwoFixedEaInstruction {
 
     @Override
     InstructionSize getInstructionSize(M68KAssemblyContext context) {
-        InstructionSize size = context.parseIntegerInstructionSize();
+        final InstructionSize size = context.parseIntegerInstructionSize();
         if (size != InstructionSize.DEFAULT && size != InstructionSize.LONG) {
             context.addInvalidSizeAttributeErrorMessage();
         }

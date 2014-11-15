@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.reasm.*;
@@ -31,9 +33,12 @@ import com.google.common.collect.ImmutableList;
  */
 public class M68KArchitectureTest {
 
+    @Nonnull
     private static final UnsignedIntValue ONE_HUNDRED = new UnsignedIntValue(100);
+    @Nonnull
     private static final UnsignedIntValue TWENTY = new UnsignedIntValue(20);
 
+    @Nonnull
     private static Assembly createAssembly1() {
         final PredefinedSymbol fooSymbol = new PredefinedSymbol(SymbolContext.VALUE, "foo", SymbolType.CONSTANT, ONE_HUNDRED);
         final PredefinedSymbol barSymbol = new PredefinedSymbol(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, TWENTY);

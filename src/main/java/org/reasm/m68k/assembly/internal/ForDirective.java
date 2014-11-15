@@ -2,6 +2,10 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.SymbolContext;
 import org.reasm.SymbolType;
 import org.reasm.UnsignedIntValue;
@@ -14,14 +18,18 @@ import org.reasm.expressions.BinaryOperator;
  *
  * @author Francis Gagné
  */
-final class ForDirective extends Mnemonic {
+@Immutable
+class ForDirective extends Mnemonic {
 
+    @Nonnull
     static final ForDirective FOR = new ForDirective();
 
+    @Nonnull
     private static final Value ZERO = new UnsignedIntValue(0);
+    @Nonnull
     private static final Value ONE = new UnsignedIntValue(1);
 
-    private static void defineVariable(M68KAssemblyContext context, String label, Value counter) {
+    private static void defineVariable(@Nonnull M68KAssemblyContext context, @Nonnull String label, @CheckForNull Value counter) {
         context.defineSymbol(SymbolContext.VALUE, label, SymbolType.VARIABLE, counter);
     }
 

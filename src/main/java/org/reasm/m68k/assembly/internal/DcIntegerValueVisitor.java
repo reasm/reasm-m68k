@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.reasm.Function;
 import org.reasm.m68k.messages.FunctionCannotBeConvertedToIntegerErrorMessage;
 import org.reasm.m68k.messages.StringTooLongErrorMessage;
@@ -11,13 +14,16 @@ import org.reasm.m68k.messages.ValueOutOfRangeErrorMessage;
 
 final class DcIntegerValueVisitor implements DcValueVisitor {
 
+    @Nonnull
     private final M68KAssemblyContext context;
-    private InstructionSize size;
+    @Nonnull
+    private InstructionSize size = InstructionSize.DEFAULT;
     private long output;
     private boolean signed;
+    @CheckForNull
     private ByteBuffer outputBytes;
 
-    DcIntegerValueVisitor(M68KAssemblyContext context) {
+    DcIntegerValueVisitor(@Nonnull M68KAssemblyContext context) {
         this.context = context;
     }
 

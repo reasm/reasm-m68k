@@ -2,6 +2,9 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.AssemblyMessage;
 import org.reasm.Value;
 import org.reasm.m68k.messages.CountMustNotBeNegativeErrorMessage;
@@ -13,10 +16,13 @@ import com.google.common.primitives.UnsignedLongs;
  *
  * @author Francis Gagné
  */
+@Immutable
 class DcbDirective extends Mnemonic {
 
+    @Nonnull
     static final DcbDirective DCB = new DcbDirective();
 
+    @Nonnull
     private static final CardinalValueVisitor.ErrorFactory NEGATIVE_VALUE_ERROR_FACTORY = new CardinalValueVisitor.ErrorFactory() {
         @Override
         public AssemblyMessage createMessage() {

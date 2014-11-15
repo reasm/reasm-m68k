@@ -20,7 +20,9 @@ import ca.fragag.text.CharSequenceReader;
  */
 final class LogicalLineParser {
 
+    @Nonnull
     private static final SubstringBounds[] EMPTY_SUBSTRING_BOUNDS_ARRAY = new SubstringBounds[0];
+    @Nonnull
     private static final int[] EMPTY_INT_ARRAY = new int[0];
 
     /**

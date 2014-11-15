@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
+import javax.annotation.Nonnull;
+
 import org.junit.Test;
 
 /**
@@ -14,7 +16,9 @@ import org.junit.Test;
  */
 public class CharSequenceParserReaderTest {
 
+    @Nonnull
     private static final CharSequence CHAR_SEQUENCE = new String("abc");
+    @Nonnull
     private static final CharSequence CHAR_SEQUENCE_NON_BMP = new String("x\uD83C\uDF41y");
 
     /**

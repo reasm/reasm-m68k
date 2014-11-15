@@ -23,6 +23,7 @@ import ca.fragag.text.DocumentReader;
  */
 public final class Parser {
 
+    @Nonnull
     private static final Map<String, BlockParser> BLOCKS = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
     static {

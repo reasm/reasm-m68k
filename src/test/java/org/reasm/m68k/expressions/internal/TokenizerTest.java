@@ -32,6 +32,7 @@ public class TokenizerTest {
     @RunWith(Parameterized.class)
     public static class ChangeToBinaryIntegerTest {
 
+        @Nonnull
         private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
         static {
@@ -119,6 +120,7 @@ public class TokenizerTest {
     @RunWith(Parameterized.class)
     public static class TokenizeTest {
 
+        @Nonnull
         private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
         static {

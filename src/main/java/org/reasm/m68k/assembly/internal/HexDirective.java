@@ -3,6 +3,9 @@ package org.reasm.m68k.assembly.internal;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.messages.InvalidCharacterInHexDirectiveErrorMessage;
 import org.reasm.messages.OddNumberOfCharactersInHexDirectiveErrorMessage;
 
@@ -11,15 +14,17 @@ import org.reasm.messages.OddNumberOfCharactersInHexDirectiveErrorMessage;
  *
  * @author Francis Gagné
  */
+@Immutable
 class HexDirective extends Mnemonic {
 
+    @Nonnull
     static final HexDirective HEX = new HexDirective();
 
     private HexDirective() {
     }
 
     @Override
-    protected void assemble(M68KAssemblyContext context) throws IOException {
+    void assemble(M68KAssemblyContext context) throws IOException {
         context.sizeNotAllowed();
 
         final LogicalLineReader reader = context.logicalLineReader;

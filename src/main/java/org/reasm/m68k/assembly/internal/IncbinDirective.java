@@ -3,6 +3,9 @@ package org.reasm.m68k.assembly.internal;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.AssemblyMessage;
 import org.reasm.Value;
 import org.reasm.m68k.messages.IncbinLengthMustNotBeNegativeErrorMessage;
@@ -10,14 +13,17 @@ import org.reasm.m68k.messages.IncbinStartMustNotBeNegativeErrorMessage;
 import org.reasm.m68k.messages.ValueOutOfRangeErrorMessage;
 
 /**
- * The <code>INCBIN</code> (a.k.a. <code>BINCLUDE</code>) directive.
+ * The <code>INCBIN</code> and <code>BINCLUDE</code> directives.
  *
  * @author Francis Gagné
  */
+@Immutable
 class IncbinDirective extends Mnemonic {
 
+    @Nonnull
     static final IncbinDirective INCBIN = new IncbinDirective();
 
+    @Nonnull
     private static final CardinalValueVisitor.ErrorFactory START_NEGATIVE_VALUE_ERROR_FACTORY = new CardinalValueVisitor.ErrorFactory() {
         @Override
         public AssemblyMessage createMessage() {
@@ -25,6 +31,7 @@ class IncbinDirective extends Mnemonic {
         }
     };
 
+    @Nonnull
     private static final CardinalValueVisitor.ErrorFactory LENGTH_NEGATIVE_VALUE_ERROR_FACTORY = new CardinalValueVisitor.ErrorFactory() {
         @Override
         public AssemblyMessage createMessage() {

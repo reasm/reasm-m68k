@@ -2,15 +2,21 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * The <code>EOR</code> instruction.
  *
  * @author Francis Gagné
  */
+@Immutable
 class EorInstruction extends TwoFixedEaInstruction {
 
+    @Nonnull
     static final EorInstruction EOR = new EorInstruction();
 
+    @Nonnull
     private static final AddAndCmpEorOrSubForms FORMS = AddAndCmpEorOrSubForms.EOR;
 
     private EorInstruction() {

@@ -2,13 +2,18 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * The <code>EVEN</code> directive.
  *
  * @author Francis Gagné
  */
+@Immutable
 class EvenDirective extends Mnemonic {
 
+    @Nonnull
     static final EvenDirective EVEN = new EvenDirective();
 
     private EvenDirective() {

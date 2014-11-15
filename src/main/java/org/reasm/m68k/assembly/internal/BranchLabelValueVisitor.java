@@ -1,5 +1,7 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.Nonnull;
+
 import org.reasm.Function;
 import org.reasm.ValueVisitor;
 import org.reasm.m68k.messages.BranchTargetOutOfRangeErrorMessage;
@@ -7,13 +9,16 @@ import org.reasm.m68k.messages.LabelExpectedErrorMessage;
 
 final class BranchLabelValueVisitor implements ValueVisitor<Void> {
 
+    @Nonnull
     private final M68KAssemblyContext context;
-    private InstructionSize size;
+    @Nonnull
+    private InstructionSize size = InstructionSize.DEFAULT;
 
-    InstructionSize outputSize;
+    @Nonnull
+    InstructionSize outputSize = InstructionSize.DEFAULT;
     int distance;
 
-    BranchLabelValueVisitor(M68KAssemblyContext context) {
+    BranchLabelValueVisitor(@Nonnull M68KAssemblyContext context) {
         this.context = context;
     }
 
@@ -109,7 +114,7 @@ final class BranchLabelValueVisitor implements ValueVisitor<Void> {
         return this.visitSignedInt(value);
     }
 
-    void reset(InstructionSize size) {
+    void reset(@Nonnull InstructionSize size) {
         this.size = size;
     }
 

@@ -6,6 +6,8 @@ import static org.junit.Assert.assertThat;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.reasm.*;
 import org.reasm.expressions.EvaluationContext;
 import org.reasm.expressions.Expression;
@@ -23,10 +25,15 @@ import ca.fragag.testhelpers.ObjectHashCodeEqualsContract;
  */
 public class M68KSymbolLookupTest extends ObjectHashCodeEqualsContract {
 
+    @Nonnull
     private static final Object MAIN_OBJECT;
+    @Nonnull
     private static final Object OTHER_EQUAL_OBJECT;
+    @Nonnull
     private static final Object ANOTHER_EQUAL_OBJECT;
+    @Nonnull
     private static final Object DIFFERENT_OBJECT_0;
+    @Nonnull
     private static final Object DIFFERENT_OBJECT_1;
 
     static {

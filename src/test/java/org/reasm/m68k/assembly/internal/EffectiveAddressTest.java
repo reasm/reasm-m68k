@@ -12,6 +12,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +48,7 @@ public class EffectiveAddressTest {
 
     public static abstract class BaseSuccessfulTest extends BaseTestWithOutputCheck<BaseTestWithOutputCheck.DataItem> {
 
-        protected BaseSuccessfulTest(DataItem data) {
+        protected BaseSuccessfulTest(@Nonnull DataItem data) {
             super(data);
         }
 
@@ -60,19 +63,27 @@ public class EffectiveAddressTest {
 
         public static class DataItem {
 
+            @Nonnull
             private static final M68KTestAssemblyContext EMPTY_ASSEMBLY_CONTEXT = new M68KTestAssemblyContext();
 
+            @Nonnull
             final String text;
+            @Nonnull
             final Set<AddressingMode> validAddressingModes;
             final boolean expectBitFieldSpecification;
+            @Nonnull
             final InstructionSize instructionSize;
+            @Nonnull
             final InstructionSet instructionSet;
+            @CheckForNull
             final SymbolLookup symbolLookup;
+            @Nonnull
             final M68KTestAssemblyContext context;
 
-            public DataItem(String text, Set<AddressingMode> validAddressingModes, boolean expectBitFieldSpecification,
-                    InstructionSize instructionSize, InstructionSet instructionSet, SymbolLookup symbolLookup,
-                    M68KTestAssemblyContext context) {
+            public DataItem(@Nonnull String text, @Nonnull Set<AddressingMode> validAddressingModes,
+                    boolean expectBitFieldSpecification, @Nonnull InstructionSize instructionSize,
+                    @Nonnull InstructionSet instructionSet, @CheckForNull SymbolLookup symbolLookup,
+                    @CheckForNull M68KTestAssemblyContext context) {
                 this.text = text;
                 this.validAddressingModes = validAddressingModes;
                 this.expectBitFieldSpecification = expectBitFieldSpecification;
@@ -84,9 +95,10 @@ public class EffectiveAddressTest {
 
         }
 
+        @Nonnull
         final TDataItem data;
 
-        protected BaseTest(TDataItem data) {
+        protected BaseTest(@Nonnull TDataItem data) {
             this.data = data;
         }
 
@@ -108,9 +120,9 @@ public class EffectiveAddressTest {
             }
         }
 
-        protected abstract void checkMessages(ArrayList<AssemblyMessage> messages);
+        protected abstract void checkMessages(@Nonnull ArrayList<AssemblyMessage> messages);
 
-        protected abstract void checkOutput(EffectiveAddress ea);
+        protected abstract void checkOutput(@Nonnull EffectiveAddress ea);
 
     }
 
@@ -119,11 +131,13 @@ public class EffectiveAddressTest {
 
         public static class DataItem extends BaseTest.DataItem {
 
+            @Nonnull
             final short[] words;
 
-            public DataItem(String text, Set<AddressingMode> validAddressingModes, boolean expectBitFieldSpecification,
-                    InstructionSize instructionSize, InstructionSet instructionSet, SymbolLookup symbolLookup,
-                    M68KTestAssemblyContext context, short[] words) {
+            public DataItem(@Nonnull String text, @Nonnull Set<AddressingMode> validAddressingModes,
+                    boolean expectBitFieldSpecification, @Nonnull InstructionSize instructionSize,
+                    @Nonnull InstructionSet instructionSet, @CheckForNull SymbolLookup symbolLookup,
+                    @CheckForNull M68KTestAssemblyContext context, short[] words) {
                 super(text, validAddressingModes, expectBitFieldSpecification, instructionSize, instructionSet, symbolLookup,
                         context);
                 this.words = words;
@@ -131,12 +145,12 @@ public class EffectiveAddressTest {
 
         }
 
-        protected BaseTestWithOutputCheck(TDataItem data) {
+        protected BaseTestWithOutputCheck(@Nonnull TDataItem data) {
             super(data);
         }
 
         @Override
-        protected void checkOutput(EffectiveAddress ea) {
+        protected void checkOutput(@Nonnull EffectiveAddress ea) {
             assertThat((int) ea.numberOfWords, is(this.data.words.length));
             for (int i = 0; i < ea.numberOfWords; i++) {
                 assertThat(ea.getWord(i), is(this.data.words[i]));
@@ -148,6 +162,7 @@ public class EffectiveAddressTest {
     @RunWith(Parameterized.class)
     public static class ExtendedSyntaxTest extends BaseSuccessfulTest {
 
+        @Nonnull
         private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
         static {
@@ -555,30 +570,31 @@ public class EffectiveAddressTest {
             addDataItem("2(PC)", context, new short[] { 0b111010, 0x0000 });
         }
 
+        @Nonnull
         @Parameters
         public static List<Object[]> data() {
             return TEST_DATA;
         }
 
-        private static void addDataItem(String text, InstructionSet instructionSet, short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull InstructionSet instructionSet, @Nonnull short[] words) {
             addDataItem(text, InstructionSize.DEFAULT, instructionSet, null, words);
         }
 
-        private static void addDataItem(String text, InstructionSize instructionSize, InstructionSet instructionSet,
-                M68KTestAssemblyContext context, short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull InstructionSize instructionSize,
+                @Nonnull InstructionSet instructionSet, @CheckForNull M68KTestAssemblyContext context, short[] words) {
             TEST_DATA.add(new Object[] { new DataItem(text, AddressingModeCategory.ALL, false, instructionSize, instructionSet,
                     DummySymbolLookup.DEFAULT, context, words) });
         }
 
-        private static void addDataItem(String text, M68KTestAssemblyContext context, short[] words) {
+        private static void addDataItem(@Nonnull String text, @CheckForNull M68KTestAssemblyContext context, @Nonnull short[] words) {
             addDataItem(text, InstructionSize.DEFAULT, InstructionSet.MC68000, context, words);
         }
 
-        private static void addDataItem(String text, short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull short[] words) {
             addDataItem(text, InstructionSize.DEFAULT, InstructionSet.MC68000, null, words);
         }
 
-        public ExtendedSyntaxTest(DataItem data) {
+        public ExtendedSyntaxTest(@Nonnull DataItem data) {
             super(data);
         }
 
@@ -589,11 +605,12 @@ public class EffectiveAddressTest {
 
         public static class DataItem extends BaseTestWithOutputCheck.DataItem {
 
+            @Nonnull
             final Matcher<AssemblyMessage>[] messageMatchers;
 
-            public DataItem(String text, boolean expectBitFieldSpecification, InstructionSize instructionSize,
-                    InstructionSet instructionSet, SymbolLookup symbolLookup, Matcher<AssemblyMessage>[] messageMatchers,
-                    short[] words) {
+            public DataItem(@Nonnull String text, boolean expectBitFieldSpecification, @Nonnull InstructionSize instructionSize,
+                    @Nonnull InstructionSet instructionSet, @CheckForNull SymbolLookup symbolLookup,
+                    @Nonnull Matcher<AssemblyMessage>[] messageMatchers, @Nonnull short[] words) {
                 super(text, AddressingModeCategory.ALL, expectBitFieldSpecification, instructionSize, instructionSet, symbolLookup,
                         null, words);
                 this.messageMatchers = messageMatchers;
@@ -601,11 +618,14 @@ public class EffectiveAddressTest {
 
         }
 
+        @Nonnull
         private static final short[] NO_WORDS = new short[0];
 
+        @Nonnull
         private static final EquivalentAssemblyMessage[] SYNTAX_ERROR = new EquivalentAssemblyMessage[] { new EquivalentAssemblyMessage(
                 new SyntaxErrorInEffectiveAddressErrorMessage()) };
 
+        @Nonnull
         private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
         static {
@@ -681,43 +701,46 @@ public class EffectiveAddressTest {
                     new LossyConversionFromRealToIntegerWarningMessage(0.5)) }, new short[] { 0b111100, 0x0000 });
         }
 
+        @Nonnull
         @Parameters
         public static List<Object[]> data() {
             return TEST_DATA;
         }
 
-        private static void addDataItem(String text, boolean expectBitFieldSpecification, InstructionSize instructionSize,
-                InstructionSet instructionSet, SymbolLookup symbolLookup, Matcher<AssemblyMessage>[] messageMatchers, short[] words) {
+        private static void addDataItem(@Nonnull String text, boolean expectBitFieldSpecification,
+                @Nonnull InstructionSize instructionSize, @Nonnull InstructionSet instructionSet,
+                @CheckForNull SymbolLookup symbolLookup, @Nonnull Matcher<AssemblyMessage>[] messageMatchers, @Nonnull short[] words) {
             TEST_DATA.add(new Object[] { new DataItem(text, expectBitFieldSpecification, instructionSize, instructionSet,
                     symbolLookup, messageMatchers, words) });
         }
 
-        private static void addDataItem(String text, boolean expectBitFieldSpecification,
-                Matcher<AssemblyMessage>[] messageMatchers, short[] words) {
+        private static void addDataItem(@Nonnull String text, boolean expectBitFieldSpecification,
+                @Nonnull Matcher<AssemblyMessage>[] messageMatchers, @Nonnull short[] words) {
             addDataItem(text, expectBitFieldSpecification, InstructionSize.DEFAULT, InstructionSet.MC68000, null, messageMatchers,
                     words);
         }
 
-        private static void addDataItem(String text, InstructionSet instructionSet, Matcher<AssemblyMessage>[] messageMatchers,
-                short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull InstructionSet instructionSet,
+                @Nonnull Matcher<AssemblyMessage>[] messageMatchers, @Nonnull short[] words) {
             addDataItem(text, false, InstructionSize.DEFAULT, instructionSet, null, messageMatchers, words);
         }
 
-        private static void addDataItem(String text, InstructionSize instructionSize, EquivalentAssemblyMessage[] messageMatchers,
-                short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull InstructionSize instructionSize,
+                @Nonnull EquivalentAssemblyMessage[] messageMatchers, @Nonnull short[] words) {
             addDataItem(text, false, instructionSize, InstructionSet.MC68000, null, messageMatchers, words);
         }
 
-        private static void addDataItem(String text, Matcher<AssemblyMessage>[] messageMatchers, short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull Matcher<AssemblyMessage>[] messageMatchers,
+                @Nonnull short[] words) {
             addDataItem(text, false, InstructionSize.DEFAULT, InstructionSet.MC68000, null, messageMatchers, words);
         }
 
-        private static void addDataItem(String text, SymbolLookup symbolLookup, EquivalentAssemblyMessage[] messageMatchers,
-                short[] words) {
+        private static void addDataItem(@Nonnull String text, @CheckForNull SymbolLookup symbolLookup,
+                @Nonnull EquivalentAssemblyMessage[] messageMatchers, @Nonnull short[] words) {
             addDataItem(text, false, InstructionSize.DEFAULT, InstructionSet.MC68000, symbolLookup, messageMatchers, words);
         }
 
-        public MessageTest(DataItem data) {
+        public MessageTest(@Nonnull DataItem data) {
             super(data);
         }
 
@@ -731,6 +754,7 @@ public class EffectiveAddressTest {
     @RunWith(Parameterized.class)
     public static class RegisterAliasTest extends BaseSuccessfulTest {
 
+        @Nonnull
         private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
         static {
@@ -759,26 +783,28 @@ public class EffectiveAddressTest {
             addDataItem("sx", context, new short[] { 0b001110 });
         }
 
+        @Nonnull
         @Parameters
         public static List<Object[]> data() {
             return TEST_DATA;
         }
 
-        private static void addDataItem(String text, InstructionSet instructionSet, M68KTestAssemblyContext context, short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull InstructionSet instructionSet,
+                @Nonnull M68KTestAssemblyContext context, @Nonnull short[] words) {
             addDataItem(text, InstructionSize.DEFAULT, instructionSet, context, words);
         }
 
-        private static void addDataItem(String text, InstructionSize instructionSize, InstructionSet instructionSet,
-                M68KTestAssemblyContext context, short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull InstructionSize instructionSize,
+                @Nonnull InstructionSet instructionSet, @Nonnull M68KTestAssemblyContext context, @Nonnull short[] words) {
             TEST_DATA.add(new Object[] { new DataItem(text, AddressingModeCategory.ALL, false, instructionSize, instructionSet,
                     DummySymbolLookup.DEFAULT, context, words) });
         }
 
-        private static void addDataItem(String text, M68KTestAssemblyContext context, short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull M68KTestAssemblyContext context, @Nonnull short[] words) {
             addDataItem(text, InstructionSize.DEFAULT, InstructionSet.MC68000, context, words);
         }
 
-        public RegisterAliasTest(DataItem data) {
+        public RegisterAliasTest(@Nonnull DataItem data) {
             super(data);
         }
 
@@ -787,6 +813,7 @@ public class EffectiveAddressTest {
     @RunWith(Parameterized.class)
     public static class StandardSyntaxTest extends BaseSuccessfulTest {
 
+        @Nonnull
         private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
         static {
@@ -1251,48 +1278,51 @@ public class EffectiveAddressTest {
             addDataItem("D0{1:1}", true, new short[] { 0b000000 });
         }
 
+        @Nonnull
         @Parameters
         public static List<Object[]> data() {
             return TEST_DATA;
         }
 
-        private static void addDataItem(String text, boolean expectBitFieldSpecification, short[] words) {
+        private static void addDataItem(@Nonnull String text, boolean expectBitFieldSpecification, @Nonnull short[] words) {
             addDataItem(text, AddressingModeCategory.ALL, expectBitFieldSpecification, InstructionSize.DEFAULT,
                     InstructionSet.MC68000, null, words);
         }
 
-        private static void addDataItem(String text, InstructionSet instructionSet, short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull InstructionSet instructionSet, @Nonnull short[] words) {
             addDataItem(text, AddressingModeCategory.ALL, false, InstructionSize.DEFAULT, instructionSet, null, words);
         }
 
-        private static void addDataItem(String text, InstructionSize instructionSize, short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull InstructionSize instructionSize, @Nonnull short[] words) {
             addDataItem(text, AddressingModeCategory.ALL, false, instructionSize, InstructionSet.MC68000, null, words);
         }
 
-        private static void addDataItem(String text, M68KTestAssemblyContext context, short[] words) {
+        private static void addDataItem(@Nonnull String text, @CheckForNull M68KTestAssemblyContext context, @Nonnull short[] words) {
             addDataItem(text, AddressingModeCategory.ALL, false, InstructionSize.DEFAULT, InstructionSet.MC68000, context, words);
         }
 
-        private static void addDataItem(String text, Set<AddressingMode> validAddressingModes, boolean expectBitFieldSpecification,
-                InstructionSize instructionSize, InstructionSet instructionSet, M68KTestAssemblyContext context, short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull Set<AddressingMode> validAddressingModes,
+                boolean expectBitFieldSpecification, @Nonnull InstructionSize instructionSize,
+                @Nonnull InstructionSet instructionSet, @CheckForNull M68KTestAssemblyContext context, @Nonnull short[] words) {
             TEST_DATA.add(new Object[] { new DataItem(text, validAddressingModes, expectBitFieldSpecification, instructionSize,
                     instructionSet, DummySymbolLookup.DEFAULT, context, words) });
         }
 
-        private static void addDataItem(String text, Set<AddressingMode> validAddressingModes, M68KTestAssemblyContext context,
-                short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull Set<AddressingMode> validAddressingModes,
+                @CheckForNull M68KTestAssemblyContext context, @Nonnull short[] words) {
             addDataItem(text, validAddressingModes, false, InstructionSize.DEFAULT, InstructionSet.MC68000, context, words);
         }
 
-        private static void addDataItem(String text, Set<AddressingMode> validAddressingModes, short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull Set<AddressingMode> validAddressingModes,
+                @Nonnull short[] words) {
             addDataItem(text, validAddressingModes, false, InstructionSize.DEFAULT, InstructionSet.MC68000, null, words);
         }
 
-        private static void addDataItem(String text, short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull short[] words) {
             addDataItem(text, AddressingModeCategory.ALL, false, InstructionSize.DEFAULT, InstructionSet.MC68000, null, words);
         }
 
-        public StandardSyntaxTest(DataItem data) {
+        public StandardSyntaxTest(@Nonnull DataItem data) {
             super(data);
         }
 
@@ -1301,6 +1331,7 @@ public class EffectiveAddressTest {
     @RunWith(Parameterized.class)
     public static class SymbolTest extends BaseSuccessfulTest {
 
+        @Nonnull
         private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
         static {
@@ -1374,26 +1405,28 @@ public class EffectiveAddressTest {
             addDataItem("foo(0, 0)", symbolLookup, new short[] { 0b111000, 0x0001 });
         }
 
+        @Nonnull
         @Parameters
         public static List<Object[]> data() {
             return TEST_DATA;
         }
 
-        private static void addDataItem(String text, InstructionSet instructionSet, SymbolLookup symbolLookup, short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull InstructionSet instructionSet,
+                @CheckForNull SymbolLookup symbolLookup, @Nonnull short[] words) {
             addDataItem(text, InstructionSize.DEFAULT, instructionSet, symbolLookup, words);
         }
 
-        private static void addDataItem(String text, InstructionSize instructionSize, InstructionSet instructionSet,
-                SymbolLookup symbolLookup, short[] words) {
+        private static void addDataItem(@Nonnull String text, @Nonnull InstructionSize instructionSize,
+                @Nonnull InstructionSet instructionSet, @CheckForNull SymbolLookup symbolLookup, @Nonnull short[] words) {
             TEST_DATA.add(new Object[] { new DataItem(text, AddressingModeCategory.ALL, false, instructionSize, instructionSet,
                     symbolLookup, null, words) });
         }
 
-        private static void addDataItem(String text, SymbolLookup symbolLookup, short[] words) {
+        private static void addDataItem(@Nonnull String text, @CheckForNull SymbolLookup symbolLookup, @Nonnull short[] words) {
             addDataItem(text, InstructionSize.DEFAULT, InstructionSet.MC68000, symbolLookup, words);
         }
 
-        public SymbolTest(DataItem data) {
+        public SymbolTest(@Nonnull DataItem data) {
             super(data);
         }
 
@@ -1406,7 +1439,7 @@ public class EffectiveAddressTest {
 
             final boolean expectedValid;
 
-            DataItem(String text, Set<AddressingMode> validAddressingModes, boolean expectedValid) {
+            DataItem(@Nonnull String text, @Nonnull Set<AddressingMode> validAddressingModes, boolean expectedValid) {
                 super(text, validAddressingModes, false, InstructionSize.DEFAULT, InstructionSet.MC68020, null, null);
                 this.expectedValid = expectedValid;
             }
@@ -1415,10 +1448,13 @@ public class EffectiveAddressTest {
 
         private static final int CLASS_CONSTANT_MODIFIERS = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
 
+        @Nonnull
         private static final EquivalentAssemblyMessage ADDRESSING_MODE_NOT_ALLOWED_HERE = new EquivalentAssemblyMessage(
                 new AddressingModeNotAllowedHereErrorMessage());
 
+        @Nonnull
         private static final ArrayList<Set<AddressingMode>> CATEGORIES = loadCategories();
+        @Nonnull
         private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
         static {
@@ -1435,17 +1471,19 @@ public class EffectiveAddressTest {
             addDataItem("#0", AddressingMode.IMMEDIATE_DATA);
         }
 
+        @Nonnull
         @Parameters
         public static List<Object[]> data() {
             return TEST_DATA;
         }
 
-        private static void addDataItem(String text, AddressingMode addressingMode) {
+        private static void addDataItem(@Nonnull String text, @Nonnull AddressingMode addressingMode) {
             for (Set<AddressingMode> category : CATEGORIES) {
                 TEST_DATA.add(new Object[] { new DataItem(text, category, category.contains(addressingMode)) });
             }
         }
 
+        @Nonnull
         @SuppressWarnings("unchecked")
         private static ArrayList<Set<AddressingMode>> loadCategories() {
             try {
@@ -1466,7 +1504,7 @@ public class EffectiveAddressTest {
             }
         }
 
-        public ValidateAddressingModeTest(DataItem data) {
+        public ValidateAddressingModeTest(@Nonnull DataItem data) {
             super(data);
         }
 
@@ -1485,11 +1523,16 @@ public class EffectiveAddressTest {
 
     }
 
+    @Nonnull
     static final UnsignedIntValue ONE_VALUE = new UnsignedIntValue(1);
+    @Nonnull
     static final ValueExpression ONE_EXPRESSION = new ValueExpression(ONE_VALUE);
 
+    @Nonnull
     static final Symbol UNDEFINED = new StaticSymbol(null);
+    @Nonnull
     static final Symbol ONE = new StaticSymbol(ONE_VALUE);
+    @Nonnull
     static final Symbol ONE_FUNCTION = new StaticSymbol(new FunctionValue(new Function() {
         @Override
         public Expression call(Expression[] arguments, EvaluationContext evaluationContext) {

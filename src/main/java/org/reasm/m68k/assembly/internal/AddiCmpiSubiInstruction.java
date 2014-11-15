@@ -3,6 +3,9 @@ package org.reasm.m68k.assembly.internal;
 import java.io.IOException;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.InstructionSet;
 
 /**
@@ -10,10 +13,13 @@ import org.reasm.m68k.InstructionSet;
  *
  * @author Francis Gagné
  */
+@Immutable
 class AddiCmpiSubiInstruction extends TwoEaInstruction {
 
+    @Nonnull
     static final AddiCmpiSubiInstruction ADDI = new AddiCmpiSubiInstruction(AddAndCmpEorOrSubForms.ADD);
 
+    @Nonnull
     static final AddiCmpiSubiInstruction CMPI = new AddiCmpiSubiInstruction(AddAndCmpEorOrSubForms.CMP) {
         @Override
         boolean encodeTst(M68KAssemblyContext context, InstructionSize size, EffectiveAddress ea0, EffectiveAddress ea1)
@@ -31,11 +37,13 @@ class AddiCmpiSubiInstruction extends TwoEaInstruction {
         }
     };
 
+    @Nonnull
     static final AddiCmpiSubiInstruction SUBI = new AddiCmpiSubiInstruction(AddAndCmpEorOrSubForms.SUB);
 
+    @Nonnull
     private final AddAndCmpEorOrSubForms forms;
 
-    AddiCmpiSubiInstruction(AddAndCmpEorOrSubForms forms) {
+    AddiCmpiSubiInstruction(@Nonnull AddAndCmpEorOrSubForms forms) {
         this.forms = forms;
     }
 
@@ -71,8 +79,8 @@ class AddiCmpiSubiInstruction extends TwoEaInstruction {
      * @throws IOException
      *             an I/O exception occurred
      */
-    boolean encodeTst(M68KAssemblyContext context, InstructionSize size, EffectiveAddress ea0, EffectiveAddress ea1)
-            throws IOException {
+    boolean encodeTst(@Nonnull M68KAssemblyContext context, @Nonnull InstructionSize size, @Nonnull EffectiveAddress ea0,
+            @Nonnull EffectiveAddress ea1) throws IOException {
         return false;
     }
 

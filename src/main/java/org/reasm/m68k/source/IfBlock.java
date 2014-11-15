@@ -1,5 +1,9 @@
 package org.reasm.m68k.source;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.AssemblyBuilder;
 import org.reasm.m68k.assembly.internal.SourceNodesImpl;
 import org.reasm.source.CompositeSourceNode;
@@ -11,6 +15,7 @@ import org.reasm.source.SourceNode;
  *
  * @author Francis Gagné
  */
+@Immutable
 public final class IfBlock extends CompositeSourceNode {
 
     /**
@@ -21,7 +26,7 @@ public final class IfBlock extends CompositeSourceNode {
      * @param parseError
      *            the parse error on the source node, or <code>null</code> if no parse error occurred
      */
-    public IfBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
+    public IfBlock(@Nonnull Iterable<? extends SourceNode> childNodes, @CheckForNull ParseError parseError) {
         super(childNodes, parseError);
     }
 

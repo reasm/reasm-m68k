@@ -1,5 +1,8 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.m68k.messages.EndnsWithoutNamespaceErrorMessage;
 import org.reasm.m68k.source.NamespaceBlock;
 
@@ -8,15 +11,17 @@ import org.reasm.m68k.source.NamespaceBlock;
  *
  * @author Francis Gagné
  */
+@Immutable
 class EndnsDirective extends Mnemonic {
 
+    @Nonnull
     static final EndnsDirective ENDNS = new EndnsDirective();
 
     private EndnsDirective() {
     }
 
     @Override
-    protected void assemble(M68KAssemblyContext context) {
+    void assemble(M68KAssemblyContext context) {
         context.sizeNotAllowed();
         context.requireNumberOfOperands(0);
 

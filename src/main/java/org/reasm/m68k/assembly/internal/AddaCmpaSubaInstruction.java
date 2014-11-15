@@ -2,15 +2,21 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * The <code>ADDA</code>, <code>CMPA</code> and <code>SUBA</code> instructions.
  *
  * @author Francis Gagné
  */
+@Immutable
 class AddaCmpaSubaInstruction extends TwoFixedEaInstruction {
 
+    @Nonnull
     static final AddaCmpaSubaInstruction ADDA = new AddaCmpaSubaInstruction(AddAndCmpEorOrSubForms.ADD);
 
+    @Nonnull
     static final AddaCmpaSubaInstruction CMPA = new AddaCmpaSubaInstruction(AddAndCmpEorOrSubForms.CMP) {
         @Override
         boolean encodeTst(M68KAssemblyContext context, InstructionSize size, EffectiveAddress ea0, EffectiveAddress ea1)
@@ -19,11 +25,13 @@ class AddaCmpaSubaInstruction extends TwoFixedEaInstruction {
         };
     };
 
+    @Nonnull
     static final AddaCmpaSubaInstruction SUBA = new AddaCmpaSubaInstruction(AddAndCmpEorOrSubForms.SUB);
 
+    @Nonnull
     private final AddAndCmpEorOrSubForms forms;
 
-    AddaCmpaSubaInstruction(AddAndCmpEorOrSubForms forms) {
+    AddaCmpaSubaInstruction(@Nonnull AddAndCmpEorOrSubForms forms) {
         super(AddressingModeCategory.ALL, AddressingModeCategory.ADDRESS_REGISTER_DIRECT);
         this.forms = forms;
     }
@@ -52,8 +60,8 @@ class AddaCmpaSubaInstruction extends TwoFixedEaInstruction {
      * @throws IOException
      *             an I/O exception occurred
      */
-    boolean encodeTst(M68KAssemblyContext context, InstructionSize size, EffectiveAddress ea0, EffectiveAddress ea1)
-            throws IOException {
+    boolean encodeTst(@Nonnull M68KAssemblyContext context, @Nonnull InstructionSize size, @Nonnull EffectiveAddress ea0,
+            @Nonnull EffectiveAddress ea1) throws IOException {
         return false;
     }
 

@@ -2,13 +2,18 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * The <code>LEA</code> instruction.
  *
  * @author Francis Gagné
  */
+@Immutable
 class LeaInstruction extends TwoFixedEaInstruction {
 
+    @Nonnull
     static final LeaInstruction LEA = new LeaInstruction();
 
     private LeaInstruction() {

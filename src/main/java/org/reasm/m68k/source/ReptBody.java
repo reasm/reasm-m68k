@@ -2,6 +2,9 @@ package org.reasm.m68k.source;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.AssemblyBuilder;
 import org.reasm.m68k.assembly.internal.SourceNodesImpl;
 import org.reasm.source.CompositeSourceNode;
@@ -12,6 +15,7 @@ import org.reasm.source.SourceNode;
  *
  * @author Francis Gagné
  */
+@Immutable
 public final class ReptBody extends CompositeSourceNode {
 
     /**
@@ -20,7 +24,7 @@ public final class ReptBody extends CompositeSourceNode {
      * @param childNodes
      *            the child nodes
      */
-    public ReptBody(Iterable<? extends SourceNode> childNodes) {
+    public ReptBody(@Nonnull Iterable<? extends SourceNode> childNodes) {
         super(childNodes, null);
     }
 

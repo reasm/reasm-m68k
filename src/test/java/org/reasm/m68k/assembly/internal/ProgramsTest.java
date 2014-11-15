@@ -3,6 +3,9 @@ package org.reasm.m68k.assembly.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -24,9 +27,12 @@ import org.reasm.source.parseerrors.UnterminatedStringParseError;
 @RunWith(Parameterized.class)
 public class ProgramsTest extends BaseProgramsTest {
 
+    @Nonnull
     private static final AssemblyMessage ALIGNMENT_MUST_NOT_BE_ZERO_OR_NEGATIVE = new AlignmentMustNotBeZeroOrNegativeErrorMessage();
+    @Nonnull
     private static final AssemblyMessage WRONG_NUMBER_OF_ARGUMENTS = new WrongNumberOfArgumentsErrorMessage();
 
+    @Nonnull
     private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
     static {
@@ -388,20 +394,23 @@ public class ProgramsTest extends BaseProgramsTest {
      *
      * @return the test data
      */
+    @Nonnull
     @Parameters
     public static List<Object[]> data() {
         return TEST_DATA;
     }
 
-    private static void addDataItem(String code, int steps, byte[] output) {
+    private static void addDataItem(@Nonnull String code, int steps, @Nonnull byte[] output) {
         addDataItem(code, steps, output, (AssemblyMessage) null);
     }
 
-    private static void addDataItem(String code, int steps, byte[] output, AssemblyMessage expectedMessage) {
+    private static void addDataItem(@Nonnull String code, int steps, @Nonnull byte[] output,
+            @CheckForNull AssemblyMessage expectedMessage) {
         TEST_DATA.add(new Object[] { code, steps, output, expectedMessage, null });
     }
 
-    private static void addDataItem(String code, int steps, byte[] output, AssemblyMessage... expectedMessages) {
+    private static void addDataItem(@Nonnull String code, int steps, @Nonnull byte[] output,
+            @CheckForNull AssemblyMessage... expectedMessages) {
         TEST_DATA.add(new Object[] { code, steps, output, null, expectedMessages });
     }
 
@@ -420,7 +429,8 @@ public class ProgramsTest extends BaseProgramsTest {
      *            an array of {@link AssemblyMessage AssemblyMessages} that are expected to be generated while assembling the code.
      *            Takes priority over <code>expectedMessage</code>.
      */
-    public ProgramsTest(String code, int steps, byte[] output, AssemblyMessage expectedMessage, AssemblyMessage[] expectedMessages) {
+    public ProgramsTest(@Nonnull String code, int steps, @Nonnull byte[] output, @CheckForNull AssemblyMessage expectedMessage,
+            @CheckForNull AssemblyMessage[] expectedMessages) {
         super(code, steps, output, M68KArchitecture.MC68000, expectedMessage, expectedMessages, null);
     }
 

@@ -1,5 +1,8 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.expressions.BinaryOperator;
 import org.reasm.m68k.messages.NextWithoutForErrorMessage;
 
@@ -8,11 +11,13 @@ import org.reasm.m68k.messages.NextWithoutForErrorMessage;
  *
  * @author Francis Gagné
  */
-final class NextDirective extends Mnemonic {
+@Immutable
+class NextDirective extends Mnemonic {
 
+    @Nonnull
     static final NextDirective NEXT = new NextDirective();
 
-    static void assembleCore(M68KAssemblyContext context) {
+    static void assembleCore(@Nonnull M68KAssemblyContext context) {
         final Object blockState = context.getParentBlock();
         if (blockState instanceof ForBlockState) {
             final ForBlockState forBlockState = (ForBlockState) blockState;

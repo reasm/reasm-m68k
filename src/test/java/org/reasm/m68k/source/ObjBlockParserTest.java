@@ -5,6 +5,9 @@ import static org.reasm.m68k.source.BlockParserTestsCommon.COMPLETE_BLOCK;
 import static org.reasm.m68k.source.BlockParserTestsCommon.INCOMPLETE_BLOCK;
 import static org.reasm.m68k.source.BlockParserTestsCommon.parseBasicBlock;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.reasm.source.ParseError;
@@ -20,8 +23,8 @@ import ca.fragag.text.CharSequenceReader;
  */
 public class ObjBlockParserTest {
 
-    private static void parseObjBlock(String code, Matcher<? super ParseError> blockParseErrorMatcher,
-            Matcher<? super SourceNode> thirdChildNodeMatcher) {
+    private static void parseObjBlock(@Nonnull String code, @Nonnull Matcher<? super ParseError> blockParseErrorMatcher,
+            @CheckForNull Matcher<? super SourceNode> thirdChildNodeMatcher) {
         parseBasicBlock(code, ObjBlock.class, SimpleCompositeSourceNode.class, blockParseErrorMatcher, thirdChildNodeMatcher);
     }
 

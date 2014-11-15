@@ -1,5 +1,8 @@
 package org.reasm.m68k.source;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.reasm.SubstringBounds;
 import org.reasm.source.SourceLocation;
 import org.reasm.source.SourceNode;
@@ -20,7 +23,8 @@ public final class SourceLocationUtils {
      *            the source location
      * @return a {@link SourceNodeRangeReader} to read the comment
      */
-    public static SourceNodeRangeReader getCommentReader(SourceLocation location) {
+    @Nonnull
+    public static SourceNodeRangeReader getCommentReader(@Nonnull SourceLocation location) {
         final SubstringBounds commentBounds = getLogicalLineRequired(location).getCommentBounds();
         if (commentBounds == null) {
             throw new IllegalArgumentException("LogicalLine has no comment");
@@ -36,7 +40,8 @@ public final class SourceLocationUtils {
      *            the source location
      * @return the text of the comment
      */
-    public static String getCommentText(SourceLocation location) {
+    @Nonnull
+    public static String getCommentText(@Nonnull SourceLocation location) {
         return getCommentReader(location).readToString();
     }
 
@@ -49,7 +54,8 @@ public final class SourceLocationUtils {
      *            the index of the label
      * @return a {@link SourceNodeRangeReader} to read the label
      */
-    public static SourceNodeRangeReader getLabelReader(SourceLocation location, int index) {
+    @Nonnull
+    public static SourceNodeRangeReader getLabelReader(@Nonnull SourceLocation location, int index) {
         return new SourceNodeRangeReader(location, getLogicalLineRequired(location).getLabelBounds(index),
                 new LogicalLineRangeReaderSkipHandler());
     }
@@ -63,7 +69,8 @@ public final class SourceLocationUtils {
      *            the index of the label
      * @return the text of the label
      */
-    public static String getLabelText(SourceLocation location, int index) {
+    @Nonnull
+    public static String getLabelText(@Nonnull SourceLocation location, int index) {
         return getLabelReader(location, index).readToString();
     }
 
@@ -75,7 +82,8 @@ public final class SourceLocationUtils {
      * @return the {@link LogicalLine} referenced by the {@link SourceLocation}, or <code>null</code> if the {@link SourceLocation}
      *         doesn't reference a {@link LogicalLine}
      */
-    public static LogicalLine getLogicalLine(SourceLocation location) {
+    @CheckForNull
+    public static LogicalLine getLogicalLine(@Nonnull SourceLocation location) {
         final SourceNode sourceNode = location.getSourceNode();
 
         if (sourceNode instanceof LogicalLine) {
@@ -98,7 +106,8 @@ public final class SourceLocationUtils {
      * @throws IllegalArgumentException
      *             the {@link SourceLocation} doesn't reference a {@link LogicalLine} or a {@link BlockDirectiveLine}
      */
-    public static LogicalLine getLogicalLineRequired(SourceLocation location) {
+    @Nonnull
+    public static LogicalLine getLogicalLineRequired(@Nonnull SourceLocation location) {
         final LogicalLine logicalLine = getLogicalLine(location);
         if (logicalLine != null) {
             return logicalLine;
@@ -114,7 +123,8 @@ public final class SourceLocationUtils {
      *            the source location
      * @return a {@link SourceNodeRangeReader} to read the mnemonic
      */
-    public static SourceNodeRangeReader getMnemonicReader(SourceLocation location) {
+    @Nonnull
+    public static SourceNodeRangeReader getMnemonicReader(@Nonnull SourceLocation location) {
         final SubstringBounds mnemonicBounds = getLogicalLineRequired(location).getMnemonicBounds();
         if (mnemonicBounds == null) {
             throw new IllegalArgumentException("LogicalLine has no mnemonic");
@@ -130,7 +140,8 @@ public final class SourceLocationUtils {
      *            the source location
      * @return the text of the mnemonic
      */
-    public static String getMnemonicText(SourceLocation location) {
+    @Nonnull
+    public static String getMnemonicText(@Nonnull SourceLocation location) {
         return getMnemonicReader(location).readToString();
     }
 
@@ -143,7 +154,8 @@ public final class SourceLocationUtils {
      *            the index of the operand
      * @return a {@link SourceNodeRangeReader} to read the operand
      */
-    public static SourceNodeRangeReader getOperandReader(SourceLocation location, int index) {
+    @Nonnull
+    public static SourceNodeRangeReader getOperandReader(@Nonnull SourceLocation location, int index) {
         return new SourceNodeRangeReader(location, getLogicalLineRequired(location).getOperandBounds(index),
                 new LogicalLineRangeReaderSkipHandler());
     }
@@ -157,7 +169,8 @@ public final class SourceLocationUtils {
      *            the index of the operand
      * @return the text of the operand
      */
-    public static String getOperandText(SourceLocation location, int index) {
+    @Nonnull
+    public static String getOperandText(@Nonnull SourceLocation location, int index) {
         return getOperandReader(location, index).readToString();
     }
 
@@ -168,7 +181,7 @@ public final class SourceLocationUtils {
      *            the source location
      * @return <code>true</code> if the logical line contains a comment; otherwise, <code>false</code>
      */
-    public static boolean hasComment(SourceLocation location) {
+    public static boolean hasComment(@Nonnull SourceLocation location) {
         return getLogicalLineRequired(location).getCommentBounds() != null;
     }
 
@@ -179,7 +192,7 @@ public final class SourceLocationUtils {
      *            the source location
      * @return <code>true</code> if the logical line contains a mnemonic; otherwise, <code>false</code>
      */
-    public static boolean hasMnemonic(SourceLocation location) {
+    public static boolean hasMnemonic(@Nonnull SourceLocation location) {
         return getLogicalLineRequired(location).getMnemonicBounds() != null;
     }
 

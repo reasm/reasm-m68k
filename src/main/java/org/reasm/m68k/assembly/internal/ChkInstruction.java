@@ -2,13 +2,18 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * The <code>CHK</code> instruction.
  *
  * @author Francis Gagné
  */
+@Immutable
 class ChkInstruction extends TwoFixedEaInstruction {
 
+    @Nonnull
     static final ChkInstruction CHK = new ChkInstruction();
 
     private ChkInstruction() {

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -19,6 +21,7 @@ import org.reasm.m68k.M68KArchitecture;
 @RunWith(Parameterized.class)
 public class AutomaticEvenTest extends BaseProgramsTest {
 
+    @Nonnull
     private static final List<Object[]> TEST_DATA = new ArrayList<>();
 
     static {
@@ -67,12 +70,13 @@ public class AutomaticEvenTest extends BaseProgramsTest {
      *
      * @return the test data
      */
+    @Nonnull
     @Parameters
     public static List<Object[]> data() {
         return TEST_DATA;
     }
 
-    private static void addDataItem(String code, int steps, byte[] output) {
+    private static void addDataItem(@Nonnull String code, int steps, @Nonnull byte[] output) {
         TEST_DATA.add(new Object[] { code, steps, output });
     }
 
@@ -86,10 +90,11 @@ public class AutomaticEvenTest extends BaseProgramsTest {
      * @param output
      *            the program's output
      */
-    public AutomaticEvenTest(String code, int steps, byte[] output) {
+    public AutomaticEvenTest(@Nonnull String code, int steps, @Nonnull byte[] output) {
         super(code, steps, output, M68KArchitecture.MC68000, null, null, null);
     }
 
+    @Nonnull
     @Override
     protected Map<String, Object> getM68KConfigurationOptions() {
         final HashMap<String, Object> m68kOptions = new HashMap<>();

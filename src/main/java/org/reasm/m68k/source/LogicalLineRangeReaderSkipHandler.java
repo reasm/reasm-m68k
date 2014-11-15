@@ -1,5 +1,8 @@
 package org.reasm.m68k.source;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+
 import org.reasm.source.SourceLocation;
 import org.reasm.source.SourceNodeRangeReader;
 
@@ -13,10 +16,12 @@ public final class LogicalLineRangeReaderSkipHandler extends SourceNodeRangeRead
     /**
      * The state of the process of skipping a continuation character and the following line break and initial whitespace.
      */
+    @Immutable
     private enum ContinuationCharacterSkipState {
         LOOK_FOR_CONTINUATION_CHARACTER, EXPECT_CR_OR_LF, EXPECT_LF_OR_WHITESPACE, EXPECT_WHITESPACE
     }
 
+    @Nonnull
     private ContinuationCharacterSkipState continuationCharacterSkipState = ContinuationCharacterSkipState.LOOK_FOR_CONTINUATION_CHARACTER;
 
     /**

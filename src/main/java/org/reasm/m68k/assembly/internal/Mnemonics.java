@@ -3,6 +3,9 @@ package org.reasm.m68k.assembly.internal;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.reasm.Symbol;
 import org.reasm.SymbolReference;
 import org.reasm.SymbolResolutionFallback;
@@ -19,11 +22,12 @@ public final class Mnemonics {
 
         private final Map<String, MnemonicSymbol> map = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
-        MnemonicSymbol get(String mnemonicName) {
+        @CheckForNull
+        MnemonicSymbol get(@Nonnull String mnemonicName) {
             return this.map.get(mnemonicName);
         }
 
-        void put(String mnemonicName, Mnemonic mnemonicHandler) {
+        void put(@Nonnull String mnemonicName, @Nonnull Mnemonic mnemonicHandler) {
             this.map.put(mnemonicName, new MnemonicSymbol(mnemonicName, mnemonicHandler));
         }
 
@@ -208,7 +212,9 @@ public final class Mnemonics {
     public static final String UNTIL = "UNTIL";
     public static final String WHILE = "WHILE";
 
+    @Nonnull
     static final MnemonicMap MAP;
+    @Nonnull
     static final SymbolResolutionFallback SYMBOL_RESOLUTION_FALLBACK;
 
     static {

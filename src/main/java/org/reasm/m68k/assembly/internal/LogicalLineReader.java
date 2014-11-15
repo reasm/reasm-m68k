@@ -1,5 +1,7 @@
 package org.reasm.m68k.assembly.internal;
 
+import javax.annotation.Nonnull;
+
 import org.reasm.SubstringBounds;
 import org.reasm.m68k.source.LogicalLine;
 import org.reasm.m68k.source.Parser;
@@ -35,6 +37,7 @@ final class LogicalLineReader {
         return this.reader.getCurrentCodePoint();
     }
 
+    @Nonnull
     String readToString() {
         final StringBuilder sb = new StringBuilder();
         while (!this.atEnd()) {
@@ -51,7 +54,7 @@ final class LogicalLineReader {
         this.reader.setCurrentPosition(position);
     }
 
-    void setRange(SourceLocation sourceLocation, LogicalLine logicalLine, int start, int end) {
+    void setRange(@Nonnull SourceLocation sourceLocation, @Nonnull LogicalLine logicalLine, int start, int end) {
         if (this.reader == null || sourceLocation.getFile().getText() != this.reader.getDocument()) {
             this.reader = new DocumentReader(sourceLocation.getFile().getText());
         }
@@ -63,7 +66,7 @@ final class LogicalLineReader {
         this.skipContinuationCharacters();
     }
 
-    void setRange(SourceLocation sourceLocation, LogicalLine logicalLine, SubstringBounds bounds) {
+    void setRange(@Nonnull SourceLocation sourceLocation, @Nonnull LogicalLine logicalLine, @Nonnull SubstringBounds bounds) {
         this.setRange(sourceLocation, logicalLine, bounds.getStart(), bounds.getEnd());
     }
 

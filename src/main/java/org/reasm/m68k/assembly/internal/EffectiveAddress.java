@@ -7,6 +7,7 @@ import java.util.Stack;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 
 import org.reasm.AssemblyMessage;
 import org.reasm.Function;
@@ -128,10 +129,12 @@ final class EffectiveAddress {
 
     }
 
+    @Immutable
     enum MemoryIndirectMode {
         NONE, PREINDEXED, POSTINDEXED
     }
 
+    @Immutable
     enum MemoryIndirectState {
         NONE, INCOMPLETE, COMPLETE
     }
@@ -283,6 +286,7 @@ final class EffectiveAddress {
 
     }
 
+    @Immutable
     private enum AbsoluteAddressingSize {
         DEFAULT, WORD, LONG
     }
