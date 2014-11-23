@@ -90,6 +90,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
 
         // Initialize the context.
         context.initialize(builder.getStep());
+        context.encoding = builder.getAssembly().getCurrentEncoding();
         return context;
     }
 

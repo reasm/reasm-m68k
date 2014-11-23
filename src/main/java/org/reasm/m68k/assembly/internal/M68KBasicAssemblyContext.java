@@ -1,5 +1,7 @@
 package org.reasm.m68k.assembly.internal;
 
+import java.nio.charset.Charset;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
@@ -12,6 +14,7 @@ abstract class M68KBasicAssemblyContext {
 
     long programCounter;
     InstructionSet instructionSet;
+    Charset encoding;
 
     @CheckForNull
     abstract GeneralPurposeRegister getRegisterAliasByName(@Nonnull String identifier);

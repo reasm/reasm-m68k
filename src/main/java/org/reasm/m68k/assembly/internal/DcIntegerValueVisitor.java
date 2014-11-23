@@ -2,7 +2,6 @@ package org.reasm.m68k.assembly.internal;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -87,8 +86,7 @@ final class DcIntegerValueVisitor implements DcValueVisitor {
 
     @Override
     public Void visitString(String value) {
-        // TODO Make the encoding configurable
-        final ByteBuffer stringBytes = Charset.defaultCharset().encode(value);
+        final ByteBuffer stringBytes = this.context.encoding.encode(value);
 
         int maxLength;
 

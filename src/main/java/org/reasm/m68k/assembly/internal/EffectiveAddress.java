@@ -34,10 +34,14 @@ final class EffectiveAddress {
         @Nonnull
         private final InstructionSize instructionSize;
         @Nonnull
+        private final Charset encoding;
+        @Nonnull
         private final Consumer<AssemblyMessage> assemblyMessageConsumer;
 
-        IntegerValueVisitor(@Nonnull InstructionSize instructionSize, @Nonnull Consumer<AssemblyMessage> assemblyMessageConsumer) {
+        IntegerValueVisitor(@Nonnull InstructionSize instructionSize, @Nonnull Charset encoding,
+                @Nonnull Consumer<AssemblyMessage> assemblyMessageConsumer) {
             this.instructionSize = instructionSize;
+            this.encoding = encoding;
             this.assemblyMessageConsumer = assemblyMessageConsumer;
         }
 
@@ -79,8 +83,7 @@ final class EffectiveAddress {
                 break;
             }
 
-            // TODO Make the encoding configurable
-            final ByteBuffer stringBytes = Charset.defaultCharset().encode(value);
+            final ByteBuffer stringBytes = this.encoding.encode(value);
 
             if (stringBytes.limit() > maxLength) {
                 this.assemblyMessageConsumer.accept(new StringTooLongErrorMessage(value));
@@ -190,7 +193,7 @@ final class EffectiveAddress {
 
             if (haveBaseDisplacement) {
                 final Integer value = Value.accept(this.baseDisplacementExpression.evaluate(evaluationContext),
-                        new IntegerValueVisitor(InstructionSize.LONG, assemblyMessageConsumer));
+                        new IntegerValueVisitor(InstructionSize.LONG, context.encoding, assemblyMessageConsumer));
                 if (value != null) {
                     baseDisplacement = value;
                 }
@@ -200,7 +203,7 @@ final class EffectiveAddress {
             int outerDisplacement = 0;
             if (haveOuterDisplacement) {
                 final Integer value = Value.accept(this.outerDisplacementExpression.evaluate(evaluationContext),
-                        new IntegerValueVisitor(InstructionSize.LONG, assemblyMessageConsumer));
+                        new IntegerValueVisitor(InstructionSize.LONG, context.encoding, assemblyMessageConsumer));
                 if (value != null) {
                     outerDisplacement = value;
                 }
@@ -595,7 +598,8 @@ final class EffectiveAddress {
                 }
 
                 final Value value = expression.evaluate(evaluationContext);
-                Integer intValue = Value.accept(value, new IntegerValueVisitor(instructionSize, assemblyMessageConsumer));
+                final Integer intValue = Value.accept(value, new IntegerValueVisitor(instructionSize, context.encoding,
+                        assemblyMessageConsumer));
                 if (intValue != null) {
                     switch (instructionSize) {
                     default:
@@ -868,7 +872,7 @@ final class EffectiveAddress {
                 final int indexReg = parseIndexRegisterName(binaryOperatorExpression.getOperand1(), context);
                 if (indexReg != -1) {
                     final Integer scale = Value.accept(binaryOperatorExpression.getOperand2().evaluate(evaluationContext),
-                            new IntegerValueVisitor(InstructionSize.LONG, assemblyMessageConsumer));
+                            new IntegerValueVisitor(InstructionSize.LONG, context.encoding, assemblyMessageConsumer));
                     final int scaleEncoding;
                     if (scale != null) {
                         switch (scale) {
@@ -927,7 +931,8 @@ final class EffectiveAddress {
             @Nonnull Consumer<AssemblyMessage> assemblyMessageConsumer, @Nonnull EffectiveAddress result,
             int offsetToExtensionWords, @Nonnull M68KBasicAssemblyContext context) {
         Integer intValue = Value.accept(expression.evaluate(evaluationContext), new IntegerValueVisitor(
-                size == AbsoluteAddressingSize.WORD ? InstructionSize.WORD : InstructionSize.LONG, assemblyMessageConsumer));
+                size == AbsoluteAddressingSize.WORD ? InstructionSize.WORD : InstructionSize.LONG, context.encoding,
+                        assemblyMessageConsumer));
         int value = intValue != null ? intValue : 0;
         if (size == AbsoluteAddressingSize.DEFAULT) {
             if (fitsInWord(value)) {
