@@ -31,10 +31,7 @@ final class DcIntegerValueVisitor implements DcValueVisitor {
         switch (this.size) {
         case BYTE:
             if (this.outputBytes != null) {
-                final int limit = this.outputBytes.limit();
-                for (int i = 0; i < limit; i++) {
-                    this.context.appendByte(this.outputBytes.get(i));
-                }
+                this.context.builder.appendAssembledData(this.outputBytes);
             } else {
                 this.context.appendByte((byte) this.output);
             }
