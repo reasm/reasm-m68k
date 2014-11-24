@@ -1,6 +1,5 @@
 package org.reasm.m68k.assembly.internal;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import javax.annotation.Nonnull;
@@ -28,7 +27,6 @@ class HexDirective extends Mnemonic {
         context.sizeNotAllowed();
 
         final LogicalLineReader reader = context.logicalLineReader;
-        final ByteArrayOutputStream data = new ByteArrayOutputStream();
         final int numberOfOperands = context.numberOfOperands;
         for (int i = 0; i < numberOfOperands; i++) {
             context.prepareOperandReader(i);
@@ -70,11 +68,9 @@ class HexDirective extends Mnemonic {
                 byteValue |= hexCharValue;
 
                 // Add the parsed byte to the buffer.
-                data.write(byteValue);
+                context.builder.appendAssembledData(byteValue);
             }
         }
-
-        context.builder.appendAssembledData(data.toByteArray());
     }
 
 }
