@@ -44,14 +44,13 @@ final class LogicalLineParser {
         int startOfLogicalLine = reader.getCurrentPosition();
 
         if (readLogicalChar(reader, startOfLogicalLine, continuationCharacters)) {
-            char currentChar = reader.getCurrentChar();
             int currentCodePoint = reader.getCurrentCodePoint();
 
             // When this flag becomes false, we have reached the end of the logical line.
             boolean onTheLine = true;
 
             // Check if the line is a full-line comment.
-            if (currentChar == '*' || currentChar == ';') {
+            if (currentCodePoint == '*' || currentCodePoint == ';') {
                 comment = readComment(reader, startOfLogicalLine);
                 onTheLine = false;
             } else {
@@ -61,40 +60,30 @@ final class LogicalLineParser {
                     // will just be skipped.
                     int start = reader.getCurrentPosition() - startOfLogicalLine;
 
-                    // Find the end of the label.
-                    while (onTheLine = readLogicalChar(reader, startOfLogicalLine, continuationCharacters)) {
-                        currentChar = reader.getCurrentChar();
-                        currentCodePoint = reader.getCurrentCodePoint();
-                        if (currentChar == ':' || currentChar == ';' || Parser.isWhitespace(currentCodePoint)) {
-                            // We found the end of the label, break out of the loop.
-                            break;
-                        }
-
-                        reader.advance();
-                    }
+                    onTheLine = readLabelOrMnemonic(reader, startOfLogicalLine, continuationCharacters);
 
                     // The colon, semicolon, whitespace or end of the line ends the label.
                     int end = reader.getCurrentPosition() - startOfLogicalLine;
                     parseError = addLabel(labels, start, end, parseError);
 
                     // If the character wasn't a colon, look for one.
-                    if (currentChar != ':') {
+                    currentCodePoint = reader.getCurrentCodePoint();
+                    if (currentCodePoint != ':') {
                         if (onTheLine = skipWhitespaceFromCurrent(reader, onTheLine, startOfLogicalLine, continuationCharacters)) {
-                            currentChar = reader.getCurrentChar();
+                            currentCodePoint = reader.getCurrentCodePoint();
                         }
                     }
 
                     // If the following character is a colon, skip it.
-                    if (currentChar == ':') {
+                    if (currentCodePoint == ':') {
                         onTheLine = advanceReadLogicalChar(reader, startOfLogicalLine, continuationCharacters);
                     }
                 }
 
                 // Parse additional labels and the mnemonic.
                 while (onTheLine = skipWhitespaceFromCurrent(reader, onTheLine, startOfLogicalLine, continuationCharacters)) {
-                    currentChar = reader.getCurrentChar();
                     currentCodePoint = reader.getCurrentCodePoint();
-                    if (currentChar == ';') {
+                    if (currentCodePoint == ';') {
                         // No mnemonic, just a comment.
                         comment = readComment(reader, startOfLogicalLine);
                         onTheLine = false;
@@ -104,19 +93,12 @@ final class LogicalLineParser {
                     // The line may still have labels, but they must be followed by a colon. If what we parse isn't
                     // followed by a colon, then it's the mnemonic.
                     int start = reader.getCurrentPosition() - startOfLogicalLine;
-                    while (onTheLine = readLogicalChar(reader, startOfLogicalLine, continuationCharacters)) {
-                        currentChar = reader.getCurrentChar();
-                        currentCodePoint = reader.getCurrentCodePoint();
-                        if (currentChar == ':' || currentChar == ';' || Parser.isWhitespace(currentCodePoint)) {
-                            break;
-                        }
 
-                        reader.advance();
-                    }
+                    onTheLine = readLabelOrMnemonic(reader, startOfLogicalLine, continuationCharacters);
 
                     int end = reader.getCurrentPosition() - startOfLogicalLine;
                     if ((onTheLine = skipWhitespaceFromCurrent(reader, onTheLine, startOfLogicalLine, continuationCharacters))
-                            && reader.getCurrentChar() == ':') {
+                            && reader.getCurrentCodePoint() == ':') {
                         parseError = addLabel(labels, start, end, parseError);
                         onTheLine = advanceReadLogicalChar(reader, startOfLogicalLine, continuationCharacters);
                     } else {
@@ -127,9 +109,8 @@ final class LogicalLineParser {
 
                 // Parse the operands.
                 if (onTheLine = skipWhitespaceFromCurrent(reader, onTheLine, startOfLogicalLine, continuationCharacters)) {
-                    currentChar = reader.getCurrentChar();
                     currentCodePoint = reader.getCurrentCodePoint();
-                    if (currentChar == ';') {
+                    if (currentCodePoint == ';') {
                         // There are no operands; this is just a comment.
                         comment = readComment(reader, startOfLogicalLine);
                         onTheLine = false;
@@ -137,24 +118,23 @@ final class LogicalLineParser {
                         int currentOperandStart = reader.getCurrentPosition() - startOfLogicalLine;
                         int startOfTrailingWhitespace = -1;
                         int numberOfParentheses = 0;
-                        char inString = '\0';
+                        int inString = -1;
                         int startOfString = -1;
                         boolean readComment = false;
 
                         inner: do {
-                            currentChar = reader.getCurrentChar();
                             currentCodePoint = reader.getCurrentCodePoint();
 
-                            if (inString != '\0') {
-                                if (currentChar == '\\') {
+                            if (inString != -1) {
+                                if (currentCodePoint == '\\') {
                                     // Skip the character after the backslash.
                                     onTheLine = advanceReadLogicalChar(reader, startOfLogicalLine, continuationCharacters);
-                                } else if (currentChar == inString) {
-                                    inString = '\0';
+                                } else if (currentCodePoint == inString) {
+                                    inString = -1;
                                     startOfString = -1;
                                 }
                             } else {
-                                switch (currentChar) {
+                                switch (currentCodePoint) {
                                 case '(':
                                     ++numberOfParentheses;
                                     break;
@@ -173,7 +153,7 @@ final class LogicalLineParser {
 
                                 case '"':
                                 case '\'':
-                                    inString = currentChar;
+                                    inString = currentCodePoint;
                                     startOfString = reader.getCurrentPosition() - startOfLogicalLine;
                                     break;
 
@@ -206,7 +186,7 @@ final class LogicalLineParser {
                             onTheLine = advanceReadLogicalChar(reader, startOfLogicalLine, continuationCharacters);
                         } while (onTheLine);
 
-                        if (inString != '\0') {
+                        if (inString != -1) {
                             if (parseError == null) {
                                 parseError = new UnterminatedStringParseError(startOfString);
                             }
@@ -240,12 +220,12 @@ final class LogicalLineParser {
         }
 
         if (!reader.atEnd()) {
-            if (reader.getCurrentChar() == '\r') {
+            if (reader.getCurrentCodePoint() == '\r') {
                 reader.advance();
                 if (reader.getCurrentCodePoint() == '\n') {
                     reader.advance();
                 }
-            } else if (reader.getCurrentChar() == '\n') {
+            } else if (reader.getCurrentCodePoint() == '\n') {
                 reader.advance();
             } else {
                 throw new AssertionError(); // unreachable
@@ -366,6 +346,49 @@ final class LogicalLineParser {
     }
 
     /**
+     * Reads a label or mnemonic.
+     *
+     * @param reader
+     *            the {@link CharSequenceReader} to read from
+     * @param startOfLogicalLine
+     *            the logical line's starting position
+     * @param continuationCharacters
+     *            the list of continuation characters on the logical line
+     * @return <code>true</code> if the current character is on the same logical line, or <code>false</code> if the current
+     *         character is a line separator
+     */
+    private static boolean readLabelOrMnemonic(CharSequenceReader<?> reader, int startOfLogicalLine,
+            ArrayList<Integer> continuationCharacters) {
+        boolean onTheLine;
+        boolean isFirstCodePoint = true;
+
+        // Find the end of the label or mnemonic.
+        while (onTheLine = readLogicalChar(reader, startOfLogicalLine, continuationCharacters)) {
+            int currentCodePoint = reader.getCurrentCodePoint();
+
+            if (currentCodePoint == '=') {
+                // If the label or mnemonic starts with a '=' character,
+                // then it is the only character in that label or mnemonic.
+                if (isFirstCodePoint) {
+                    onTheLine = advanceReadLogicalChar(reader, startOfLogicalLine, continuationCharacters);
+                }
+
+                break;
+            }
+
+            if (currentCodePoint == ':' || currentCodePoint == ';' || Parser.isWhitespace(currentCodePoint)) {
+                // We found the end of the label or mnemonic, break out of the loop.
+                break;
+            }
+
+            reader.advance();
+            isFirstCodePoint = false;
+        }
+
+        return onTheLine;
+    }
+
+    /**
      * Reads the current character and code point, processing continuation characters as they are encountered.
      *
      * @param reader
@@ -375,13 +398,13 @@ final class LogicalLineParser {
      * @param continuationCharacters
      *            the list of continuation characters on the logical line
      * @return <code>true</code> if the current character is on the same logical line, or <code>false</code> if the current
-     *         character is a line separator.
+     *         character is a line separator
      */
     private static boolean readLogicalChar(@Nonnull CharSequenceReader<?> reader, int startOfLogicalLine,
             @Nonnull ArrayList<Integer> continuationCharacters) {
         boolean onTheLine = isOnTheLine(reader);
 
-        while (onTheLine && reader.getCurrentChar() == '&') {
+        while (onTheLine && reader.getCurrentCodePoint() == '&') {
             final int position = reader.getCurrentPosition() - startOfLogicalLine;
 
             reader.advance();

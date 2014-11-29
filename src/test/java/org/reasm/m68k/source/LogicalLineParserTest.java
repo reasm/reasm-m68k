@@ -117,6 +117,8 @@ public class LogicalLineParserTest {
         addDataItem(" abc 'd", 7, new UnterminatedStringParseError(5), NO_LABELS, bounds(1, 4), array(bounds(5, 7)), null,
                 NO_CONTINUATION_CHARACTERS);
         addDataItem(" abc ''", 7, null, NO_LABELS, bounds(1, 4), array(bounds(5, 7)), null, NO_CONTINUATION_CHARACTERS);
+        addDataItem("a=", 2, null, array(bounds(0, 1)), bounds(1, 2), NO_OPERANDS, null, NO_CONTINUATION_CHARACTERS);
+        addDataItem("a=0", 3, null, array(bounds(0, 1)), bounds(1, 2), array(bounds(2, 3)), null, NO_CONTINUATION_CHARACTERS);
         addDataItem("*", 1, null, NO_LABELS, null, NO_OPERANDS, bounds(0, 1), NO_CONTINUATION_CHARACTERS);
         addDataItem("*xyz", 4, null, NO_LABELS, null, NO_OPERANDS, bounds(0, 4), NO_CONTINUATION_CHARACTERS);
         addDataItem(";", 1, null, NO_LABELS, null, NO_OPERANDS, bounds(0, 1), NO_CONTINUATION_CHARACTERS);
