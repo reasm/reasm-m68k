@@ -176,6 +176,7 @@ public final class Mnemonics {
     public static final String DS = "DS";
     public static final String ELSE = "ELSE";
     public static final String ELSEIF = "ELSEIF";
+    public static final String ENCODING = "ENCODING";
     public static final String END = "END";
     public static final String ENDC = "ENDC";
     public static final String ENDIF = "ENDIF";
@@ -365,6 +366,7 @@ public final class Mnemonics {
         map.put(DS, DsRsDirective.DS);
         map.put(ELSEIF, IfElseifDirective.ELSEIF);
         map.put(ELSE, ElseDirective.ELSE);
+        map.put(ENCODING, EncodingDirective.ENCODING);
         map.put(END, EndDirective.END);
         map.put(ENDC, EndifDirective.ENDIF);
         map.put(ENDIF, EndifDirective.ENDIF);

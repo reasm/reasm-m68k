@@ -1,5 +1,7 @@
 package org.reasm.m68k.assembly.internal;
 
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ import org.reasm.m68k.M68KArchitecture;
 import org.reasm.m68k.messages.*;
 import org.reasm.messages.DirectiveRequiresLabelErrorMessage;
 import org.reasm.messages.ParseErrorMessage;
+import org.reasm.messages.UnknownEncodingNameErrorMessage;
 import org.reasm.messages.UnknownMnemonicErrorMessage;
 import org.reasm.messages.UnresolvedSymbolReferenceErrorMessage;
 import org.reasm.messages.WrongNumberOfArgumentsErrorMessage;
@@ -102,6 +105,17 @@ public class ProgramsTest extends BaseProgramsTest {
         final ElseifWithoutIfErrorMessage elseifWithoutIf = new ElseifWithoutIfErrorMessage();
         addDataItem(" ELSEIF 1", 2, NO_DATA, elseifWithoutIf);
         addDataItem(" ELSEIF.W 1", 2, NO_DATA, SIZE_ATTRIBUTE_NOT_ALLOWED, elseifWithoutIf);
+
+        // ENCODING
+        addDataItem(" ENCODING", 2, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
+        addDataItem(" ENCODING 'US-ASCII'\n DC.B 'Hello'", 3, new byte[] { 'H', 'e', 'l', 'l', 'o' });
+        addDataItem(" ENCODING 'UTF-16BE'\n DC.B '\u3053\u3093\u306B\u3061\u306F'", 3, new byte[] { 0x30, 0x53, 0x30, (byte) 0x93,
+                0x30, 0x6B, 0x30, 0x61, 0x30, 0x6F });
+        addDataItem(" ENCODING 'UNKNOWN'", 2, NO_DATA, new UnknownEncodingNameErrorMessage("UNKNOWN",
+                new UnsupportedCharsetException("UNKNOWN")));
+        addDataItem(" ENCODING '???'", 2, NO_DATA, new UnknownEncodingNameErrorMessage("???",
+                new IllegalCharsetNameException("???")));
+        addDataItem(" ENCODING UNDEFINED", 2, NO_DATA, UNDEFINED_SYMBOL);
 
         // END
         addDataItem(" END", 2, NO_DATA);
