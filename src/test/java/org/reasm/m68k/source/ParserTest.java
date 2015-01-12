@@ -4,12 +4,16 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
 import org.reasm.source.CompositeSourceNode;
+import org.reasm.source.SimpleCompositeSourceNode;
 import org.reasm.source.SourceNode;
 
 import ca.fragag.text.Document;
@@ -139,6 +143,128 @@ public class ParserTest {
         assertThat(node.getLength(), is(4));
         assertThat(node.getParseError(), is(nullValue()));
         assertThat(node, is(instanceOf(LogicalLine.class)));
+    }
+
+    /**
+     * Asserts that {@link Parser#reparse(Document, SourceNode, int, int, int)} reparses a document.
+     */
+    @Test
+    public void reparseDelete() {
+        final String oldText = " NOP\n IF 1\n MOVE #123,D0\n ENDIF\n NOP";
+        final int replaceOffset = 18;
+        final int lengthToRemove = 3;
+        final String textToInsert = "";
+
+        final Document oldDocument = new Document(oldText);
+        final SourceNode oldNode = Parser.parse(oldDocument);
+
+        final Document newDocument = oldDocument.replace(replaceOffset, lengthToRemove, textToInsert);
+        assertThat(newDocument.toString(), is(" NOP\n IF 1\n MOVE #,D0\n ENDIF\n NOP"));
+
+        final SourceNode newNode = Parser.reparse(newDocument, oldNode, replaceOffset, lengthToRemove, textToInsert.length());
+        assertThat(newNode.getLength(), is(33));
+    }
+
+    /**
+     * Asserts that {@link Parser#reparse(Document, SourceNode, int, int, int)} reparses a document.
+     */
+    @Test
+    public void reparseInsert() {
+        final String oldText = " NOP\n IF 1\n MOVE #,D0\n ENDIF\n NOP";
+        final int replaceOffset = 18;
+        final int lengthToRemove = 0;
+        final String textToInsert = "123";
+
+        final Document oldDocument = new Document(oldText);
+        final SourceNode oldNode = Parser.parse(oldDocument);
+
+        final Document newDocument = oldDocument.replace(replaceOffset, lengthToRemove, textToInsert);
+        assertThat(newDocument.toString(), is(" NOP\n IF 1\n MOVE #123,D0\n ENDIF\n NOP"));
+
+        final SourceNode newNode = Parser.reparse(newDocument, oldNode, replaceOffset, lengthToRemove, textToInsert.length());
+        assertThat(newNode.getLength(), is(36));
+    }
+
+    /**
+     * Asserts that {@link Parser#reparse(Document, SourceNode, int, int, int)} throws an {@link IllegalArgumentException} when the
+     * length of the new document doesn't match the old root source node and the replacement.
+     */
+    @Test
+    public void reparseNonsensical() {
+        final String oldText = " NOP\n IF 1\n MOVE #0,D0\n ENDIF\n NOP";
+        final int replaceOffset = 18;
+        final int lengthToRemove = 1;
+        final String textToInsert = "123";
+
+        final Document oldDocument = new Document(oldText);
+        final SourceNode oldNode = Parser.parse(oldDocument);
+
+        final Document newDocument = new Document(" NOP\n IF 1\n MOVE #1234,D0\n ENDIF\n NOP");
+
+        try {
+            Parser.reparse(newDocument, oldNode, replaceOffset, lengthToRemove, textToInsert.length());
+            fail("Parser.reparse() should have thrown an IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+        }
+    }
+
+    /**
+     * Asserts that {@link Parser#reparse(Document, SourceNode, int, int, int)} returns the old root source node when the arguments
+     * describe no replacement.
+     */
+    @Test
+    public void reparseNoReplacement() {
+        final String oldText = " NOP\n IF 1\n MOVE #0,D0\n ENDIF\n NOP";
+        final int replaceOffset = 18;
+        final int lengthToRemove = 0;
+        final String textToInsert = "";
+
+        final Document oldDocument = new Document(oldText);
+        final SourceNode oldNode = Parser.parse(oldDocument);
+
+        final Document newDocument = oldDocument.replace(replaceOffset, lengthToRemove, textToInsert);
+        assertThat(newDocument.toString(), is(oldText));
+
+        final SourceNode newNode = Parser.reparse(newDocument, oldNode, replaceOffset, lengthToRemove, textToInsert.length());
+        assertThat(newNode, is(sameInstance(oldNode)));
+    }
+
+    /**
+     * Asserts that {@link Parser#reparse(Document, SourceNode, int, int, int)} throws a {@link NullPointerException} when the
+     * <code>oldSourceFileRootNode</code> argument is <code>null</code>.
+     */
+    @Test(expected = NullPointerException.class)
+    public void reparseNullOldSourceFileRootNode() {
+        Parser.reparse(new Document("new"), null, 0, 0, 3);
+    }
+
+    /**
+     * Asserts that {@link Parser#reparse(Document, SourceNode, int, int, int)} throws a {@link NullPointerException} when the
+     * <code>text</code> argument is <code>null</code>.
+     */
+    @Test(expected = NullPointerException.class)
+    public void reparseNullText() {
+        Parser.reparse(null, new SimpleCompositeSourceNode(Collections.<SourceNode> emptySet()), 0, 0, 3);
+    }
+
+    /**
+     * Asserts that {@link Parser#reparse(Document, SourceNode, int, int, int)} reparses a document.
+     */
+    @Test
+    public void reparseReplace() {
+        final String oldText = " NOP\n IF 1\n MOVE #0,D0\n ENDIF\n NOP";
+        final int replaceOffset = 18;
+        final int lengthToRemove = 1;
+        final String textToInsert = "123";
+
+        final Document oldDocument = new Document(oldText);
+        final SourceNode oldNode = Parser.parse(oldDocument);
+
+        final Document newDocument = oldDocument.replace(replaceOffset, lengthToRemove, textToInsert);
+        assertThat(newDocument.toString(), is(" NOP\n IF 1\n MOVE #123,D0\n ENDIF\n NOP"));
+
+        final SourceNode newNode = Parser.reparse(newDocument, oldNode, replaceOffset, lengthToRemove, textToInsert.length());
+        assertThat(newNode.getLength(), is(36));
     }
 
 }

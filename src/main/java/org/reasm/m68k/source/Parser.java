@@ -85,8 +85,31 @@ public final class Parser {
     @Nonnull
     public static SourceNode reparse(@Nonnull Document text, @Nonnull SourceNode oldSourceFileRootNode, int replaceOffset,
             int lengthToRemove, int lengthToInsert) {
-        // TODO Implement incremental re-parsing
-        return parse(text);
+        if (text == null) {
+            throw new NullPointerException("text");
+        }
+
+        if (oldSourceFileRootNode == null) {
+            throw new NullPointerException("oldSourceFileRootNode");
+        }
+
+        // Basic sanity check
+        if (text.length() != oldSourceFileRootNode.getLength() - lengthToRemove + lengthToInsert) {
+            throw new IllegalArgumentException(
+                    "The length of the new document doesn't match the old root source node and the replacement");
+        }
+
+        // Optimization: if there is no replacement, return the old source node
+        if (lengthToRemove == 0 && lengthToInsert == 0) {
+            return oldSourceFileRootNode;
+        }
+
+        try {
+            return parse(new ReparserSourceNodeProducer(new DocumentReader(text), oldSourceFileRootNode, replaceOffset,
+                    lengthToRemove, lengthToInsert));
+        } catch (RuntimeException e) {
+            return parse(text);
+        }
     }
 
     static SourceNode parse(@Nonnull SourceNodeProducer sourceNodeProducer) {
