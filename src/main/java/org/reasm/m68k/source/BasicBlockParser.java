@@ -6,19 +6,16 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import org.reasm.m68k.assembly.internal.Mnemonics;
 import org.reasm.m68k.parseerrors.UnclosedBlockParseError;
 import org.reasm.source.ParseError;
 import org.reasm.source.SimpleCompositeSourceNode;
 import org.reasm.source.SourceNode;
 
-import ca.fragag.text.CharSequenceReader;
-
 @Immutable
 class BasicBlockParser implements BlockParser {
 
     @Nonnull
-    static final BasicBlockParser DO = new BasicBlockParser(Mnemonics.UNTIL) {
+    static final BasicBlockParser DO = new BasicBlockParser(BlockDirective.UNTIL) {
         @Override
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
             return new DoBlock(childNodes, parseError);
@@ -26,7 +23,7 @@ class BasicBlockParser implements BlockParser {
     };
 
     @Nonnull
-    static final BasicBlockParser FOR = new BasicBlockParser(Mnemonics.NEXT) {
+    static final BasicBlockParser FOR = new BasicBlockParser(BlockDirective.NEXT) {
         @Override
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
             return new ForBlock(childNodes, parseError);
@@ -39,7 +36,7 @@ class BasicBlockParser implements BlockParser {
     };
 
     @Nonnull
-    static final BasicBlockParser MACRO = new BasicBlockParser(Mnemonics.ENDM) {
+    static final BasicBlockParser MACRO = new BasicBlockParser(BlockDirective.ENDM) {
         @Override
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
             return new MacroBlock(childNodes, parseError);
@@ -52,7 +49,7 @@ class BasicBlockParser implements BlockParser {
     };
 
     @Nonnull
-    static final BasicBlockParser NAMESPACE = new BasicBlockParser(Mnemonics.ENDNS) {
+    static final BasicBlockParser NAMESPACE = new BasicBlockParser(BlockDirective.ENDNS) {
         @Override
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
             return new NamespaceBlock(childNodes, parseError);
@@ -60,7 +57,7 @@ class BasicBlockParser implements BlockParser {
     };
 
     @Nonnull
-    static final BasicBlockParser REPT = new BasicBlockParser(Mnemonics.ENDR) {
+    static final BasicBlockParser REPT = new BasicBlockParser(BlockDirective.ENDR) {
         @Override
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
             return new ReptBlock(childNodes, parseError);
@@ -73,7 +70,7 @@ class BasicBlockParser implements BlockParser {
     };
 
     @Nonnull
-    static final BasicBlockParser TRANSFORM = new BasicBlockParser(Mnemonics.ENDTRANSFORM) {
+    static final BasicBlockParser TRANSFORM = new BasicBlockParser(BlockDirective.ENDTRANSFORM) {
         @Override
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
             return new TransformBlock(childNodes, parseError);
@@ -81,7 +78,7 @@ class BasicBlockParser implements BlockParser {
     };
 
     @Nonnull
-    static final BasicBlockParser WHILE = new BasicBlockParser(Mnemonics.ENDW) {
+    static final BasicBlockParser WHILE = new BasicBlockParser(BlockDirective.ENDW) {
         @Override
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
             return new WhileBlock(childNodes, parseError);
@@ -89,40 +86,39 @@ class BasicBlockParser implements BlockParser {
     };
 
     @Nonnull
-    private final String endingDirective;
+    private final BlockDirective endingDirective;
 
-    BasicBlockParser(@Nonnull String endingDirective) {
+    BasicBlockParser(@Nonnull BlockDirective endingDirective) {
         this.endingDirective = endingDirective;
     }
 
     @Override
-    public final SourceNode parseBlock(CharSequenceReader<?> reader, LogicalLine firstLine, String blockMnemonic) {
+    public final SourceNode parseBlock(SourceNodeProducer sourceNodeProducer, BlockDirectiveLine firstLine,
+            BlockDirective startingBlockDirective) {
         final ArrayList<SourceNode> nodes = new ArrayList<>(3);
-        nodes.add(new BlockDirectiveLine(firstLine));
+        nodes.add(firstLine);
 
         final ArrayList<SourceNode> bodyNodes = new ArrayList<>();
 
-        while (!reader.atEnd()) {
-            final LogicalLine logicalLine = LogicalLineParser.parse(reader);
+        while (!sourceNodeProducer.atEnd()) {
+            final SourceNode sourceNode = sourceNodeProducer.next();
 
-            // Get the mnemonic on this logical line, if any.
-            final String mnemonic = Parser.readBackMnemonic(reader, logicalLine);
+            // Check if this logical line has a block directive.
+            final BlockDirective blockDirective = BlockDirective.getBlockDirective(sourceNode);
 
-            if (mnemonic == null) {
-                bodyNodes.add(logicalLine);
-            } else if (mnemonic.equalsIgnoreCase(this.endingDirective)) {
+            if (blockDirective == this.endingDirective) {
                 nodes.add(this.createBodyBlock(bodyNodes));
-                nodes.add(new BlockDirectiveLine(logicalLine));
+                nodes.add(sourceNode);
                 return this.createBlock(nodes, null);
-            } else {
-                Parser.processBlockBodyLine(reader, bodyNodes, logicalLine, mnemonic);
             }
+
+            Parser.processBlockBodyLine(sourceNodeProducer, bodyNodes, sourceNode, blockDirective);
         }
 
         // We didn't find the end of the block: return with an error.
         nodes.add(this.createBodyBlock(bodyNodes));
         this.missingEndDirective(nodes);
-        return this.createBlock(nodes, new UnclosedBlockParseError(blockMnemonic));
+        return this.createBlock(nodes, new UnclosedBlockParseError(startingBlockDirective));
     }
 
     @Nonnull

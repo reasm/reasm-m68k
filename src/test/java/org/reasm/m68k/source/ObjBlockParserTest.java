@@ -14,8 +14,6 @@ import org.reasm.source.ParseError;
 import org.reasm.source.SimpleCompositeSourceNode;
 import org.reasm.source.SourceNode;
 
-import ca.fragag.text.CharSequenceReader;
-
 /**
  * Test class for {@link ObjBlockParser}.
  *
@@ -29,8 +27,8 @@ public class ObjBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>OBJ</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>OBJ</code> block.
      */
     @Test
     public void parseCompleteObjBlock() {
@@ -38,8 +36,8 @@ public class ObjBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>PHASE</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>PHASE</code> block.
      */
     @Test
     public void parseCompletePhaseBlock() {
@@ -47,8 +45,8 @@ public class ObjBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses an incomplete
-     * <code>OBJ</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses an
+     * incomplete <code>OBJ</code> block.
      */
     @Test
     public void parseIncompleteObjBlock() {
@@ -56,8 +54,8 @@ public class ObjBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses an incomplete
-     * <code>PHASE</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses an
+     * incomplete <code>PHASE</code> block.
      */
     @Test
     public void parseIncompletePhaseBlock() {

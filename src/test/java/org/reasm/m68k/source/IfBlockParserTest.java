@@ -21,7 +21,6 @@ import org.reasm.source.CompositeSourceNode;
 import org.reasm.source.SimpleCompositeSourceNode;
 import org.reasm.source.SourceNode;
 
-import ca.fragag.text.CharSequenceReader;
 import ca.fragag.text.Document;
 
 /**
@@ -51,8 +50,8 @@ public class IfBlockParserTest {
     }
 
     /**
-     * Asserts that {@link IfBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>IF</code> block that ends with an <code>ENDIF</code> directive.
+     * Asserts that {@link IfBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>IF</code> block that ends with an <code>ENDIF</code> directive.
      */
     @Test
     public void parseCompleteIfBlockEndc() {
@@ -60,8 +59,8 @@ public class IfBlockParserTest {
     }
 
     /**
-     * Asserts that {@link IfBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>IF</code> block that ends with an <code>ENDC</code> directive.
+     * Asserts that {@link IfBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>IF</code> block that ends with an <code>ENDC</code> directive.
      */
     @Test
     public void parseCompleteIfBlockEndif() {
@@ -69,8 +68,8 @@ public class IfBlockParserTest {
     }
 
     /**
-     * Asserts that {@link IfBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>IF</code> block with an <code>ELSE</code> clause.
+     * Asserts that {@link IfBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>IF</code> block with an <code>ELSE</code> clause.
      */
     @Test
     public void parseCompleteIfBlockWithElseClause() {
@@ -78,8 +77,8 @@ public class IfBlockParserTest {
     }
 
     /**
-     * Asserts that {@link IfBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>IF</code> block with an <code>ELSE</code> clause and an <code>ELSE</code> clause.
+     * Asserts that {@link IfBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>IF</code> block with an <code>ELSE</code> clause and an <code>ELSE</code> clause.
      */
     @Test
     public void parseCompleteIfBlockWithElseClauseAfterElseClause() {
@@ -89,8 +88,8 @@ public class IfBlockParserTest {
     }
 
     /**
-     * Asserts that {@link IfBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>IF</code> block with an <code>ELSEIF</code> clause and an <code>ELSE</code> clause.
+     * Asserts that {@link IfBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>IF</code> block with an <code>ELSEIF</code> clause and an <code>ELSE</code> clause.
      */
     @Test
     public void parseCompleteIfBlockWithElseifAndElseClause() {
@@ -98,8 +97,8 @@ public class IfBlockParserTest {
     }
 
     /**
-     * Asserts that {@link IfBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>IF</code> block with an <code>ELSEIF</code> clause.
+     * Asserts that {@link IfBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>IF</code> block with an <code>ELSEIF</code> clause.
      */
     @Test
     public void parseCompleteIfBlockWithElseifClause() {
@@ -107,8 +106,8 @@ public class IfBlockParserTest {
     }
 
     /**
-     * Asserts that {@link IfBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>IF</code> block with an <code>ELSEIF</code> clause and an <code>ELSE</code> clause.
+     * Asserts that {@link IfBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>IF</code> block with an <code>ELSEIF</code> clause and an <code>ELSE</code> clause.
      */
     @Test
     public void parseCompleteIfBlockWithElseifClauseAfterElseClause() {
@@ -118,8 +117,8 @@ public class IfBlockParserTest {
     }
 
     /**
-     * Asserts that {@link IfBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>IF</code> block with an <code>ELSEIF</code> clause and an <code>ELSE</code> clause.
+     * Asserts that {@link IfBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>IF</code> block with an <code>ELSEIF</code> clause and an <code>ELSE</code> clause.
      */
     @Test
     public void parseCompleteIfBlockWithTwoElseifClausesAfterElseClause() {
@@ -129,8 +128,8 @@ public class IfBlockParserTest {
     }
 
     /**
-     * Asserts that {@link IfBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>IF</code> block.
+     * Asserts that {@link IfBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>IF</code> block.
      */
     @Test
     public void parseIfBlockLineWithNoMnemonic() {
@@ -138,8 +137,8 @@ public class IfBlockParserTest {
     }
 
     /**
-     * Asserts that {@link IfBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses an incomplete
-     * <code>IF</code> block.
+     * Asserts that {@link IfBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses an
+     * incomplete <code>IF</code> block.
      */
     @Test
     public void parseIncompleteIfBlock() {
@@ -147,8 +146,8 @@ public class IfBlockParserTest {
     }
 
     /**
-     * Asserts that {@link IfBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses an incomplete
-     * <code>IF</code> block with an <code>ELSE</code> clause.
+     * Asserts that {@link IfBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses an
+     * incomplete <code>IF</code> block with an <code>ELSE</code> clause.
      */
     @Test
     public void parseIncompleteIfBlockWithElseClause() {

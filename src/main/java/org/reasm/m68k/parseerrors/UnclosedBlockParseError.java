@@ -5,6 +5,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
+import org.reasm.m68k.source.BlockDirective;
 import org.reasm.source.ParseError;
 
 /**
@@ -16,17 +17,18 @@ import org.reasm.source.ParseError;
 public class UnclosedBlockParseError extends ParseError {
 
     @Nonnull
-    private final String startingDirective;
+    private final BlockDirective startingBlockDirective;
 
     /**
      * Initializes a new UnclosedBlockParseError.
      *
-     * @param startingDirective
+     * @param startingBlockDirective
      *            the starting directive of the block that was not closed
      */
-    public UnclosedBlockParseError(@Nonnull String startingDirective) {
-        super("Block starting with \"" + Objects.requireNonNull(startingDirective, "startingDirective") + "\" is not closed");
-        this.startingDirective = startingDirective;
+    public UnclosedBlockParseError(@Nonnull BlockDirective startingBlockDirective) {
+        super("Block starting with \"" + Objects.requireNonNull(startingBlockDirective, "startingBlockDirective")
+                + "\" is not closed");
+        this.startingBlockDirective = startingBlockDirective;
     }
 
     /**
@@ -35,8 +37,8 @@ public class UnclosedBlockParseError extends ParseError {
      * @return the starting directive
      */
     @Nonnull
-    public final String getStartingDirective() {
-        return this.startingDirective;
+    public final BlockDirective getStartingBlockDirective() {
+        return this.startingBlockDirective;
     }
 
 }

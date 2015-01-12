@@ -111,7 +111,8 @@ public final class M68KArchitecture extends Architecture {
             }
         };
 
-        final EvaluationContext evaluationContext = new EvaluationContext(assembly, assembly.getProgramCounter(), assemblyMessageConsumer);
+        final EvaluationContext evaluationContext = new EvaluationContext(assembly, assembly.getProgramCounter(),
+                assemblyMessageConsumer);
         return Expressions.parse(expression, symbolLookup, assemblyMessageConsumer).evaluate(evaluationContext);
     }
 
@@ -135,7 +136,7 @@ public final class M68KArchitecture extends Architecture {
     @Override
     public final SourceNode reparse(@Nonnull Document text, @Nonnull AbstractSourceFile<?> oldSourceFile, int replaceOffset,
             int lengthToRemove, int lengthToInsert) {
-        return Parser.reparse(text, oldSourceFile, replaceOffset, lengthToRemove, lengthToInsert);
+        return Parser.reparse(text, oldSourceFile.getParsed(this), replaceOffset, lengthToRemove, lengthToInsert);
     }
 
 }

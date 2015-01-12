@@ -22,6 +22,28 @@ import org.reasm.source.SourceNode;
 @Immutable
 public final class LogicalLine extends SourceNode {
 
+    /**
+     * Gets the {@link LogicalLine} for the specified {@link SourceNode}.
+     *
+     * @param sourceNode
+     *            a {@link SourceNode}
+     * @return If <code>sourceNode</code> is a {@link LogicalLine}, returns <code>sourceNode</code> cast to {@link LogicalLine}.
+     *         Otherwise, if <code>sourceNode</code> is a {@link BlockDirectiveLine}, returns the result of
+     *         {@link BlockDirectiveLine#getLogicalLine()} called on <code>sourceNode</code>. Otherwise, returns <code>null</code>.
+     */
+    @CheckForNull
+    public static LogicalLine get(@CheckForNull SourceNode sourceNode) {
+        if (sourceNode instanceof LogicalLine) {
+            return (LogicalLine) sourceNode;
+        }
+
+        if (sourceNode instanceof BlockDirectiveLine) {
+            return ((BlockDirectiveLine) sourceNode).getLogicalLine();
+        }
+
+        return null;
+    }
+
     @Nonnull
     private final SubstringBounds[] labels;
     @CheckForNull

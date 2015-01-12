@@ -7,12 +7,8 @@ import java.util.TreeMap;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-import org.reasm.SubstringBounds;
-import org.reasm.m68k.assembly.internal.Mnemonics;
-import org.reasm.source.AbstractSourceFile;
 import org.reasm.source.SourceNode;
 
-import ca.fragag.text.CharSequenceReader;
 import ca.fragag.text.Document;
 import ca.fragag.text.DocumentReader;
 
@@ -24,19 +20,19 @@ import ca.fragag.text.DocumentReader;
 public final class Parser {
 
     @Nonnull
-    private static final Map<String, BlockParser> BLOCKS = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    static final Map<BlockDirective, BlockParser> BLOCKS = new TreeMap<>();
 
     static {
-        BLOCKS.put(Mnemonics.DO, BasicBlockParser.DO);
-        BLOCKS.put(Mnemonics.FOR, BasicBlockParser.FOR);
-        BLOCKS.put(Mnemonics.IF, IfBlockParser.IF);
-        BLOCKS.put(Mnemonics.MACRO, BasicBlockParser.MACRO);
-        BLOCKS.put(Mnemonics.NAMESPACE, BasicBlockParser.NAMESPACE);
-        BLOCKS.put(Mnemonics.OBJ, ObjBlockParser.OBJ);
-        BLOCKS.put(Mnemonics.PHASE, ObjBlockParser.PHASE);
-        BLOCKS.put(Mnemonics.REPT, BasicBlockParser.REPT);
-        BLOCKS.put(Mnemonics.TRANSFORM, BasicBlockParser.TRANSFORM);
-        BLOCKS.put(Mnemonics.WHILE, BasicBlockParser.WHILE);
+        BLOCKS.put(BlockDirective.DO, BasicBlockParser.DO);
+        BLOCKS.put(BlockDirective.FOR, BasicBlockParser.FOR);
+        BLOCKS.put(BlockDirective.IF, IfBlockParser.IF);
+        BLOCKS.put(BlockDirective.MACRO, BasicBlockParser.MACRO);
+        BLOCKS.put(BlockDirective.NAMESPACE, BasicBlockParser.NAMESPACE);
+        BLOCKS.put(BlockDirective.OBJ, ObjBlockParser.OBJ);
+        BLOCKS.put(BlockDirective.PHASE, ObjBlockParser.PHASE);
+        BLOCKS.put(BlockDirective.REPT, BasicBlockParser.REPT);
+        BLOCKS.put(BlockDirective.TRANSFORM, BasicBlockParser.TRANSFORM);
+        BLOCKS.put(BlockDirective.WHILE, BasicBlockParser.WHILE);
     }
 
     /**
@@ -68,22 +64,7 @@ public final class Parser {
      */
     @Nonnull
     public static SourceNode parse(@Nonnull Document text) {
-        final CharSequenceReader<?> reader = new DocumentReader(text);
-
-        final ArrayList<SourceNode> nodes = new ArrayList<>();
-        while (!reader.atEnd()) {
-            final LogicalLine logicalLine = LogicalLineParser.parse(reader);
-
-            // Get the mnemonic on this logical line, if any.
-            final String mnemonic = readBackMnemonic(reader, logicalLine);
-            if (mnemonic == null) {
-                nodes.add(logicalLine);
-            } else {
-                processBlockBodyLine(reader, nodes, logicalLine, mnemonic);
-            }
-        }
-
-        return new Block(nodes, null);
+        return parse(new SourceNodeProducer(new DocumentReader(text)));
     }
 
     /**
@@ -91,8 +72,8 @@ public final class Parser {
      *
      * @param text
      *            the new contents of the source file
-     * @param oldSourceFile
-     *            the old source file
+     * @param oldSourceFileRootNode
+     *            the root source node of the old source
      * @param replaceOffset
      *            the offset at which the replace occurred
      * @param lengthToRemove
@@ -102,60 +83,38 @@ public final class Parser {
      * @return a {@link SourceNode} that is the root of the source file's abstract syntax tree
      */
     @Nonnull
-    public static SourceNode reparse(@Nonnull Document text, @Nonnull AbstractSourceFile<?> oldSourceFile, int replaceOffset,
+    public static SourceNode reparse(@Nonnull Document text, @Nonnull SourceNode oldSourceFileRootNode, int replaceOffset,
             int lengthToRemove, int lengthToInsert) {
         // TODO Implement incremental re-parsing
         return parse(text);
     }
 
-    static void processBlockBodyLine(@Nonnull CharSequenceReader<?> reader, @Nonnull ArrayList<SourceNode> childNodes,
-            @Nonnull LogicalLine logicalLine, @Nonnull String mnemonic) {
+    static SourceNode parse(@Nonnull SourceNodeProducer sourceNodeProducer) {
+        final ArrayList<SourceNode> nodes = new ArrayList<>();
+        while (!sourceNodeProducer.atEnd()) {
+            final SourceNode sourceNode = sourceNodeProducer.next();
+
+            // Get the block directive on this logical line, if any.
+            final BlockDirective blockDirective = BlockDirective.getBlockDirective(sourceNode);
+
+            processBlockBodyLine(sourceNodeProducer, nodes, sourceNode, blockDirective);
+        }
+
+        return new Block(nodes, null);
+    }
+
+    static void processBlockBodyLine(@Nonnull SourceNodeProducer sourceNodeProducer, @Nonnull ArrayList<SourceNode> childNodes,
+            @Nonnull SourceNode sourceNode, @CheckForNull BlockDirective blockDirective) {
         // Check if this mnemonic starts a block.
-        final BlockParser blockParser = BLOCKS.get(mnemonic);
+        final BlockParser blockParser = blockDirective == null ? null : BLOCKS.get(blockDirective);
 
         // If the mnemonic doesn't start a block, add the logical line to the child nodes list.
         // Otherwise, parse a block.
         if (blockParser == null) {
-            childNodes.add(logicalLine);
+            childNodes.add(sourceNode);
         } else {
-            childNodes.add(blockParser.parseBlock(reader, logicalLine, mnemonic));
+            childNodes.add(blockParser.parseBlock(sourceNodeProducer, (BlockDirectiveLine) sourceNode, blockDirective));
         }
-    }
-
-    @CheckForNull
-    static String readBackMnemonic(@Nonnull CharSequenceReader<?> reader, @Nonnull LogicalLine logicalLine) {
-        String mnemonic;
-        final SubstringBounds mnemonicBounds = logicalLine.getMnemonicBounds();
-        if (mnemonicBounds == null) {
-            // There's no mnemonic on this line.
-            mnemonic = null;
-        } else {
-            final int backupPosition = reader.getCurrentPosition();
-            try {
-                // Temporarily move back the reader to the start of the mnemonic and read the mnemonic.
-                reader.setCurrentPosition(backupPosition - logicalLine.getLength() + mnemonicBounds.getStart());
-                mnemonic = reader.readSubstring(mnemonicBounds.getEnd() - mnemonicBounds.getStart());
-
-                // If the mnemonic starts with '!', remove that character.
-                // '!' is used to bypass macros, but block directives always bypass macros anyway.
-                if (mnemonic.startsWith("!")) {
-                    mnemonic = mnemonic.substring(1);
-                }
-
-                // If the mnemonic has a size attribute, remove it.
-                // If someone writes something silly like "IF.W", we'll still open an IF block
-                // because the IF directive expects to be in an IF block.
-                final int indexOfPeriod = mnemonic.indexOf('.');
-                if (indexOfPeriod != -1) {
-                    mnemonic = mnemonic.substring(0, indexOfPeriod);
-                }
-            } finally {
-                // Restore the reader's position.
-                reader.setCurrentPosition(backupPosition);
-            }
-        }
-
-        return mnemonic;
     }
 
     // This class is not meant to be instantiated.

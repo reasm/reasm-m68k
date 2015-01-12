@@ -19,10 +19,23 @@ public final class BlockDirectiveLine extends SourceNode {
 
     @Nonnull
     private final LogicalLine logicalLine;
+    @Nonnull
+    private final BlockDirective blockDirective;
 
-    BlockDirectiveLine(@Nonnull LogicalLine logicalLine) {
+    BlockDirectiveLine(@Nonnull LogicalLine logicalLine, @Nonnull BlockDirective blockDirective) {
         super(logicalLine.getLength(), logicalLine.getParseError());
         this.logicalLine = logicalLine;
+        this.blockDirective = blockDirective;
+    }
+
+    /**
+     * Gets the {@link BlockDirective} on this line.
+     *
+     * @return the {@link BlockDirective}
+     */
+    @Nonnull
+    public final BlockDirective getBlockDirective() {
+        return this.blockDirective;
     }
 
     /**

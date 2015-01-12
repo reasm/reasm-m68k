@@ -5,7 +5,6 @@ import javax.annotation.Nonnull;
 
 import org.reasm.SubstringBounds;
 import org.reasm.source.SourceLocation;
-import org.reasm.source.SourceNode;
 import org.reasm.source.SourceNodeRangeReader;
 
 /**
@@ -84,17 +83,7 @@ public final class SourceLocationUtils {
      */
     @CheckForNull
     public static LogicalLine getLogicalLine(@Nonnull SourceLocation location) {
-        final SourceNode sourceNode = location.getSourceNode();
-
-        if (sourceNode instanceof LogicalLine) {
-            return (LogicalLine) sourceNode;
-        }
-
-        if (sourceNode instanceof BlockDirectiveLine) {
-            return ((BlockDirectiveLine) sourceNode).getLogicalLine();
-        }
-
-        return null;
+        return LogicalLine.get(location.getSourceNode());
     }
 
     /**

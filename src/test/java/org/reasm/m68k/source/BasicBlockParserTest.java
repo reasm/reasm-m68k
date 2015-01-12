@@ -8,11 +8,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.reasm.m68k.source.BlockParserTestsCommon.COMPLETE_BLOCK;
 import static org.reasm.m68k.source.BlockParserTestsCommon.INCOMPLETE_BLOCK;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
@@ -20,14 +18,12 @@ import javax.annotation.Nonnull;
 
 import org.hamcrest.Matcher;
 import org.junit.Test;
-import org.reasm.AssemblyBuilder;
 import org.reasm.SubstringBounds;
 import org.reasm.source.CompositeSourceNode;
 import org.reasm.source.ParseError;
 import org.reasm.source.SimpleCompositeSourceNode;
 import org.reasm.source.SourceNode;
 
-import ca.fragag.text.CharSequenceReader;
 import ca.fragag.text.Document;
 import ca.fragag.text.DocumentReader;
 
@@ -38,22 +34,6 @@ import ca.fragag.text.DocumentReader;
  */
 public class BasicBlockParserTest {
 
-    @Nonnull
-    static final SourceNode MISSING_END_DIRECTIVE = new SourceNode(0, null) {
-        @Override
-        protected void assembleCore(AssemblyBuilder builder) {
-            fail();
-        }
-    };
-
-    @Nonnull
-    private static final BasicBlockParser TEST_BLOCK_PARSER = new BasicBlockParser("ENDBLOCK") {
-        @Override
-        void missingEndDirective(ArrayList<SourceNode> nodes) {
-            nodes.add(MISSING_END_DIRECTIVE);
-        };
-    };
-
     private static void parseBasicBlock(@Nonnull String code, @Nonnull Class<?> blockType, @Nonnull Class<?> bodyType,
             @Nonnull Matcher<? super ParseError> blockParseErrorMatcher,
             @CheckForNull Matcher<? super SourceNode> thirdChildNodeMatcher) {
@@ -61,23 +41,20 @@ public class BasicBlockParserTest {
     }
 
     private static List<SourceNode> parseBlock(@Nonnull String code, @Nonnull Matcher<? super ParseError> blockParseErrorMatcher) {
-        final DocumentReader reader = new DocumentReader(new Document(code), 7);
-        final LogicalLine firstLine = new LogicalLine(7, null, new SubstringBounds[0], new SubstringBounds(1, 6),
-                new SubstringBounds[0], null, new int[0]);
+        final DocumentReader reader = new DocumentReader(new Document(code), 5);
+        final BlockDirectiveLine firstLine = new BlockDirectiveLine(new LogicalLine(5, null, new SubstringBounds[0],
+                new SubstringBounds(1, 4), new SubstringBounds[0], null, new int[0]), BlockDirective.FOR);
 
-        final SourceNode block = TEST_BLOCK_PARSER.parseBlock(reader, firstLine, "BLOCK");
+        final SourceNode block = BasicBlockParser.FOR.parseBlock(new SourceNodeProducer(reader), firstLine, BlockDirective.FOR);
         assertThat(block.getLength(), is(code.length()));
         assertThat(block.getParseError(), blockParseErrorMatcher);
-        assertThat(block, hasType(Block.class));
+        assertThat(block, hasType(ForBlock.class));
 
         final List<SourceNode> childNodes = ((CompositeSourceNode) block).getChildNodes();
         assertThat(childNodes.size(), is(3));
 
         final SourceNode blockStart = childNodes.get(0);
-        assertThat(blockStart.getLength(), is(7));
-        assertThat(blockStart.getParseError(), is(nullValue()));
-        assertThat(blockStart, hasType(BlockDirectiveLine.class));
-        assertThat(((BlockDirectiveLine) blockStart).getLogicalLine(), is(firstLine));
+        assertThat(blockStart, is((SourceNode) firstLine));
 
         final SourceNode blockBody = childNodes.get(1);
         assertThat(blockBody, hasType(SimpleCompositeSourceNode.class));
@@ -89,7 +66,7 @@ public class BasicBlockParserTest {
         final List<SourceNode> childNodes = parseBlock(code, COMPLETE_BLOCK);
 
         final SourceNode blockEnd = childNodes.get(2);
-        assertThat(blockEnd.getLength(), is(9));
+        assertThat(blockEnd.getLength(), is(5));
         assertThat(blockEnd.getParseError(), is(nullValue()));
         assertThat(blockEnd, hasType(BlockDirectiveLine.class));
 
@@ -103,13 +80,13 @@ public class BasicBlockParserTest {
 
     private static CompositeSourceNode parseIncompleteBlock(@Nonnull String code) {
         final Matcher<Object> blockParseErrorMatcher = both(INCOMPLETE_BLOCK).and(
-                hasProperty("startingDirective", equalTo("BLOCK")));
+                hasProperty("startingBlockDirective", equalTo(BlockDirective.FOR)));
         final List<SourceNode> childNodes = parseBlock(code, blockParseErrorMatcher);
 
         final SourceNode blockEnd = childNodes.get(2);
         assertThat(blockEnd.getLength(), is(0));
         assertThat(blockEnd.getParseError(), is(nullValue()));
-        assertThat(blockEnd, is(sameInstance(MISSING_END_DIRECTIVE)));
+        assertThat(blockEnd, is(sameInstance((SourceNode) ImplicitNextNode.INSTANCE)));
 
         return (CompositeSourceNode) childNodes.get(1);
     }
@@ -140,24 +117,24 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a block with an
-     * empty body.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * block with an empty body.
      */
     @Test
     public void parseBlockEmptyBody() {
-        final String code = " BLOCK\n ENDBLOCK";
+        final String code = " FOR\n NEXT";
         final CompositeSourceNode body = parseCompleteBlock(code);
         final List<SourceNode> bodyNodes = body.getChildNodes();
         assertThat(bodyNodes.size(), is(0));
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a block with a
-     * logical line in its body that has no mnemonic.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * block with a logical line in its body that has no mnemonic.
      */
     @Test
     public void parseBlockLineWithNoMnemonic() {
-        final String code = " BLOCK\nfoo:\n ENDBLOCK";
+        final String code = " FOR\nfoo:\n NEXT";
         final CompositeSourceNode body = parseCompleteBlock(code);
         final List<SourceNode> bodyNodes = body.getChildNodes();
         assertThat(bodyNodes.size(), is(1));
@@ -169,12 +146,12 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a block with the
-     * end directive missing.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * block with the end directive missing.
      */
     @Test
     public void parseBlockMissingEndDirective() {
-        final String code = " BLOCK\n NOP";
+        final String code = " FOR\n NOP";
         final CompositeSourceNode body = parseIncompleteBlock(code);
         final List<SourceNode> bodyNodes = body.getChildNodes();
         assertThat(bodyNodes.size(), is(1));
@@ -186,12 +163,12 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a block with a
-     * nested block in its body.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * block with a nested block in its body.
      */
     @Test
     public void parseBlockNestedBlock() {
-        final String code = " BLOCK\n WHILE\n NOP\n ENDW\n ENDBLOCK";
+        final String code = " FOR\n WHILE\n NOP\n ENDW\n NEXT";
         final CompositeSourceNode body = parseCompleteBlock(code);
         final List<SourceNode> bodyNodes = body.getChildNodes();
         assertThat(bodyNodes.size(), is(1));
@@ -203,12 +180,12 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a block with 1
-     * logical line in its body.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * block with 1 logical line in its body.
      */
     @Test
     public void parseBlockOneLineBody() {
-        final String code = " BLOCK\n NOP\n ENDBLOCK";
+        final String code = " FOR\n NOP\n NEXT";
         final CompositeSourceNode body = parseCompleteBlock(code);
         final List<SourceNode> bodyNodes = body.getChildNodes();
         assertThat(bodyNodes.size(), is(1));
@@ -220,12 +197,12 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a block with 2
-     * logical lines in its body.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * block with 2 logical lines in its body.
      */
     @Test
     public void parseBlockTwoLineBody() {
-        final String code = " BLOCK\n NOP\n ILLEGAL\n ENDBLOCK";
+        final String code = " FOR\n NOP\n ILLEGAL\n NEXT";
         final CompositeSourceNode body = parseCompleteBlock(code);
         final List<SourceNode> bodyNodes = body.getChildNodes();
         assertThat(bodyNodes.size(), is(2));
@@ -242,8 +219,8 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>FOR</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>FOR</code> block.
      */
     @Test
     public void parseCompleteForBlock() {
@@ -251,8 +228,8 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>MACRO</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>MACRO</code> block.
      */
     @Test
     public void parseCompleteMacroBlock() {
@@ -260,8 +237,8 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>NAMESPACE</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>NAMESPACE</code> block.
      */
     @Test
     public void parseCompleteNamespaceBlock() {
@@ -269,8 +246,8 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>REPT</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>REPT</code> block.
      */
     @Test
     public void parseCompleteReptBlock() {
@@ -278,8 +255,8 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>TRANSFORM</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>TRANSFORM</code> block.
      */
     @Test
     public void parseCompleteTransformBlock() {
@@ -287,8 +264,8 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses a complete
-     * <code>WHILE</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
+     * complete <code>WHILE</code> block.
      */
     @Test
     public void parseCompleteWhileBlock() {
@@ -296,8 +273,8 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses an incomplete
-     * <code>FOR</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses an
+     * incomplete <code>FOR</code> block.
      */
     @Test
     public void parseIncompleteForBlock() {
@@ -305,8 +282,8 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses an incomplete
-     * <code>MACRO</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses an
+     * incomplete <code>MACRO</code> block.
      */
     @Test
     public void parseIncompleteMacroBlock() {
@@ -314,8 +291,8 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses an incomplete
-     * <code>NAMESPACE</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses an
+     * incomplete <code>NAMESPACE</code> block.
      */
     @Test
     public void parseIncompleteNamespaceBlock() {
@@ -323,8 +300,8 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses an incomplete
-     * <code>REPT</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses an
+     * incomplete <code>REPT</code> block.
      */
     @Test
     public void parseIncompleteReptBlock() {
@@ -332,8 +309,8 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses an incomplete
-     * <code>TRANSFORM</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses an
+     * incomplete <code>TRANSFORM</code> block.
      */
     @Test
     public void parseIncompleteTransformBlock() {
@@ -341,8 +318,8 @@ public class BasicBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(CharSequenceReader, LogicalLine, String)} correctly parses an incomplete
-     * <code>WHILE</code> block.
+     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses an
+     * incomplete <code>WHILE</code> block.
      */
     @Test
     public void parseIncompleteWhileBlock() {

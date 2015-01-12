@@ -5,14 +5,11 @@ import java.util.ArrayList;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import org.reasm.m68k.assembly.internal.Mnemonics;
 import org.reasm.m68k.parseerrors.ElseOrElseIfAfterElseParseError;
 import org.reasm.m68k.parseerrors.UnclosedBlockParseError;
 import org.reasm.source.ParseError;
 import org.reasm.source.SimpleCompositeSourceNode;
 import org.reasm.source.SourceNode;
-
-import ca.fragag.text.CharSequenceReader;
 
 @Immutable
 final class IfBlockParser implements BlockParser {
@@ -24,7 +21,8 @@ final class IfBlockParser implements BlockParser {
     }
 
     @Override
-    public SourceNode parseBlock(CharSequenceReader<?> reader, LogicalLine firstLine, String blockMnemonic) {
+    public final SourceNode parseBlock(SourceNodeProducer sourceNodeProducer, BlockDirectiveLine firstLine,
+            BlockDirective startingBlockDirective) {
         // The child nodes of an IfBlock are structured like this:
         //   (LogicalLine SimpleCompositeSourceNode)+ LogicalLine?
         // The LogicalLine in the repetition block is an IF, ELSEIF or ELSE directive.
@@ -32,27 +30,27 @@ final class IfBlockParser implements BlockParser {
         // The last LogicalLine is an ENDIF directive (it may be missing).
 
         final ArrayList<SourceNode> nodes = new ArrayList<>();
-        nodes.add(new BlockDirectiveLine(firstLine));
+        nodes.add(firstLine);
 
         ParseError parseError = null;
         ArrayList<SourceNode> bodyNodes = new ArrayList<>();
         boolean gotElse = false;
 
-        while (!reader.atEnd()) {
-            final LogicalLine logicalLine = LogicalLineParser.parse(reader);
+        while (!sourceNodeProducer.atEnd()) {
+            final SourceNode sourceNode = sourceNodeProducer.next();
+
+            // Check if this logical line has a block directive.
+            final BlockDirective blockDirective = BlockDirective.getBlockDirective(sourceNode);
 
             // Get the mnemonic on this logical line, if any.
             boolean isElse = false;
-            final String mnemonic = Parser.readBackMnemonic(reader, logicalLine);
-            if (mnemonic == null) {
-                bodyNodes.add(logicalLine);
-            } else if (mnemonic.equalsIgnoreCase(Mnemonics.ENDIF) || mnemonic.equalsIgnoreCase(Mnemonics.ENDC)) {
+            if (blockDirective == BlockDirective.ENDIF || blockDirective == BlockDirective.ENDC) {
                 nodes.add(new SimpleCompositeSourceNode(bodyNodes));
-                nodes.add(new BlockDirectiveLine(logicalLine));
+                nodes.add(sourceNode);
                 return new IfBlock(nodes, parseError);
-            } else if ((isElse = mnemonic.equalsIgnoreCase(Mnemonics.ELSE)) || mnemonic.equalsIgnoreCase(Mnemonics.ELSEIF)) {
+            } else if ((isElse = blockDirective == BlockDirective.ELSE) || blockDirective == BlockDirective.ELSEIF) {
                 nodes.add(new SimpleCompositeSourceNode(bodyNodes));
-                nodes.add(new BlockDirectiveLine(logicalLine));
+                nodes.add(sourceNode);
 
                 // SimpleCompositeSourceNode's constructor copies the contents of the list it receives,
                 // so we can reuse our list.
@@ -62,7 +60,7 @@ final class IfBlockParser implements BlockParser {
                 // following the first ELSE clause of this IF block,
                 // raise an error.
                 if (gotElse && parseError == null) {
-                    parseError = new ElseOrElseIfAfterElseParseError(mnemonic);
+                    parseError = new ElseOrElseIfAfterElseParseError(blockDirective);
                 }
 
                 // If this is an ELSE clause,
@@ -71,13 +69,13 @@ final class IfBlockParser implements BlockParser {
                     gotElse = true;
                 }
             } else {
-                Parser.processBlockBodyLine(reader, bodyNodes, logicalLine, mnemonic);
+                Parser.processBlockBodyLine(sourceNodeProducer, bodyNodes, sourceNode, blockDirective);
             }
         }
 
         // We didn't find the end of the block: return with an error.
         nodes.add(new SimpleCompositeSourceNode(bodyNodes));
-        return new IfBlock(nodes, new UnclosedBlockParseError(blockMnemonic));
+        return new IfBlock(nodes, new UnclosedBlockParseError(startingBlockDirective));
     }
 
 }

@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
+import org.reasm.m68k.source.BlockDirective;
 import org.reasm.source.ParseError;
 
 /**
@@ -17,11 +18,11 @@ public class ElseOrElseIfAfterElseParseError extends ParseError {
     /**
      * Initializes a new ElseOrElseIfAfterElseParseError.
      *
-     * @param mnemonic
-     *            the mnemonic of the offending clause
+     * @param directive
+     *            the directive of the offending clause
      */
-    public ElseOrElseIfAfterElseParseError(@Nonnull String mnemonic) {
-        super(Objects.requireNonNull(mnemonic, "mnemonic") + " clause after an ELSE clause");
+    public ElseOrElseIfAfterElseParseError(@Nonnull BlockDirective directive) {
+        super(Objects.requireNonNull(directive, "directive") + " clause after an ELSE clause");
     }
 
 }

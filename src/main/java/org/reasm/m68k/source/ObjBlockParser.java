@@ -3,7 +3,6 @@ package org.reasm.m68k.source;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import org.reasm.m68k.assembly.internal.Mnemonics;
 import org.reasm.source.ParseError;
 import org.reasm.source.SourceNode;
 
@@ -11,11 +10,11 @@ import org.reasm.source.SourceNode;
 final class ObjBlockParser extends BasicBlockParser {
 
     @Nonnull
-    static final ObjBlockParser OBJ = new ObjBlockParser(Mnemonics.OBJEND);
+    static final ObjBlockParser OBJ = new ObjBlockParser(BlockDirective.OBJEND);
     @Nonnull
-    static final ObjBlockParser PHASE = new ObjBlockParser(Mnemonics.DEPHASE);
+    static final ObjBlockParser PHASE = new ObjBlockParser(BlockDirective.DEPHASE);
 
-    ObjBlockParser(@Nonnull String endingDirective) {
+    ObjBlockParser(@Nonnull BlockDirective endingDirective) {
         super(endingDirective);
     }
 
