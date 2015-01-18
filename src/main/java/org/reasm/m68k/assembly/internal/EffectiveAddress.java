@@ -932,7 +932,7 @@ final class EffectiveAddress {
             int offsetToExtensionWords, @Nonnull M68KBasicAssemblyContext context) {
         Integer intValue = Value.accept(expression.evaluate(evaluationContext), new IntegerValueVisitor(
                 size == AbsoluteAddressingSize.WORD ? InstructionSize.WORD : InstructionSize.LONG, context.encoding,
-                        assemblyMessageConsumer));
+                assemblyMessageConsumer));
         int value = intValue != null ? intValue : 0;
         if (size == AbsoluteAddressingSize.DEFAULT) {
             if (fitsInWord(value)) {

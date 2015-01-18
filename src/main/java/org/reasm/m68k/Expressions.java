@@ -36,8 +36,8 @@ public final class Expressions {
      * @return an {@link Expression} corresponding to the expression text
      */
     @Nonnull
-    public static Expression parse(@Nonnull CharSequence expression,
-            @CheckForNull SymbolLookup symbolLookup, @CheckForNull Consumer<AssemblyMessage> assemblyMessageConsumer) {
+    public static Expression parse(@Nonnull CharSequence expression, @CheckForNull SymbolLookup symbolLookup,
+            @CheckForNull Consumer<AssemblyMessage> assemblyMessageConsumer) {
         if (expression == null) {
             throw new NullPointerException("expression");
         }
