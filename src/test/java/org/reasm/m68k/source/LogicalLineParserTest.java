@@ -74,6 +74,9 @@ public class LogicalLineParserTest {
         addDataItem(" abc d", 6, null, NO_LABELS, bounds(1, 4), array(bounds(5, 6)), null, NO_CONTINUATION_CHARACTERS);
         addDataItem(" abc d ", 7, null, NO_LABELS, bounds(1, 4), array(bounds(5, 6)), null, NO_CONTINUATION_CHARACTERS);
         addDataItem(" abc d  ", 8, null, NO_LABELS, bounds(1, 4), array(bounds(5, 6)), null, NO_CONTINUATION_CHARACTERS);
+        addDataItem(" abc d'", 7, null, NO_LABELS, bounds(1, 4), array(bounds(5, 7)), null, NO_CONTINUATION_CHARACTERS);
+        addDataItem(" abc 0", 6, null, NO_LABELS, bounds(1, 4), array(bounds(5, 6)), null, NO_CONTINUATION_CHARACTERS);
+        addDataItem(" abc 0'", 7, null, NO_LABELS, bounds(1, 4), array(bounds(5, 7)), null, NO_CONTINUATION_CHARACTERS);
         addDataItem(" abc ,", 6, null, NO_LABELS, bounds(1, 4), array(bounds(5, 5), bounds(6, 6)), null, NO_CONTINUATION_CHARACTERS);
         addDataItem(" abc def,ghi", 12, null, NO_LABELS, bounds(1, 4), array(bounds(5, 8), bounds(9, 12)), null,
                 NO_CONTINUATION_CHARACTERS);

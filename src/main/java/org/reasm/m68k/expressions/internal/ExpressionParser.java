@@ -13,7 +13,7 @@ import org.reasm.FloatValue;
 import org.reasm.StringValue;
 import org.reasm.UnsignedIntValue;
 import org.reasm.expressions.*;
-import org.reasm.m68k.Identifier;
+import org.reasm.m68k.Syntax;
 import org.reasm.m68k.messages.UnrecognizedEscapeSequenceWarningMessage;
 import org.reasm.messages.OverflowInLiteralWarningMessage;
 
@@ -563,10 +563,10 @@ public final class ExpressionParser {
             int digit;
 
             // Compute the value of the current digit.
-            if (Identifier.isDigit(ch)) {
+            if (Syntax.isDigit(ch)) {
                 digit = ch - '0';
             } else {
-                assert Tokenizer.isHexDigit(ch);
+                assert Syntax.isHexDigit(ch);
 
                 // Force the letter to upper case.
                 digit = (ch & 0x5F) - 'A' + 10;

@@ -16,7 +16,7 @@ import org.reasm.Symbol;
 import org.reasm.Value;
 import org.reasm.ValueVisitor;
 import org.reasm.expressions.Expression;
-import org.reasm.m68k.Identifier;
+import org.reasm.m68k.Syntax;
 import org.reasm.m68k.expressions.internal.ExpressionParser;
 import org.reasm.m68k.expressions.internal.InvalidTokenException;
 import org.reasm.m68k.expressions.internal.TokenType;
@@ -143,15 +143,13 @@ abstract class Mnemonic {
 
     @CheckForNull
     static String parseRegisterIdentifier(@Nonnull LogicalLineReader operandReader) {
-        if (!operandReader.atEnd() && operandReader.getCurrentChar() != '.'
-                && !Identifier.isDigit(operandReader.getCurrentCodePoint())
-                && Identifier.isValidIdentifierCodePoint(operandReader.getCurrentCodePoint())) {
+        if (!operandReader.atEnd() && Syntax.isValidIdentifierInitialCodePoint(operandReader.getCurrentCodePoint())) {
             final StringBuilder sb = new StringBuilder();
             sb.appendCodePoint(operandReader.getCurrentCodePoint());
             operandReader.advance();
 
             while (!operandReader.atEnd() && operandReader.getCurrentChar() != '.'
-                    && Identifier.isValidIdentifierCodePoint(operandReader.getCurrentCodePoint())) {
+                    && Syntax.isValidIdentifierCodePoint(operandReader.getCurrentCodePoint())) {
                 sb.appendCodePoint(operandReader.getCurrentCodePoint());
                 operandReader.advance();
             }

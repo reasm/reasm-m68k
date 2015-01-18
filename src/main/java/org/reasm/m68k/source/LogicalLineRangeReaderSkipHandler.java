@@ -3,6 +3,7 @@ package org.reasm.m68k.source;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
+import org.reasm.m68k.Syntax;
 import org.reasm.source.SourceLocation;
 import org.reasm.source.SourceNodeRangeReader;
 
@@ -65,7 +66,7 @@ public final class LogicalLineRangeReaderSkipHandler extends SourceNodeRangeRead
             // fall through
 
         case EXPECT_WHITESPACE:
-            if (Parser.isWhitespace(reader.getCurrentCodePoint())) {
+            if (Syntax.isWhitespace(reader.getCurrentCodePoint())) {
                 // Remain in this state as long as we encounter whitespace.
                 return true;
             }

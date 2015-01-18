@@ -6,7 +6,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import org.reasm.m68k.Identifier;
+import org.reasm.m68k.Syntax;
 import org.reasm.source.MacroInstantiation;
 import org.reasm.source.SourceLocation;
 
@@ -119,11 +119,11 @@ class Macro extends Mnemonic {
                 }
 
                 if (inString == -1) {
-                    if (Identifier.isDigit(codePoint)) {
+                    if (Syntax.isDigit(codePoint)) {
                         // Read until we find a non-digit.
                         do {
                             reader.advance();
-                        } while (Identifier.isDigit(reader.getCurrentCodePoint()));
+                        } while (Syntax.isDigit(reader.getCurrentCodePoint()));
 
                         final int endPosition = reader.getCurrentPosition();
                         reader.setCurrentPosition(startPosition + 1);
@@ -145,13 +145,13 @@ class Macro extends Mnemonic {
                 if (inString == -1) {
                     if (codePoint == '\'' || codePoint == '"') {
                         inString = codePoint;
-                    } else if (Identifier.isValidIdentifierCodePoint(codePoint)) {
-                        boolean startsWithDigit = Identifier.isDigit(codePoint);
+                    } else if (Syntax.isValidIdentifierCodePoint(codePoint)) {
+                        boolean startsWithDigit = Syntax.isDigit(codePoint);
 
                         // Read an identifier.
                         do {
                             reader.advance();
-                        } while (Identifier.isValidIdentifierCodePoint(reader.getCurrentCodePoint()));
+                        } while (Syntax.isValidIdentifierCodePoint(reader.getCurrentCodePoint()));
 
                         if (!startsWithDigit) {
                             final int endPosition = reader.getCurrentPosition();
@@ -185,7 +185,7 @@ class Macro extends Mnemonic {
         long result = 0;
         for (int i = 0; i < length; i++) {
             final char ch = name.charAt(i);
-            if (!Identifier.isDigit(ch)) {
+            if (!Syntax.isDigit(ch)) {
                 return null;
             }
 

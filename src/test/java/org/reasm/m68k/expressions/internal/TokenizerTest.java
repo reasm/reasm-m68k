@@ -128,6 +128,7 @@ public class TokenizerTest {
             addDataItem("");
             addDataItem("\t");
             addDataItem("\r");
+            addDataItem("\f");
             addDataItem("\n");
             addDataItem("\r\n");
             addDataItem(" ");
@@ -216,6 +217,7 @@ public class TokenizerTest {
             addDataItem("0E0", real3);
             addDataItem("0E+0", real4);
             addDataItem("0a", invalid2);
+            addDataItem("0'", invalid2);
             addDataItem(":", new TokenMatcher(TokenType.CONDITIONAL_OPERATOR_SECOND, 0, 1));
             addDataItem(";", invalid1);
             addDataItem("<", operator1);
@@ -229,7 +231,8 @@ public class TokenizerTest {
             addDataItem(">>", operator2);
             addDataItem("?", new TokenMatcher(TokenType.CONDITIONAL_OPERATOR_FIRST, 0, 1));
             addDataItem("A", new TokenMatcher(TokenType.IDENTIFIER, 0, 1));
-            addDataItem("A@b_c`d\u00A0é¶\uFF46¬9.h", new TokenMatcher(TokenType.IDENTIFIER, 0, 15));
+            addDataItem("ABCD", new TokenMatcher(TokenType.IDENTIFIER, 0, 4));
+            addDataItem("A@b_c`d\u00A0é¶\uFF46¬9.h\"i#j$k'l", new TokenMatcher(TokenType.IDENTIFIER, 0, 23));
             addDataItem("[", new TokenMatcher(TokenType.OPENING_BRACKET, 0, 1));
             addDataItem("\\", invalid1);
             addDataItem("\\0", invalid2);

@@ -26,24 +26,6 @@ import ca.fragag.text.Document;
 public class ParserTest {
 
     /**
-     * Asserts that {@link Parser#isWhitespace(int)} returns <code>true</code> when the specified character is interpreted as
-     * whitespace by the parser and <code>false</code> when it isn't.
-     */
-    @Test
-    public void isWhitespace() {
-        assertThat(Parser.isWhitespace(0), is(false));
-        assertThat(Parser.isWhitespace('\t'), is(true));
-        assertThat(Parser.isWhitespace('\n'), is(true));
-        assertThat(Parser.isWhitespace('\f'), is(true));
-        assertThat(Parser.isWhitespace('\r'), is(true));
-        assertThat(Parser.isWhitespace(' '), is(true));
-        assertThat(Parser.isWhitespace('0'), is(false));
-        assertThat(Parser.isWhitespace('A'), is(false));
-        assertThat(Parser.isWhitespace('\u00a0'), is(false));
-        assertThat(Parser.isWhitespace('\u2000'), is(false));
-    }
-
-    /**
      * Asserts that {@link Parser#parse(Document)} returns a {@link Block} with a single {@link WhileBlock} child node when the
      * document contains a <code>WHILE</code> block.
      */

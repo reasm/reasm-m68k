@@ -36,26 +36,6 @@ public final class Parser {
     }
 
     /**
-     * Determines whether the specified code point represents whitespace or not.
-     *
-     * @param codePoint
-     *            the code point to test
-     * @return <code>true</code> if the code point represents whitespace, otherwise <code>false</code>
-     */
-    public static boolean isWhitespace(int codePoint) {
-        switch (codePoint) {
-        case '\t':
-        case '\n':
-        case '\f':
-        case '\r':
-        case ' ':
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Parses the contents of a source file.
      *
      * @param text

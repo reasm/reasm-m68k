@@ -6,6 +6,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.reasm.SubstringBounds;
+import org.reasm.m68k.Syntax;
 import org.reasm.m68k.parseerrors.LabelExpectedParseError;
 import org.reasm.source.ParseError;
 import org.reasm.source.parseerrors.MismatchedParenthesisParseError;
@@ -55,7 +56,7 @@ final class LogicalLineParser {
                 onTheLine = false;
             } else {
                 // Parse the labels.
-                if (!Parser.isWhitespace(currentCodePoint)) {
+                if (!Syntax.isWhitespace(currentCodePoint)) {
                     // The line starts with a label. This label doesn't need to end with a colon, but if one is found, it
                     // will just be skipped.
                     int start = reader.getCurrentPosition() - startOfLogicalLine;
@@ -120,6 +121,7 @@ final class LogicalLineParser {
                         int numberOfParentheses = 0;
                         int inString = -1;
                         int startOfString = -1;
+                        boolean inNumberOrIdentifier = false;
                         boolean readComment = false;
 
                         inner: do {
@@ -134,52 +136,63 @@ final class LogicalLineParser {
                                     startOfString = -1;
                                 }
                             } else {
-                                switch (currentCodePoint) {
-                                case '(':
-                                    ++numberOfParentheses;
-                                    break;
-
-                                case ')':
-                                    if (numberOfParentheses == 0) {
-                                        if (parseError == null) {
-                                            parseError = new MismatchedParenthesisParseError(reader.getCurrentPosition()
-                                                    - startOfLogicalLine);
-                                        }
-                                    } else {
-                                        --numberOfParentheses;
-                                    }
-
-                                    break;
-
-                                case '"':
-                                case '\'':
-                                    inString = currentCodePoint;
-                                    startOfString = reader.getCurrentPosition() - startOfLogicalLine;
-                                    break;
-
-                                case ';':
-                                    readComment = true;
-                                    break inner;
-
-                                case ',':
-                                    if (numberOfParentheses == 0) {
-                                        addOperand(operands, currentOperandStart, startOfTrailingWhitespace,
-                                                reader.getCurrentPosition() - startOfLogicalLine);
-                                        onTheLine = skipWhitespaceFromNext(reader, startOfLogicalLine, continuationCharacters);
-                                        currentOperandStart = reader.getCurrentPosition() - startOfLogicalLine;
-                                        continue;
-                                    }
-
-                                    break;
-
+                                if (inNumberOrIdentifier && !Syntax.isValidIdentifierCodePoint(currentCodePoint)) {
+                                    inNumberOrIdentifier = false;
                                 }
 
-                                if (Parser.isWhitespace(currentCodePoint)) {
-                                    if (startOfTrailingWhitespace == -1) {
-                                        startOfTrailingWhitespace = reader.getCurrentPosition() - startOfLogicalLine;
+                                if (!inNumberOrIdentifier) {
+                                    switch (currentCodePoint) {
+                                    case '(':
+                                        ++numberOfParentheses;
+                                        break;
+
+                                    case ')':
+                                        if (numberOfParentheses == 0) {
+                                            if (parseError == null) {
+                                                parseError = new MismatchedParenthesisParseError(reader.getCurrentPosition()
+                                                        - startOfLogicalLine);
+                                            }
+                                        } else {
+                                            --numberOfParentheses;
+                                        }
+
+                                        break;
+
+                                    case '"':
+                                    case '\'':
+                                        inString = currentCodePoint;
+                                        startOfString = reader.getCurrentPosition() - startOfLogicalLine;
+                                        break;
+
+                                    case ';':
+                                        readComment = true;
+                                        break inner;
+
+                                    case ',':
+                                        if (numberOfParentheses == 0) {
+                                            addOperand(operands, currentOperandStart, startOfTrailingWhitespace,
+                                                    reader.getCurrentPosition() - startOfLogicalLine);
+                                            onTheLine = skipWhitespaceFromNext(reader, startOfLogicalLine, continuationCharacters);
+                                            currentOperandStart = reader.getCurrentPosition() - startOfLogicalLine;
+                                            continue;
+                                        }
+
+                                        break;
+
                                     }
-                                } else {
-                                    startOfTrailingWhitespace = -1;
+
+                                    if (Syntax.isWhitespace(currentCodePoint)) {
+                                        if (startOfTrailingWhitespace == -1) {
+                                            startOfTrailingWhitespace = reader.getCurrentPosition() - startOfLogicalLine;
+                                        }
+                                    } else {
+                                        startOfTrailingWhitespace = -1;
+
+                                        if (Syntax.isValidNumberInitialCodePoint(currentCodePoint)
+                                                || Syntax.isValidIdentifierInitialCodePoint(currentCodePoint)) {
+                                            inNumberOrIdentifier = true;
+                                        }
+                                    }
                                 }
                             }
 
@@ -376,7 +389,7 @@ final class LogicalLineParser {
                 break;
             }
 
-            if (currentCodePoint == ':' || currentCodePoint == ';' || Parser.isWhitespace(currentCodePoint)) {
+            if (currentCodePoint == ':' || currentCodePoint == ';' || Syntax.isWhitespace(currentCodePoint)) {
                 // We found the end of the label or mnemonic, break out of the loop.
                 break;
             }
@@ -427,7 +440,7 @@ final class LogicalLineParser {
 
             // Skip any leading whitespace on the line.
             onTheLine = isOnTheLine(reader);
-            while (onTheLine && Parser.isWhitespace(reader.getCurrentCodePoint())) {
+            while (onTheLine && Syntax.isWhitespace(reader.getCurrentCodePoint())) {
                 reader.advance();
                 onTheLine = isOnTheLine(reader);
             }
@@ -453,7 +466,7 @@ final class LogicalLineParser {
      */
     private static boolean skipWhitespaceFromCurrent(@Nonnull CharSequenceReader<?> reader, boolean onTheLine,
             int startOfLogicalLine, @Nonnull ArrayList<Integer> continuationCharacters) {
-        while (onTheLine && Parser.isWhitespace(reader.getCurrentCodePoint())) {
+        while (onTheLine && Syntax.isWhitespace(reader.getCurrentCodePoint())) {
             reader.advance();
             onTheLine = readLogicalChar(reader, startOfLogicalLine, continuationCharacters);
         }
@@ -479,7 +492,7 @@ final class LogicalLineParser {
         do {
             reader.advance();
         } while ((onTheLine = readLogicalChar(reader, startOfLogicalLine, continuationCharacters))
-                && Parser.isWhitespace(reader.getCurrentCodePoint()));
+                && Syntax.isWhitespace(reader.getCurrentCodePoint()));
 
         return onTheLine;
     }

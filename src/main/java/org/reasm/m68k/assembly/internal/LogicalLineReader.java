@@ -3,8 +3,8 @@ package org.reasm.m68k.assembly.internal;
 import javax.annotation.Nonnull;
 
 import org.reasm.SubstringBounds;
+import org.reasm.m68k.Syntax;
 import org.reasm.m68k.source.LogicalLine;
-import org.reasm.m68k.source.Parser;
 import org.reasm.source.SourceLocation;
 
 import ca.fragag.text.DocumentReader;
@@ -71,7 +71,7 @@ final class LogicalLineReader {
     }
 
     void skipWhitespace() {
-        while (!this.atEnd() && Parser.isWhitespace(this.reader.getCurrentCodePoint())) {
+        while (!this.atEnd() && Syntax.isWhitespace(this.reader.getCurrentCodePoint())) {
             this.advance();
         }
     }
@@ -81,7 +81,7 @@ final class LogicalLineReader {
             this.reader.advance();
 
             // Skip the line separator and the leading whitespace on the following line.
-            while (!this.atEnd() && Parser.isWhitespace(this.reader.getCurrentCodePoint())) {
+            while (!this.atEnd() && Syntax.isWhitespace(this.reader.getCurrentCodePoint())) {
                 this.reader.advance();
             }
         }

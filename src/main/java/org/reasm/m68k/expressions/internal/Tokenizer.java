@@ -3,7 +3,7 @@ package org.reasm.m68k.expressions.internal;
 import javax.annotation.Nonnull;
 
 import org.reasm.m68k.CharSequenceParserReader;
-import org.reasm.m68k.Identifier;
+import org.reasm.m68k.Syntax;
 
 /**
  * The tokenizer for expressions and effective addresses.
@@ -11,18 +11,6 @@ import org.reasm.m68k.Identifier;
  * @author Francis Gagné
  */
 public final class Tokenizer {
-
-    static boolean isHexDigit(int codePoint) {
-        return Identifier.isDigit(codePoint) || codePoint >= 'A' && codePoint <= 'F' || codePoint >= 'a' && codePoint <= 'f';
-    }
-
-    private static boolean isBinDigit(int codePoint) {
-        return codePoint == '0' || codePoint == '1';
-    }
-
-    private static boolean isWhitespace(int codePoint) {
-        return codePoint == '\t' || codePoint == '\n' || codePoint == '\r' || codePoint == ' ';
-    }
 
     private CharSequenceParserReader reader;
     private int endOfBrokenSequence;
@@ -72,7 +60,7 @@ public final class Tokenizer {
 
         this.setToken(TokenType.END, this.tokenEnd, this.tokenEnd);
 
-        while (isWhitespace(this.reader.getCurrentCodePoint())) {
+        while (Syntax.isWhitespace(this.reader.getCurrentCodePoint())) {
             this.reader.advance();
         }
 
@@ -141,12 +129,12 @@ public final class Tokenizer {
                 codePoint = this.reader.getCurrentCodePoint();
 
                 // If the next character is not a valid identifier character or if it's a period, it's the end of the token.
-                if (!Identifier.isValidIdentifierCodePoint(codePoint) || codePoint == '.') {
+                if (!Syntax.isValidIdentifierCodePoint(codePoint) || codePoint == '.') {
                     break;
                 }
 
                 // If the next character is not an hexadecimal digit, make the token invalid.
-                if (!isHexDigit(codePoint)) {
+                if (!Syntax.isHexDigit(codePoint)) {
                     tokenType = TokenType.INVALID;
                     this.finishIdentifier();
                     break;
@@ -260,7 +248,7 @@ public final class Tokenizer {
         case '\\':
             tokenType = TokenType.INVALID;
             this.reader.advance();
-            for (; Identifier.isValidIdentifierCodePoint(codePoint = this.reader.getCurrentCodePoint()); this.reader.advance()) {
+            for (; Syntax.isValidIdentifierCodePoint(codePoint = this.reader.getCurrentCodePoint()); this.reader.advance()) {
             }
 
             break;
@@ -293,7 +281,7 @@ public final class Tokenizer {
             break;
 
         default:
-            if (firstCodePoint == '.' || Identifier.isDigit(firstCodePoint)) {
+            if (firstCodePoint == '.' || Syntax.isDigit(firstCodePoint)) {
                 // If it's a digit, then it's an integer or a real. Assume it's a decimal integer literal for now.
                 // If it's a point, then it's an operator or a real. In the first pass in the loop below, the point will be found
                 // and the token type will switch to REAL if there is a valid real.
@@ -309,7 +297,7 @@ public final class Tokenizer {
 
                         // If the decimal point is followed by a character that is not a valid identifier character, keep the point
                         // as part of this token, unless the token is only a point.
-                        if (!Identifier.isValidIdentifierCodePoint(codePoint)) {
+                        if (!Syntax.isValidIdentifierCodePoint(codePoint)) {
                             if (firstCodePoint == '.') {
                                 break;
                             }
@@ -322,7 +310,7 @@ public final class Tokenizer {
                         // If the decimal point is followed by a valid identifier character that is not a digit, then reject the
                         // point as a decimal separator and stay with the integer. The point will then be parsed as an operator
                         // and an identifier will follow it.
-                        if (!Identifier.isDigit(codePoint)) {
+                        if (!Syntax.isDigit(codePoint)) {
                             break;
                         }
 
@@ -347,13 +335,13 @@ public final class Tokenizer {
                             this.reader.advance();
                             codePoint2 = this.reader.getCurrentCodePoint();
 
-                            if (!Identifier.isDigit(codePoint2)) {
+                            if (!Syntax.isDigit(codePoint2)) {
                                 // If the '+' or '-' is not followed by a digit, make the token invalid.
                                 tokenType = TokenType.INVALID;
                                 this.finishIdentifier();
                                 break;
                             }
-                        } else if (!Identifier.isDigit(codePoint2)) {
+                        } else if (!Syntax.isDigit(codePoint2)) {
                             // If the 'E' or 'e' is not followed by a '+', a '-' or a digit, make the token invalid.
                             tokenType = TokenType.INVALID;
                             this.finishIdentifier();
@@ -374,12 +362,12 @@ public final class Tokenizer {
                     }
 
                     // If the next character is not a valid identifier character, it's the end of the integer token.
-                    if (!Identifier.isValidIdentifierCodePoint(codePoint)) {
+                    if (!Syntax.isValidIdentifierCodePoint(codePoint)) {
                         break;
                     }
 
                     // If it's not a digit, make the token invalid.
-                    if (!Identifier.isDigit(codePoint)) {
+                    if (!Syntax.isDigit(codePoint)) {
                         tokenType = TokenType.INVALID;
                         this.finishIdentifier();
                         break;
@@ -392,7 +380,7 @@ public final class Tokenizer {
                     this.reader.advance();
                 }
             } else {
-                assert Identifier.isValidIdentifierCodePoint(firstCodePoint);
+                assert Syntax.isValidIdentifierCodePoint(firstCodePoint);
 
                 // If it's a valid code point for an identifier, then it's an identifier.
                 tokenType = TokenType.IDENTIFIER;
@@ -448,12 +436,12 @@ public final class Tokenizer {
             int codePoint = this.reader.getCurrentCodePoint();
 
             // If the next character is not a valid identifier character or if it's a period, it's the end of the token.
-            if (!Identifier.isValidIdentifierCodePoint(codePoint) || codePoint == '.') {
+            if (!Syntax.isValidIdentifierCodePoint(codePoint) || codePoint == '.') {
                 break;
             }
 
             // If the next character is not an hexadecimal digit, make the token invalid.
-            if (!isBinDigit(codePoint)) {
+            if (!Syntax.isBinDigit(codePoint)) {
                 tokenType = TokenType.INVALID;
                 this.finishIdentifier();
                 break;
@@ -604,7 +592,7 @@ public final class Tokenizer {
         do {
             this.reader.advance();
             codePoint = this.reader.getCurrentCodePoint();
-        } while (Identifier.isValidIdentifierCodePoint(codePoint));
+        } while (Syntax.isValidIdentifierCodePoint(codePoint));
     }
 
     private final TokenType readRealDigits(boolean acceptScientificENotation) {
@@ -613,7 +601,7 @@ public final class Tokenizer {
             int codePoint = this.reader.getCurrentCodePoint();
 
             // If the next character is not a valid identifier character, it's the end of the real token.
-            if (!Identifier.isValidIdentifierCodePoint(codePoint)) {
+            if (!Syntax.isValidIdentifierCodePoint(codePoint)) {
                 break;
             }
 
@@ -623,7 +611,7 @@ public final class Tokenizer {
             }
 
             // If the next character is not a digit, make the token invalid.
-            if (!Identifier.isDigit(codePoint)) {
+            if (!Syntax.isDigit(codePoint)) {
                 this.finishIdentifier();
                 return TokenType.INVALID;
             }
