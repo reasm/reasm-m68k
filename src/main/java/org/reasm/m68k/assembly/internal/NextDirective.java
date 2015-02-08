@@ -17,7 +17,14 @@ class NextDirective extends Mnemonic {
     @Nonnull
     static final NextDirective NEXT = new NextDirective();
 
-    static void assembleCore(@Nonnull M68KAssemblyContext context) {
+    private NextDirective() {
+    }
+
+    @Override
+    void assemble(M68KAssemblyContext context) {
+        context.sizeNotAllowed();
+        context.requireNumberOfOperands(0);
+
         final Object blockState = context.getParentBlock();
         if (blockState instanceof ForBlockState) {
             final ForBlockState forBlockState = (ForBlockState) blockState;
@@ -27,16 +34,6 @@ class NextDirective extends Mnemonic {
         } else {
             context.addMessage(new NextWithoutForErrorMessage());
         }
-    }
-
-    private NextDirective() {
-    }
-
-    @Override
-    void assemble(M68KAssemblyContext context) {
-        context.sizeNotAllowed();
-        context.requireNumberOfOperands(0);
-        assembleCore(context);
     }
 
 }

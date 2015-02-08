@@ -28,11 +28,6 @@ class BasicBlockParser implements BlockParser {
         SourceNode createBlock(Iterable<? extends SourceNode> childNodes, ParseError parseError) {
             return new ForBlock(childNodes, parseError);
         };
-
-        @Override
-        void missingEndDirective(ArrayList<SourceNode> nodes) {
-            nodes.add(ImplicitNextNode.INSTANCE);
-        };
     };
 
     @Nonnull
@@ -117,7 +112,6 @@ class BasicBlockParser implements BlockParser {
 
         // We didn't find the end of the block: return with an error.
         nodes.add(this.createBodyBlock(bodyNodes));
-        this.missingEndDirective(nodes);
         return this.createBlock(nodes, new UnclosedBlockParseError(startingBlockDirective));
     }
 
@@ -129,9 +123,6 @@ class BasicBlockParser implements BlockParser {
     @Nonnull
     SourceNode createBodyBlock(@Nonnull Iterable<? extends SourceNode> childNodes) {
         return new SimpleCompositeSourceNode(childNodes);
-    }
-
-    void missingEndDirective(@Nonnull @SuppressWarnings("unused") ArrayList<SourceNode> nodes) {
     }
 
 }

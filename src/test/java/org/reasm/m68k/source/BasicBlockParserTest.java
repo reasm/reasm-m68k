@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.reasm.m68k.source.BlockParserTestsCommon.COMPLETE_BLOCK;
 import static org.reasm.m68k.source.BlockParserTestsCommon.INCOMPLETE_BLOCK;
@@ -40,7 +39,8 @@ public class BasicBlockParserTest {
         BlockParserTestsCommon.parseBasicBlock(code, blockType, bodyType, blockParseErrorMatcher, thirdChildNodeMatcher);
     }
 
-    private static List<SourceNode> parseBlock(@Nonnull String code, @Nonnull Matcher<? super ParseError> blockParseErrorMatcher) {
+    private static List<SourceNode> parseBlock(@Nonnull String code, @Nonnull Matcher<? super ParseError> blockParseErrorMatcher,
+            int childrenCount) {
         final DocumentReader reader = new DocumentReader(new Document(code), 5);
         final BlockDirectiveLine firstLine = new BlockDirectiveLine(new LogicalLine(5, null, new SubstringBounds[0],
                 new SubstringBounds(1, 4), new SubstringBounds[0], null, new int[0]), BlockDirective.FOR);
@@ -51,7 +51,7 @@ public class BasicBlockParserTest {
         assertThat(block, hasType(ForBlock.class));
 
         final List<SourceNode> childNodes = ((CompositeSourceNode) block).getChildNodes();
-        assertThat(childNodes.size(), is(3));
+        assertThat(childNodes.size(), is(childrenCount));
 
         final SourceNode blockStart = childNodes.get(0);
         assertThat(blockStart, is((SourceNode) firstLine));
@@ -63,7 +63,7 @@ public class BasicBlockParserTest {
     }
 
     private static CompositeSourceNode parseCompleteBlock(@Nonnull String code) {
-        final List<SourceNode> childNodes = parseBlock(code, COMPLETE_BLOCK);
+        final List<SourceNode> childNodes = parseBlock(code, COMPLETE_BLOCK, 3);
 
         final SourceNode blockEnd = childNodes.get(2);
         assertThat(blockEnd.getLength(), is(5));
@@ -81,13 +81,7 @@ public class BasicBlockParserTest {
     private static CompositeSourceNode parseIncompleteBlock(@Nonnull String code) {
         final Matcher<Object> blockParseErrorMatcher = both(INCOMPLETE_BLOCK).and(
                 hasProperty("startingBlockDirective", equalTo(BlockDirective.FOR)));
-        final List<SourceNode> childNodes = parseBlock(code, blockParseErrorMatcher);
-
-        final SourceNode blockEnd = childNodes.get(2);
-        assertThat(blockEnd.getLength(), is(0));
-        assertThat(blockEnd.getParseError(), is(nullValue()));
-        assertThat(blockEnd, is(sameInstance((SourceNode) ImplicitNextNode.INSTANCE)));
-
+        final List<SourceNode> childNodes = parseBlock(code, blockParseErrorMatcher, 2);
         return (CompositeSourceNode) childNodes.get(1);
     }
 
@@ -278,7 +272,7 @@ public class BasicBlockParserTest {
      */
     @Test
     public void parseIncompleteForBlock() {
-        parseForBlock(" FOR\n NOP", INCOMPLETE_BLOCK, is(sameInstance((SourceNode) ImplicitNextNode.INSTANCE)));
+        parseForBlock(" FOR\n NOP", INCOMPLETE_BLOCK, null);
     }
 
     /**

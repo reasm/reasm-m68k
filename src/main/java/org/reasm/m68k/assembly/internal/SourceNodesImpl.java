@@ -124,17 +124,6 @@ public final class SourceNodesImpl {
     }
 
     /**
-     * Assembles an implicit <code>NEXT</code> directive.
-     *
-     * @param builder
-     *            an assembly builder
-     */
-    public static void assembleImplicitNext(@Nonnull AssemblyBuilder builder) {
-        final M68KAssemblyContext context = M68KAssemblyContext.getAssemblyContext(builder);
-        NextDirective.assembleCore(context);
-    }
-
-    /**
      * Assembles a logical line.
      *
      * @param builder
