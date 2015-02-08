@@ -87,7 +87,8 @@ class ReparserSourceNodeProducer extends SourceNodeProducer {
                     final int endPosition = reader.getCurrentPosition() + nodeLength;
 
                     // Don't recycle the node if it crosses the replacement.
-                    if (endPosition <= this.replaceOffset) {
+                    // Don't recycle the node if its ends where the replacement begins and the node has a parse error.
+                    if (endPosition < this.replaceOffset || endPosition == this.replaceOffset && node.getParseError() == null) {
                         // Don't recycle the node if that type of node cannot appear here.
                         if (isParsableNode(node)) {
                             // Don't recycle the node if it doesn't end with a line feed or a carriage return.

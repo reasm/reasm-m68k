@@ -428,7 +428,7 @@ public class ReparserSourceNodeProducerTest {
                         composite(IfBlock.class, new UnclosedBlockParseError(BlockDirective.IF), ifDirective2,
                                 composite(SimpleCompositeSourceNode.class, recycled_1))));
 
-        // Close a block
+        // Close a block before the end of the source
         addDataItem(
                 " NOP\n IF 1\n MOVE.W D1,D0\n NOP",
                 25,
@@ -444,6 +444,23 @@ public class ReparserSourceNodeProducerTest {
                                 composite(SimpleCompositeSourceNode.class, recycled_1_1_0),
                                 blockDirectiveLine(logicalLine(7, null, NO_LABELS, bounds_1_6, NO_OPERANDS, null,
                                         NO_CONTINUATION_CHARACTERS))), recycled_1_1_1));
+
+        // Close a block at the end of the source
+        addDataItem(
+                " NOP\n IF 1\n MOVE.W D1,D0\n",
+                25,
+                0,
+                " ENDIF\n",
+                " NOP\n IF 1\n MOVE.W D1,D0\n ENDIF\n",
+                composite(
+                        Block.class,
+                        recycled_0,
+                        composite(
+                                IfBlock.class,
+                                recycled_1_0,
+                                composite(SimpleCompositeSourceNode.class, recycled_1_1_0),
+                                blockDirectiveLine(logicalLine(7, null, NO_LABELS, bounds_1_6, NO_OPERANDS, null,
+                                        NO_CONTINUATION_CHARACTERS)))));
 
         // Insert an ELSE in the middle of an IF block
         addDataItem(
