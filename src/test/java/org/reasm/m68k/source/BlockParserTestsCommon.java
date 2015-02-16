@@ -13,7 +13,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.hamcrest.Matcher;
-import org.reasm.m68k.parseerrors.UnclosedBlockParseError;
+import org.reasm.commons.parseerrors.UnclosedBlockParseError;
 import org.reasm.source.CompositeSourceNode;
 import org.reasm.source.ParseError;
 import org.reasm.source.SourceNode;
@@ -30,7 +30,7 @@ final class BlockParserTestsCommon {
     static void parseBasicBlock(@Nonnull String code, @Nonnull Class<?> blockType, @Nonnull Class<?> bodyType,
             @Nonnull Matcher<? super ParseError> blockParseErrorMatcher,
             @CheckForNull Matcher<? super SourceNode> thirdChildNodeMatcher) {
-        SourceNode node = Parser.parse(new Document(code));
+        SourceNode node = M68KParser.INSTANCE.parse(new Document(code));
         List<SourceNode> childNodes = ((CompositeSourceNode) node).getChildNodes();
         assertThat(childNodes.size(), is(1));
 
@@ -40,7 +40,7 @@ final class BlockParserTestsCommon {
 
         childNodes = ((CompositeSourceNode) node).getChildNodes();
         assertThat(childNodes.size(), is(thirdChildNodeMatcher == null ? 2 : 3));
-        assertThat(childNodes.get(0), both(hasType(BlockDirectiveLine.class)).and(hasProperty("parseError", nullValue())));
+        assertThat(childNodes.get(0), both(hasType(M68KBlockDirectiveLine.class)).and(hasProperty("parseError", nullValue())));
         assertThat(childNodes.get(1), hasType(bodyType));
         if (thirdChildNodeMatcher != null) {
             assertThat(childNodes.get(2), both(thirdChildNodeMatcher).and(hasProperty("parseError", nullValue())));

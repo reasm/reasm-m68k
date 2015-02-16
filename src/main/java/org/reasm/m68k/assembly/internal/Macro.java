@@ -6,7 +6,8 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import org.reasm.m68k.Syntax;
+import org.reasm.commons.source.Syntax;
+import org.reasm.m68k.source.M68KParser;
 import org.reasm.source.MacroInstantiation;
 import org.reasm.source.SourceLocation;
 
@@ -145,13 +146,13 @@ class Macro extends Mnemonic {
                 if (inString == -1) {
                     if (codePoint == '\'' || codePoint == '"') {
                         inString = codePoint;
-                    } else if (Syntax.isValidIdentifierCodePoint(codePoint)) {
+                    } else if (M68KParser.SYNTAX.isValidIdentifierCodePoint(codePoint)) {
                         boolean startsWithDigit = Syntax.isDigit(codePoint);
 
                         // Read an identifier.
                         do {
                             reader.advance();
-                        } while (Syntax.isValidIdentifierCodePoint(reader.getCurrentCodePoint()));
+                        } while (M68KParser.SYNTAX.isValidIdentifierCodePoint(reader.getCurrentCodePoint()));
 
                         if (!startsWithDigit) {
                             final int endPosition = reader.getCurrentPosition();

@@ -27,26 +27,23 @@ public class ObjBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
-     * complete <code>OBJ</code> block.
+     * Asserts that {@link ObjBlockParser} correctly parses a complete <code>OBJ</code> block.
      */
     @Test
     public void parseCompleteObjBlock() {
-        parseObjBlock(" OBJ\n NOP\n OBJEND", COMPLETE_BLOCK, hasType(BlockDirectiveLine.class));
+        parseObjBlock(" OBJ\n NOP\n OBJEND", COMPLETE_BLOCK, hasType(M68KBlockDirectiveLine.class));
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses a
-     * complete <code>PHASE</code> block.
+     * Asserts that {@link ObjBlockParser} correctly parses a complete <code>PHASE</code> block.
      */
     @Test
     public void parseCompletePhaseBlock() {
-        parseObjBlock(" PHASE\n NOP\n DEPHASE", COMPLETE_BLOCK, hasType(BlockDirectiveLine.class));
+        parseObjBlock(" PHASE\n NOP\n DEPHASE", COMPLETE_BLOCK, hasType(M68KBlockDirectiveLine.class));
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses an
-     * incomplete <code>OBJ</code> block.
+     * Asserts that {@link ObjBlockParser} correctly parses an incomplete <code>OBJ</code> block.
      */
     @Test
     public void parseIncompleteObjBlock() {
@@ -54,8 +51,7 @@ public class ObjBlockParserTest {
     }
 
     /**
-     * Asserts that {@link BasicBlockParser#parseBlock(SourceNodeProducer, BlockDirectiveLine, BlockDirective)} correctly parses an
-     * incomplete <code>PHASE</code> block.
+     * Asserts that {@link ObjBlockParser} correctly parses an incomplete <code>PHASE</code> block.
      */
     @Test
     public void parseIncompletePhaseBlock() {

@@ -11,7 +11,7 @@ import javax.annotation.concurrent.Immutable;
 import org.reasm.*;
 import org.reasm.expressions.EvaluationContext;
 import org.reasm.expressions.SymbolLookup;
-import org.reasm.m68k.source.Parser;
+import org.reasm.m68k.source.M68KParser;
 import org.reasm.source.AbstractSourceFile;
 import org.reasm.source.SourceFile;
 import org.reasm.source.SourceNode;
@@ -129,14 +129,14 @@ public final class M68KArchitecture extends Architecture {
     @Nonnull
     @Override
     public final SourceNode parse(@Nonnull Document text) {
-        return Parser.parse(text);
+        return M68KParser.INSTANCE.parse(text);
     }
 
     @Nonnull
     @Override
     public final SourceNode reparse(@Nonnull Document text, @Nonnull AbstractSourceFile<?> oldSourceFile, int replaceOffset,
             int lengthToRemove, int lengthToInsert) {
-        return Parser.reparse(text, oldSourceFile.getParsed(this), replaceOffset, lengthToRemove, lengthToInsert);
+        return M68KParser.INSTANCE.reparse(text, oldSourceFile.getParsed(this), replaceOffset, lengthToRemove, lengthToInsert);
     }
 
 }

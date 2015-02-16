@@ -10,7 +10,7 @@ import org.reasm.AssemblyBuilder;
 import org.reasm.AssemblyStepLocation;
 import org.reasm.BlockEvents;
 import org.reasm.Symbol;
-import org.reasm.m68k.source.SourceLocationUtils;
+import org.reasm.commons.source.SourceLocationUtils;
 import org.reasm.messages.UnknownMnemonicErrorMessage;
 import org.reasm.source.SourceLocation;
 import org.reasm.source.SourceNode;

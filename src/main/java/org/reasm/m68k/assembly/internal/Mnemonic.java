@@ -16,7 +16,6 @@ import org.reasm.Symbol;
 import org.reasm.Value;
 import org.reasm.ValueVisitor;
 import org.reasm.expressions.Expression;
-import org.reasm.m68k.Syntax;
 import org.reasm.m68k.expressions.internal.ExpressionParser;
 import org.reasm.m68k.expressions.internal.InvalidTokenException;
 import org.reasm.m68k.expressions.internal.TokenType;
@@ -25,6 +24,7 @@ import org.reasm.m68k.messages.DuplicateRegistersInRegisterListWarningMessage;
 import org.reasm.m68k.messages.InvalidDataTypeForOrgOrObjDirectiveErrorMessage;
 import org.reasm.m68k.messages.InvalidExpressionErrorMessage;
 import org.reasm.m68k.messages.NotSupportedOnArchitectureErrorMessage;
+import org.reasm.m68k.source.M68KParser;
 
 /**
  * Base class for all instructions and directives provided by the M68000 architecture family.
@@ -143,13 +143,13 @@ abstract class Mnemonic {
 
     @CheckForNull
     static String parseRegisterIdentifier(@Nonnull LogicalLineReader operandReader) {
-        if (!operandReader.atEnd() && Syntax.isValidIdentifierInitialCodePoint(operandReader.getCurrentCodePoint())) {
+        if (!operandReader.atEnd() && M68KParser.SYNTAX.isValidIdentifierInitialCodePoint(operandReader.getCurrentCodePoint())) {
             final StringBuilder sb = new StringBuilder();
             sb.appendCodePoint(operandReader.getCurrentCodePoint());
             operandReader.advance();
 
             while (!operandReader.atEnd() && operandReader.getCurrentChar() != '.'
-                    && Syntax.isValidIdentifierCodePoint(operandReader.getCurrentCodePoint())) {
+                    && M68KParser.SYNTAX.isValidIdentifierCodePoint(operandReader.getCurrentCodePoint())) {
                 sb.appendCodePoint(operandReader.getCurrentCodePoint());
                 operandReader.advance();
             }

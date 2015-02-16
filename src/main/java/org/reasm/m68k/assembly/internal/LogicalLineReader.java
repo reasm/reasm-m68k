@@ -3,8 +3,8 @@ package org.reasm.m68k.assembly.internal;
 import javax.annotation.Nonnull;
 
 import org.reasm.SubstringBounds;
-import org.reasm.m68k.Syntax;
-import org.reasm.m68k.source.LogicalLine;
+import org.reasm.commons.source.LogicalLine;
+import org.reasm.commons.source.Syntax;
 import org.reasm.source.SourceLocation;
 
 import ca.fragag.text.DocumentReader;

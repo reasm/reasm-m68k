@@ -9,6 +9,8 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.reasm.*;
+import org.reasm.commons.source.LogicalLine;
+import org.reasm.commons.source.SourceLocationUtils;
 import org.reasm.expressions.EvaluationContext;
 import org.reasm.expressions.SymbolLookup;
 import org.reasm.m68k.ConfigurationOptions;
@@ -16,8 +18,6 @@ import org.reasm.m68k.M68KArchitecture;
 import org.reasm.m68k.expressions.internal.Tokenizer;
 import org.reasm.m68k.messages.InvalidSizeAttributeErrorMessage;
 import org.reasm.m68k.messages.SizeAttributeNotAllowedErrorMessage;
-import org.reasm.m68k.source.LogicalLine;
-import org.reasm.m68k.source.SourceLocationUtils;
 import org.reasm.messages.WrongNumberOfOperandsErrorMessage;
 import org.reasm.source.SourceLocation;
 import org.reasm.source.SourceNode;

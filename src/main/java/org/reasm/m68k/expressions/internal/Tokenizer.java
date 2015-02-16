@@ -2,8 +2,9 @@ package org.reasm.m68k.expressions.internal;
 
 import javax.annotation.Nonnull;
 
+import org.reasm.commons.source.Syntax;
 import org.reasm.m68k.CharSequenceParserReader;
-import org.reasm.m68k.Syntax;
+import org.reasm.m68k.source.M68KParser;
 
 /**
  * The tokenizer for expressions and effective addresses.
@@ -129,7 +130,7 @@ public final class Tokenizer {
                 codePoint = this.reader.getCurrentCodePoint();
 
                 // If the next character is not a valid identifier character or if it's a period, it's the end of the token.
-                if (!Syntax.isValidIdentifierCodePoint(codePoint) || codePoint == '.') {
+                if (!M68KParser.SYNTAX.isValidIdentifierCodePoint(codePoint) || codePoint == '.') {
                     break;
                 }
 
@@ -248,7 +249,8 @@ public final class Tokenizer {
         case '\\':
             tokenType = TokenType.INVALID;
             this.reader.advance();
-            for (; Syntax.isValidIdentifierCodePoint(codePoint = this.reader.getCurrentCodePoint()); this.reader.advance()) {
+            for (; M68KParser.SYNTAX.isValidIdentifierCodePoint(codePoint = this.reader.getCurrentCodePoint()); this.reader
+                    .advance()) {
             }
 
             break;
@@ -297,7 +299,7 @@ public final class Tokenizer {
 
                         // If the decimal point is followed by a character that is not a valid identifier character, keep the point
                         // as part of this token, unless the token is only a point.
-                        if (!Syntax.isValidIdentifierCodePoint(codePoint)) {
+                        if (!M68KParser.SYNTAX.isValidIdentifierCodePoint(codePoint)) {
                             if (firstCodePoint == '.') {
                                 break;
                             }
@@ -362,7 +364,7 @@ public final class Tokenizer {
                     }
 
                     // If the next character is not a valid identifier character, it's the end of the integer token.
-                    if (!Syntax.isValidIdentifierCodePoint(codePoint)) {
+                    if (!M68KParser.SYNTAX.isValidIdentifierCodePoint(codePoint)) {
                         break;
                     }
 
@@ -380,7 +382,7 @@ public final class Tokenizer {
                     this.reader.advance();
                 }
             } else {
-                assert Syntax.isValidIdentifierCodePoint(firstCodePoint);
+                assert M68KParser.SYNTAX.isValidIdentifierCodePoint(firstCodePoint);
 
                 // If it's a valid code point for an identifier, then it's an identifier.
                 tokenType = TokenType.IDENTIFIER;
@@ -436,7 +438,7 @@ public final class Tokenizer {
             int codePoint = this.reader.getCurrentCodePoint();
 
             // If the next character is not a valid identifier character or if it's a period, it's the end of the token.
-            if (!Syntax.isValidIdentifierCodePoint(codePoint) || codePoint == '.') {
+            if (!M68KParser.SYNTAX.isValidIdentifierCodePoint(codePoint) || codePoint == '.') {
                 break;
             }
 
@@ -592,7 +594,7 @@ public final class Tokenizer {
         do {
             this.reader.advance();
             codePoint = this.reader.getCurrentCodePoint();
-        } while (Syntax.isValidIdentifierCodePoint(codePoint));
+        } while (M68KParser.SYNTAX.isValidIdentifierCodePoint(codePoint));
     }
 
     private final TokenType readRealDigits(boolean acceptScientificENotation) {
@@ -601,7 +603,7 @@ public final class Tokenizer {
             int codePoint = this.reader.getCurrentCodePoint();
 
             // If the next character is not a valid identifier character, it's the end of the real token.
-            if (!Syntax.isValidIdentifierCodePoint(codePoint)) {
+            if (!M68KParser.SYNTAX.isValidIdentifierCodePoint(codePoint)) {
                 break;
             }
 
