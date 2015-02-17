@@ -16,8 +16,8 @@ import org.reasm.source.SourceLocation;
 import org.reasm.source.SourceNode;
 
 /**
- * Provides the implementation for assembling the various {@link SourceNode} subclasses defined in the <code>org.reasm.source</code>
- * package.
+ * Provides the implementation for assembling the various {@link SourceNode} subclasses defined in the
+ * <code>org.reasm.m68k.source</code> package.
  *
  * @author Francis Gagné
  */
