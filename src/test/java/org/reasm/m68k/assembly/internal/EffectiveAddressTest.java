@@ -26,6 +26,7 @@ import org.reasm.FunctionValue;
 import org.reasm.StaticSymbol;
 import org.reasm.Symbol;
 import org.reasm.UnsignedIntValue;
+import org.reasm.commons.messages.InvalidTokenErrorMessage;
 import org.reasm.expressions.EvaluationContext;
 import org.reasm.expressions.Expression;
 import org.reasm.expressions.SymbolLookup;

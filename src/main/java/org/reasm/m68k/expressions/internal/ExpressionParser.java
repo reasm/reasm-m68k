@@ -12,9 +12,9 @@ import org.reasm.AssemblyMessage;
 import org.reasm.FloatValue;
 import org.reasm.StringValue;
 import org.reasm.UnsignedIntValue;
+import org.reasm.commons.messages.UnrecognizedEscapeSequenceWarningMessage;
 import org.reasm.commons.source.Syntax;
 import org.reasm.expressions.*;
-import org.reasm.m68k.messages.UnrecognizedEscapeSequenceWarningMessage;
 import org.reasm.messages.OverflowInLiteralWarningMessage;
 
 import ca.fragag.Consumer;

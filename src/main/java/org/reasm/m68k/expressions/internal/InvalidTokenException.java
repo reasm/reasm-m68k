@@ -2,7 +2,7 @@ package org.reasm.m68k.expressions.internal;
 
 import javax.annotation.Nonnull;
 
-import org.reasm.m68k.messages.InvalidTokenErrorMessage;
+import org.reasm.commons.messages.InvalidTokenErrorMessage;
 
 /**
  * A checked exception that is thrown when the expression parser encounters an invalid token.
