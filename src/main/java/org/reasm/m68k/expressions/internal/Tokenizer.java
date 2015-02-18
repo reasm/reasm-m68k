@@ -4,7 +4,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.reasm.commons.source.Syntax;
-import org.reasm.m68k.CharSequenceParserReader;
+import org.reasm.commons.util.CharSequenceParserReader;
 import org.reasm.m68k.source.M68KParser;
 
 /**
