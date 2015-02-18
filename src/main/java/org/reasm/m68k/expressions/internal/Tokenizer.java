@@ -1,5 +1,6 @@
 package org.reasm.m68k.expressions.internal;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.reasm.commons.source.Syntax;
@@ -468,7 +469,7 @@ public final class Tokenizer {
      *            the other Tokenizer
      * @see #duplicateAndAdvance()
      */
-    public final void copyFrom(Tokenizer other) {
+    public final void copyFrom(@Nonnull Tokenizer other) {
         this.reader.copyFrom(other.reader);
         this.endOfBrokenSequence = other.endOfBrokenSequence;
         this.tokenType = other.tokenType;
@@ -482,6 +483,7 @@ public final class Tokenizer {
      * @return the new Tokenizer
      * @see #copyFrom(Tokenizer)
      */
+    @Nonnull
     public final Tokenizer duplicateAndAdvance() {
         final Tokenizer duplicate = new Tokenizer(this);
         duplicate.advance();
@@ -520,6 +522,7 @@ public final class Tokenizer {
      *
      * @return the current token's text
      */
+    @Nonnull
     public final CharSequence getTokenText() {
         return this.reader.getCharSequence().subSequence(this.tokenStart, this.tokenEnd);
     }
@@ -539,7 +542,7 @@ public final class Tokenizer {
      * @param charSequence
      *            the {@link CharSequence} to read from
      */
-    public final void setCharSequence(CharSequence charSequence) {
+    public final void setCharSequence(@Nonnull CharSequence charSequence) {
         if (charSequence == null) {
             throw new NullPointerException("charSequence");
         }
@@ -568,7 +571,7 @@ public final class Tokenizer {
      *            the string to compare the token's text with
      * @return <code>true</code> if the token's text is equal to the string, otherwise <code>false</code>
      */
-    public final boolean tokenEqualsString(String string) {
+    public final boolean tokenEqualsString(@CheckForNull String string) {
         if (string == null) {
             return false;
         }
@@ -597,6 +600,7 @@ public final class Tokenizer {
         } while (M68KParser.SYNTAX.isValidIdentifierCodePoint(codePoint));
     }
 
+    @Nonnull
     private final TokenType readRealDigits(boolean acceptScientificENotation) {
         for (;;) {
             this.reader.advance();
@@ -622,7 +626,7 @@ public final class Tokenizer {
         return TokenType.REAL;
     }
 
-    private final void setToken(TokenType tokenType, int tokenStart, int tokenEnd) {
+    private final void setToken(@Nonnull TokenType tokenType, int tokenStart, int tokenEnd) {
         this.tokenType = tokenType;
         this.tokenStart = tokenStart;
         this.tokenEnd = tokenEnd;
