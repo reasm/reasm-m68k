@@ -30,8 +30,7 @@ class HexDirective extends Mnemonic {
         final int numberOfOperands = context.numberOfOperands;
         for (int i = 0; i < numberOfOperands; i++) {
             context.prepareOperandReader(i);
-            for (int currentCodePoint; !reader.atEnd(); reader.advance()) {
-                reader.skipWhitespace();
+            for (int currentCodePoint; !reader.atEnd(); reader.advance(), reader.skipWhitespace()) {
                 currentCodePoint = reader.getCurrentCodePoint();
                 assert currentCodePoint != -1;
 
@@ -48,13 +47,15 @@ class HexDirective extends Mnemonic {
 
                 reader.advance();
                 reader.skipWhitespace();
-                currentCodePoint = reader.getCurrentCodePoint();
-                if (currentCodePoint == -1) {
+                if (reader.atEnd()) {
                     context.addMessage(new OddNumberOfCharactersInHexDirectiveErrorMessage());
 
                     // Continue to next operand.
                     break;
                 }
+
+                currentCodePoint = reader.getCurrentCodePoint();
+                assert currentCodePoint != -1;
 
                 // Parse the second nybble of a nybble pair.
                 hexCharValue = Character.digit(currentCodePoint, 16);
