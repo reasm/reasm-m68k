@@ -29,10 +29,6 @@ final class LogicalLineReader {
         return this.reader.getCurrentPosition();
     }
 
-    char getCurrentChar() {
-        return this.reader.getCurrentChar();
-    }
-
     int getCurrentCodePoint() {
         return this.reader.getCurrentCodePoint();
     }

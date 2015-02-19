@@ -65,7 +65,7 @@ class MultiplyDivideInstruction extends TwoOperandIntegerInstruction {
 
         GeneralPurposeRegister secondRegister = null;
         reader.skipWhitespace();
-        if (!reader.atEnd() && reader.getCurrentChar() == (this.operation == Operation.MULX ? '-' : ':')) {
+        if (!reader.atEnd() && reader.getCurrentCodePoint() == (this.operation == Operation.MULX ? '-' : ':')) {
             reader.advance();
             reader.skipWhitespace();
 

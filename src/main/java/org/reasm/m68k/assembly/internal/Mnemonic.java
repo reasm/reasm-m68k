@@ -163,7 +163,7 @@ abstract class Mnemonic {
             sb.appendCodePoint(operandReader.getCurrentCodePoint());
             operandReader.advance();
 
-            while (!operandReader.atEnd() && operandReader.getCurrentChar() != '.'
+            while (!operandReader.atEnd() && operandReader.getCurrentCodePoint() != '.'
                     && M68KParser.SYNTAX.isValidIdentifierCodePoint(operandReader.getCurrentCodePoint())) {
                 sb.appendCodePoint(operandReader.getCurrentCodePoint());
                 operandReader.advance();
@@ -221,7 +221,7 @@ abstract class Mnemonic {
                 }
 
                 operandReader.skipWhitespace();
-                if (!operandReader.atEnd() && operandReader.getCurrentChar() == '-') {
+                if (!operandReader.atEnd() && operandReader.getCurrentCodePoint() == '-') {
                     operandReader.advance();
                     operandReader.skipWhitespace();
                     GeneralPurposeRegister secondRegisterOfRange = parseRegister(context, operandReader);
@@ -251,7 +251,7 @@ abstract class Mnemonic {
                 }
 
                 // A slash separates register ranges.
-                if (operandReader.getCurrentChar() != '/') {
+                if (operandReader.getCurrentCodePoint() != '/') {
                     return null;
                 }
 
@@ -273,15 +273,17 @@ abstract class Mnemonic {
     static boolean parseSpecialRegister(@Nonnull M68KAssemblyContext context, int operandIndex, @Nonnull String registerName) {
         final LogicalLineReader reader = context.logicalLineReader;
         context.prepareOperandReader(operandIndex);
-        for (int i = 0; i < registerName.length(); i++, reader.advance()) {
+
+        int expectedCodePoint;
+        for (int i = 0; i < registerName.length(); i += Character.charCount(expectedCodePoint), reader.advance()) {
             if (reader.atEnd()) {
                 return false;
             }
 
-            final char actualChar = reader.getCurrentChar();
-            final char expectedChar = registerName.charAt(i);
-            assert expectedChar >= 'A' && expectedChar <= 'Z';
-            if (actualChar != expectedChar && actualChar != (expectedChar | 0x20)) {
+            final int actualCodePoint = reader.getCurrentCodePoint();
+            expectedCodePoint = registerName.codePointAt(i);
+            assert expectedCodePoint >= 'A' && expectedCodePoint <= 'Z';
+            if (actualCodePoint != expectedCodePoint && actualCodePoint != (expectedCodePoint | 0x20)) {
                 return false;
             }
         }
