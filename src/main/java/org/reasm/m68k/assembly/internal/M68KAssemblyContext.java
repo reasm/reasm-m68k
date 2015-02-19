@@ -147,7 +147,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
     @Nonnull
     final RsSymbol rs = new RsSymbol();
 
-    M68KAssemblyContext(@Nonnull AssemblyBuilder builder) {
+    private M68KAssemblyContext(@Nonnull AssemblyBuilder builder) {
         this.builder = builder;
     }
 
