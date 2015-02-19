@@ -113,6 +113,21 @@ abstract class Mnemonic {
         return null;
     }
 
+    @Nonnull
+    static ScopedEffectBlockEvents getScopedEffectBlockEvents(@Nonnull M68KAssemblyContext context) {
+        final Block block = context.builder.getCurrentBlock();
+        if (block == null) {
+            throw new AssertionError();
+        }
+
+        final BlockEvents blockEvents = block.getEvents();
+        if (blockEvents == null || !(blockEvents instanceof ScopedEffectBlockEvents)) {
+            throw new AssertionError();
+        }
+
+        return (ScopedEffectBlockEvents) blockEvents;
+    }
+
     @CheckForNull
     static Expression parseExpressionOperand(@Nonnull M68KAssemblyContext context, int operandIndex) {
         final String operandText = context.getOperandText(operandIndex);
@@ -324,21 +339,6 @@ abstract class Mnemonic {
 
     void defineLabels(@Nonnull M68KAssemblyContext context) {
         context.defineLabels();
-    }
-
-    @Nonnull
-    ScopedEffectBlockEvents getScopedEffectBlockEvents(@Nonnull M68KAssemblyContext context) {
-        final Block block = context.builder.getCurrentBlock();
-        if (block == null) {
-            throw new AssertionError();
-        }
-
-        final BlockEvents blockEvents = block.getEvents();
-        if (blockEvents == null || !(blockEvents instanceof ScopedEffectBlockEvents)) {
-            throw new AssertionError();
-        }
-
-        return (ScopedEffectBlockEvents) blockEvents;
     }
 
 }

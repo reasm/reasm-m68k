@@ -29,7 +29,7 @@ class TransformDirective extends Mnemonic {
     void assemble(M68KAssemblyContext context) throws IOException {
         context.sizeNotAllowed();
 
-        final ScopedEffectBlockEvents blockEvents = this.getScopedEffectBlockEvents(context);
+        final ScopedEffectBlockEvents blockEvents = getScopedEffectBlockEvents(context);
 
         if (context.numberOfOperands >= 1) {
             // The first operand is the name of an output transformation factory.

@@ -24,7 +24,7 @@ class NamespaceDirective extends Mnemonic {
         context.sizeNotAllowed();
         context.requireNumberOfOperands(0);
 
-        final ScopedEffectBlockEvents blockEvents = this.getScopedEffectBlockEvents(context);
+        final ScopedEffectBlockEvents blockEvents = getScopedEffectBlockEvents(context);
 
         if (context.numberOfLabels < 1) {
             context.addMessage(new DirectiveRequiresLabelErrorMessage(Mnemonics.NAMESPACE));
