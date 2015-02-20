@@ -49,6 +49,14 @@ public class SymbolsTest extends BaseProgramsTest {
     private static final ArrayList<Object[]> TEST_DATA = new ArrayList<>();
 
     static {
+        // No mnemonic
+        addDataItem("foo", 2, new UserSymbolMatcher[] { new UserSymbolMatcher<>(SymbolContext.VALUE, "foo", SymbolType.CONSTANT,
+                UINT_0) });
+        addDataItem("foo:", 2, new UserSymbolMatcher[] { new UserSymbolMatcher<>(SymbolContext.VALUE, "foo", SymbolType.CONSTANT,
+                UINT_0) });
+        addDataItem(" ORG $456\nfoo", 3, new UserSymbolMatcher[] { new UserSymbolMatcher<>(SymbolContext.VALUE, "foo",
+                SymbolType.CONSTANT, new UnsignedIntValue(0x456)) });
+
         // =
         addDataItem("foo = 0", 2, new UserSymbolMatcher[] { new UserSymbolMatcher<>(SymbolContext.VALUE, "foo",
                 SymbolType.VARIABLE, UINT_0) });
