@@ -1521,7 +1521,7 @@ public class InstructionsTest extends BaseInstructionsTest {
      *            an {@link AssemblyMessage} that is expected to be generated while assembling the line of code
      * @param expectedMessages
      *            an array of {@link AssemblyMessage} that are expected to be generated while assembling the line of code. Takes
-     *            priority over expectedMessage.
+     *            priority over <code>expectedMessage</code>.
      */
     public InstructionsTest(@Nonnull String code, @Nonnull short[] output, @Nonnull M68KArchitecture architecture,
             @CheckForNull AssemblyMessage expectedMessage, @CheckForNull AssemblyMessage[] expectedMessages) {
