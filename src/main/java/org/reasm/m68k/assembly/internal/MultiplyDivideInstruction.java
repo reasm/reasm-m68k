@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
+import org.reasm.commons.source.LogicalLineReader;
 import org.reasm.m68k.messages.AddressingModeNotAllowedHereErrorMessage;
 import org.reasm.m68k.messages.DivisionRemainderDiscardedWarningMessage;
 import org.reasm.m68k.messages.MultiplicationResultUndefinedWarningMessage;

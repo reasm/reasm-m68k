@@ -15,6 +15,7 @@ import org.reasm.Function;
 import org.reasm.Symbol;
 import org.reasm.Value;
 import org.reasm.ValueVisitor;
+import org.reasm.commons.source.LogicalLineReader;
 import org.reasm.expressions.Expression;
 import org.reasm.m68k.expressions.internal.ExpressionParser;
 import org.reasm.m68k.expressions.internal.InvalidTokenException;

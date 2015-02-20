@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 
 import org.reasm.*;
 import org.reasm.commons.source.LogicalLine;
+import org.reasm.commons.source.LogicalLineReader;
 import org.reasm.commons.source.SourceLocationUtils;
 import org.reasm.expressions.EvaluationContext;
 import org.reasm.expressions.SymbolLookup;
@@ -312,7 +313,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
 
     @Nonnull
     String getLabelText(int index) {
-        this.logicalLineReader.setRange(this.sourceLocation, this.logicalLine, this.logicalLine.getLabelBounds(index));
+        this.logicalLineReader.setRange(this.sourceLocation, this.logicalLine.getLabelBounds(index));
         return this.logicalLineReader.readToString();
     }
 
@@ -325,7 +326,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
     String getMnemonicText() {
         final SubstringBounds mnemonicBounds = this.logicalLine.getMnemonicBounds();
         assert mnemonicBounds != null;
-        this.logicalLineReader.setRange(this.sourceLocation, this.logicalLine, mnemonicBounds);
+        this.logicalLineReader.setRange(this.sourceLocation, mnemonicBounds);
         return this.logicalLineReader.readToString();
     }
 
@@ -448,7 +449,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
     }
 
     void prepareOperandReader(int index) {
-        this.logicalLineReader.setRange(this.sourceLocation, this.logicalLine, this.logicalLine.getOperandBounds(index));
+        this.logicalLineReader.setRange(this.sourceLocation, this.logicalLine.getOperandBounds(index));
     }
 
     boolean requireNumberOfOperands(int requiredNumberOfOperands) {

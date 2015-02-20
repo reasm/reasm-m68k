@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
+import org.reasm.commons.source.LogicalLineReader;
 import org.reasm.commons.source.Syntax;
 import org.reasm.m68k.messages.InvalidCharacterInHexDirectiveErrorMessage;
 import org.reasm.messages.OddNumberOfCharactersInHexDirectiveErrorMessage;
