@@ -228,13 +228,7 @@ public class SymbolsTest extends BaseProgramsTest {
 
     private static void addDataItem(@Nonnull String code, int steps, @Nonnull UserSymbolMatcher<?>[] symbols,
             @CheckForNull AssemblyMessage expectedMessage) {
-        TEST_DATA.add(new Object[] { code, steps, symbols, expectedMessage, null });
-    }
-
-    @SuppressWarnings("unused")
-    private static void addDataItem(@Nonnull String code, int steps, @Nonnull UserSymbolMatcher<?>[] symbols,
-            @CheckForNull AssemblyMessage... expectedMessages) {
-        TEST_DATA.add(new Object[] { code, steps, symbols, null, expectedMessages });
+        TEST_DATA.add(new Object[] { code, steps, symbols, expectedMessage });
     }
 
     /**
@@ -248,13 +242,10 @@ public class SymbolsTest extends BaseProgramsTest {
      *            an array of matchers for the symbols that are expected to be defined in the program
      * @param expectedMessage
      *            an {@link AssemblyMessage} that is expected to be generated while assembling the code
-     * @param expectedMessages
-     *            an array of {@link AssemblyMessage AssemblyMessages} that are expected to be generated while assembling the code.
-     *            Takes priority over <code>expectedMessage</code>.
      */
     public SymbolsTest(@Nonnull String code, int steps, @Nonnull UserSymbolMatcher<?>[] symbolMatchers,
-            @CheckForNull AssemblyMessage expectedMessage, @CheckForNull AssemblyMessage[] expectedMessages) {
-        super(code, steps, NO_DATA, M68KArchitecture.MC68000, expectedMessage, expectedMessages, symbolMatchers);
+            @CheckForNull AssemblyMessage expectedMessage) {
+        super(code, steps, NO_DATA, M68KArchitecture.MC68000, expectedMessage, null, symbolMatchers);
     }
 
 }
