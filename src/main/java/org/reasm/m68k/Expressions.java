@@ -45,7 +45,7 @@ public final class Expressions {
         final Tokenizer tokenizer = new Tokenizer();
         tokenizer.setCharSequence(expression);
 
-        Expression result;
+        final Expression result;
         try {
             result = ExpressionParser.parse(tokenizer, symbolLookup, assemblyMessageConsumer);
         } catch (InvalidTokenException e) {
@@ -57,69 +57,6 @@ public final class Expressions {
         }
 
         return result;
-    }
-
-    /**
-     * Serializes a string such that it can be parsed by {@link Expressions#parse(CharSequence, SymbolLookup, Consumer)}. The string
-     * is surrounded with quotes and characters are escaped where necessary.
-     *
-     * @param string
-     *            the string to serialize
-     * @return the serialized string
-     */
-    @Nonnull
-    public static String serializeString(@Nonnull String string) {
-        if (string == null) {
-            throw new NullPointerException("string");
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append('"');
-
-        int codePoint;
-        for (int i = 0; i < string.length(); i += Character.charCount(codePoint)) {
-            codePoint = string.codePointAt(i);
-
-            switch (codePoint) {
-            case 0:
-                sb.append("\\0");
-                break;
-
-            case 7: // bell
-                sb.append("\\a");
-                break;
-
-            case '\b':
-                sb.append("\\b");
-                break;
-
-            case '\t':
-                sb.append("\\t");
-                break;
-
-            case '\n':
-                sb.append("\\n");
-                break;
-
-            case '\f':
-                sb.append("\\f");
-                break;
-
-            case '\r':
-                sb.append("\\r");
-                break;
-
-            case '"':
-                sb.append("\\\"");
-                break;
-
-            default:
-                sb.appendCodePoint(codePoint);
-                break;
-            }
-        }
-
-        return sb.append('"').toString();
     }
 
     // This class is not meant to be instantiated.

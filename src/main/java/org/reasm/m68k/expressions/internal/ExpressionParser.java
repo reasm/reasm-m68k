@@ -5,14 +5,11 @@ import java.util.ArrayList;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-import org.apache.commons.pool.BasePoolableObjectFactory;
-import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.impl.GenericObjectPool;
 import org.reasm.AssemblyMessage;
 import org.reasm.FloatValue;
 import org.reasm.StringValue;
 import org.reasm.UnsignedIntValue;
-import org.reasm.commons.messages.UnrecognizedEscapeSequenceWarningMessage;
+import org.reasm.commons.expressions.Expressions;
 import org.reasm.commons.source.Syntax;
 import org.reasm.expressions.*;
 import org.reasm.messages.OverflowInLiteralWarningMessage;
@@ -27,28 +24,6 @@ import com.google.common.primitives.UnsignedLongs;
  * @author Francis Gagné
  */
 public final class ExpressionParser {
-
-    @Nonnull
-    private static final ThreadLocal<ObjectPool<StringBuilder>> STRING_BUILDER_POOL = new ThreadLocal<ObjectPool<StringBuilder>>() {
-
-        @Override
-        protected ObjectPool<StringBuilder> initialValue() {
-            return new GenericObjectPool<>(new BasePoolableObjectFactory<StringBuilder>() {
-
-                @Override
-                public StringBuilder makeObject() {
-                    return new StringBuilder();
-                };
-
-                @Override
-                public void passivateObject(StringBuilder sb) {
-                    sb.setLength(0);
-                };
-
-            });
-        };
-
-    };
 
     @Nonnull
     private static final Expression[] NO_ARGUMENTS = new Expression[0];
@@ -100,15 +75,6 @@ public final class ExpressionParser {
         }
 
         return expression;
-    }
-
-    @Nonnull
-    private static StringBuilder acquireStringBuilder() {
-        try {
-            return STRING_BUILDER_POOL.get().borrowObject();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @CheckForNull
@@ -271,65 +237,8 @@ public final class ExpressionParser {
             break;
 
         case STRING:
-            final StringBuilder stringValue = acquireStringBuilder();
-            try {
-                // The token contains the initial and final quote or apostrophe delimiters.
-                int codePoint;
-                for (int i = 1; i < tokenText.length() - 1; i += Character.charCount(codePoint)) {
-                    codePoint = Character.codePointAt(tokenText, i);
-
-                    if (codePoint == '\\') {
-                        i++;
-                        codePoint = Character.codePointAt(tokenText, i);
-
-                        switch (codePoint) {
-                        // Output these characters as-is, but don't raise a warning.
-                        case '"':
-                        case '\'':
-                        case '\\':
-                            break;
-
-                        // Replace these characters with another character.
-                        case '0':
-                            codePoint = 0; // null
-                            break;
-                        case 'a':
-                            codePoint = 7; // bell
-                            break;
-                        case 'b':
-                            codePoint = '\b'; // backspace
-                            break;
-                        case 't':
-                            codePoint = '\t'; // horizontal tab
-                            break;
-                        case 'n':
-                            codePoint = '\n'; // line feed
-                            break;
-                        case 'f':
-                            codePoint = '\f'; // form feed
-                            break;
-                        case 'r':
-                            codePoint = '\r'; // carriage return
-                            break;
-
-                        // Output all other characters as-is, and raise a warning.
-                        default:
-                            if (assemblyMessageConsumer != null) {
-                                assemblyMessageConsumer.accept(new UnrecognizedEscapeSequenceWarningMessage(codePoint));
-                            }
-
-                            break;
-                        }
-                    }
-
-                    stringValue.appendCodePoint(codePoint);
-                }
-
-                expression = new ValueExpression(new StringValue(stringValue.toString()));
-            } finally {
-                releaseStringBuilder(stringValue);
-            }
-
+            final String stringValue = Expressions.parseString(tokenText, assemblyMessageConsumer);
+            expression = new ValueExpression(new StringValue(stringValue));
             break;
 
         case IDENTIFIER:
@@ -612,14 +521,6 @@ public final class ExpressionParser {
         }
 
         return result;
-    }
-
-    private static void releaseStringBuilder(@Nonnull StringBuilder sb) {
-        try {
-            STRING_BUILDER_POOL.get().returnObject(sb);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     // This class is not meant to be instantiated.

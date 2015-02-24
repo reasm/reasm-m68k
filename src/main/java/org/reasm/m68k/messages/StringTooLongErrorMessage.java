@@ -5,7 +5,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 
 import org.reasm.AssemblyErrorMessage;
-import org.reasm.m68k.Expressions;
+import org.reasm.commons.expressions.Expressions;
 
 /**
  * An error message that is generated during an assembly when a string is too long in a particular context.

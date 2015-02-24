@@ -22,21 +22,19 @@ import org.reasm.AssemblyMessage;
 import org.reasm.FloatValue;
 import org.reasm.StringValue;
 import org.reasm.UnsignedIntValue;
-import org.reasm.commons.messages.UnrecognizedEscapeSequenceWarningMessage;
-import org.reasm.commons.util.ParserReader;
 import org.reasm.expressions.*;
 import org.reasm.messages.OverflowInLiteralWarningMessage;
+import org.reasm.testhelpers.AssemblyMessageCollector;
 import org.reasm.testhelpers.DummySymbolLookup;
 import org.reasm.testhelpers.EquivalentAssemblyMessage;
 
 import ca.fragag.Consumer;
 
 /**
- * Parameterized test class for {@link ExpressionParser#parse(ParserReader, Consumer)}.
+ * Parameterized test class for {@link ExpressionParser#parse(Tokenizer, SymbolLookup, Consumer)}.
  *
  * @author Francis Gagné
  */
-@SuppressWarnings("javadoc")
 @RunWith(Parameterized.class)
 public class ExpressionParserTest {
 
@@ -135,10 +133,6 @@ public class ExpressionParserTest {
 
     @Nonnull
     private static final AssemblyMessage[] DONT_CHECK_ASSEMBLY_MESSAGES = null;
-
-    @Nonnull
-    private static final UnrecognizedEscapeSequenceWarningMessage UNRECOGNIZED_ESCAPE_SEQUENCE_WARNING_MESSAGE = new UnrecognizedEscapeSequenceWarningMessage(
-            'z');
 
     @Nonnull
     private static final Object[][] TEST_DATA_ARRAY = new Object[][] {
@@ -325,33 +319,11 @@ public class ExpressionParserTest {
             // The program counter
             { new DataItem("*", 1, ProgramCounterExpression.INSTANCE) },
 
-            // An empty string delimited by apostrophes (single quotes)
-            { new DataItem("''", 2, VALUE_STRING_EMPTY) },
-
-            // An empty string delimited by double quotes
-            { new DataItem("\"\"", 2, VALUE_STRING_EMPTY) },
-
             // A string delimited by apostrophes (single quotes)
             { new DataItem("'abcdef'", 8, VALUE_STRING_ABCDEF) },
 
             // A string delimited by double quotes
             { new DataItem("\"abcdef\"", 8, VALUE_STRING_ABCDEF) },
-
-            // A string delimited by apostrophes (single quotes) with all valid escape sequences plus one invalid escape sequence
-            { new DataItem("'\\0\\\"\\\'\\\\\\a\\b\\f\\n\\r\\t\\z'", 24, new ValueExpression(new StringValue(
-                    "\0\"\'\\\u0007\b\f\n\r\tz")), UNRECOGNIZED_ESCAPE_SEQUENCE_WARNING_MESSAGE) },
-
-            // A string delimited by double quotes with all valid escape sequences plus one invalid escape sequence
-            { new DataItem("\"\\0\\\"\\\'\\\\\\a\\b\\f\\n\\r\\t\\z\"", 24, new ValueExpression(new StringValue(
-                    "\0\"\'\\\u0007\b\f\n\r\tz")), UNRECOGNIZED_ESCAPE_SEQUENCE_WARNING_MESSAGE) },
-
-            // A string delimited by apostrophes (single quotes) with all valid escape sequences plus one invalid escape sequence (parse with assemblyMessageConsumer == null)
-            { new DataItem("'\\0\\\"\\\'\\\\\\a\\b\\f\\n\\r\\t\\z'", 24, new ValueExpression(new StringValue(
-                    "\0\"\'\\\u0007\b\f\n\r\tz")), DONT_CHECK_ASSEMBLY_MESSAGES) },
-
-            // A string delimited by double quotes with all valid escape sequences plus one invalid escape sequence (parse with assemblyMessageConsumer == null)
-            { new DataItem("\"\\0\\\"\\\'\\\\\\a\\b\\f\\n\\r\\t\\z\"", 24, new ValueExpression(new StringValue(
-                    "\0\"\'\\\u0007\b\f\n\r\tz")), DONT_CHECK_ASSEMBLY_MESSAGES) },
 
             // An unterminated string starting with an apostrophe (single quote)
             { new DataItem("'abcdef", -1, null) },
@@ -364,12 +336,6 @@ public class ExpressionParserTest {
 
             // An unterminated string starting with a double quote and containing an escaped double quote
             { new DataItem("\"\\\"", -1, null) },
-
-            // A string delimited by apostrophes (single quotes) with an escaped backslash
-            { new DataItem("'\\\\'", 4, VALUE_STRING_BACKSLASH) },
-
-            // A string delimited by double quotes with an escaped backslash
-            { new DataItem("\"\\\\\"", 4, VALUE_STRING_BACKSLASH) },
 
             // A short identifier
             { new DataItem("a", 1, IDENTIFIER_A) },
@@ -624,6 +590,11 @@ public class ExpressionParserTest {
     @Nonnull
     private static final List<Object[]> TEST_DATA_LIST = Arrays.asList(TEST_DATA_ARRAY);
 
+    /**
+     * Gets the test data for this parameterized test.
+     *
+     * @return the test data
+     */
     @Nonnull
     @Parameters
     public static List<Object[]> data() {
@@ -644,8 +615,8 @@ public class ExpressionParserTest {
     }
 
     /**
-     * Asserts that {@link ExpressionParser#parse(Tokenizer, Consumer)} parses the correct expression, leaves the tokenizer in the
-     * expected state and emits the expected {@link AssemblyMessage AssemblyMessages}.
+     * Asserts that {@link ExpressionParser#parse(Tokenizer, SymbolLookup, Consumer)} parses the correct expression, leaves the
+     * tokenizer in the expected state and emits the expected {@link AssemblyMessage AssemblyMessages}.
      */
     @Test
     public void parse() {
@@ -653,13 +624,8 @@ public class ExpressionParserTest {
             final Tokenizer tokenizer = new Tokenizer();
             final ArrayList<AssemblyMessage> assemblyMessages = new ArrayList<>();
             final Consumer<AssemblyMessage> assemblyMessageConsumer = this.data.expectedAssemblyMessageMatchers == null ? null
-                    : new Consumer<AssemblyMessage>() {
-                        @Override
-                        public void accept(AssemblyMessage assemblyMessage) {
-                            assemblyMessages.add(assemblyMessage);
-                        }
-                    };
-            Expression expression;
+                    : new AssemblyMessageCollector(assemblyMessages);
+            final Expression expression;
 
             tokenizer.setCharSequence(this.data.expressionText);
             try {

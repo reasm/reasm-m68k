@@ -78,28 +78,4 @@ public class ExpressionsTest {
         assertThat(Expressions.parse("2+2", DummySymbolLookup.DEFAULT, null), is(expected));
     }
 
-    /**
-     * Asserts that {@link Expressions#serializeString(String)} correctly serializes a string that contains no special characters.
-     */
-    @Test
-    public void serializeStringBasic() {
-        assertThat(Expressions.serializeString("abc"), is("\"abc\""));
-    }
-
-    /**
-     * Asserts that {@link Expressions#serializeString(String)} correctly serializes a string that contains special characters.
-     */
-    @Test
-    public void serializeStringEscapes() {
-        assertThat(Expressions.serializeString("\0\u0007\b\t\n\f\r\""), is("\"\\0\\a\\b\\t\\n\\f\\r\\\"\""));
-    }
-
-    /**
-     * Asserts that {@link Expressions#serializeString(String)} throws a {@link NullPointerException} when the <code>string</code>
-     * argument is <code>null</code>
-     */
-    @Test(expected = NullPointerException.class)
-    public void serializeStringNull() {
-        Expressions.serializeString(null);
-    }
 }
