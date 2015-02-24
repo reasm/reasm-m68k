@@ -5,7 +5,7 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.reasm.m68k.messages.ValueOutOfRangeErrorMessage;
+import org.reasm.commons.messages.ValueOutOfRangeErrorMessage;
 
 class BitManipulationInstruction extends TwoOperandIntegerInstruction {
 

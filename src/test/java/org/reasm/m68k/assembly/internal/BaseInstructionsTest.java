@@ -4,8 +4,8 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.reasm.AssemblyMessage;
+import org.reasm.commons.messages.AddressingModeNotAllowedHereErrorMessage;
 import org.reasm.m68k.M68KArchitecture;
-import org.reasm.m68k.messages.AddressingModeNotAllowedHereErrorMessage;
 import org.reasm.m68k.messages.BranchTargetOutOfRangeErrorMessage;
 import org.reasm.m68k.messages.BreakpointNumberOutOfRangeErrorMessage;
 import org.reasm.m68k.messages.LabelExpectedErrorMessage;

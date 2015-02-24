@@ -7,9 +7,9 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.reasm.Function;
-import org.reasm.m68k.messages.FunctionCannotBeConvertedToIntegerErrorMessage;
-import org.reasm.m68k.messages.StringTooLongErrorMessage;
-import org.reasm.m68k.messages.ValueOutOfRangeErrorMessage;
+import org.reasm.commons.messages.FunctionCannotBeConvertedToIntegerErrorMessage;
+import org.reasm.commons.messages.StringTooLongErrorMessage;
+import org.reasm.commons.messages.ValueOutOfRangeErrorMessage;
 
 final class DcIntegerValueVisitor implements DcValueVisitor {
 

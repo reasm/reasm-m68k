@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.reasm.AssemblyMessage;
+import org.reasm.commons.messages.ValueOutOfRangeErrorMessage;
 import org.reasm.m68k.M68KArchitecture;
 import org.reasm.m68k.messages.*;
 

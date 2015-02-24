@@ -8,9 +8,9 @@ import javax.annotation.concurrent.Immutable;
 
 import org.reasm.AssemblyMessage;
 import org.reasm.Value;
+import org.reasm.commons.messages.ValueOutOfRangeErrorMessage;
 import org.reasm.m68k.messages.IncbinLengthMustNotBeNegativeErrorMessage;
 import org.reasm.m68k.messages.IncbinStartMustNotBeNegativeErrorMessage;
-import org.reasm.m68k.messages.ValueOutOfRangeErrorMessage;
 
 /**
  * The <code>INCBIN</code> and <code>BINCLUDE</code> directives.

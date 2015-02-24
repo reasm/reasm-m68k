@@ -7,8 +7,8 @@ import org.reasm.Function;
 import org.reasm.StringValue;
 import org.reasm.Value;
 import org.reasm.ValueVisitor;
+import org.reasm.commons.messages.FunctionCannotBeConvertedToIntegerErrorMessage;
 import org.reasm.expressions.UnaryOperator;
-import org.reasm.m68k.messages.FunctionCannotBeConvertedToIntegerErrorMessage;
 
 final class CardinalValueVisitor implements ValueVisitor<Void> {
 
