@@ -448,10 +448,12 @@ public class InstructionsTest extends BaseInstructionsTest {
         addDataItem(" BRA 0-", new short[] { 0x6000, -2 }, new InvalidExpressionErrorMessage("0-"));
         addDataItem(" BRA 0a", new short[] { 0x6000, -2 }, new InvalidExpressionErrorMessage("0a"));
         addDataItem(" BRA $8000", new short[] { 0x6000, 0x7FFE });
-        addDataItem(" BRA $8002", new short[] { 0x6000, -0x8000 }, BRANCH_TARGET_OUT_OF_RANGE);
-        addDataItem(" BRA $8002", new short[] { 0x6000, -0x8000 }, M68KArchitecture.MC68020, BRANCH_TARGET_OUT_OF_RANGE);
-        addDataItem(" BRA -$8000", new short[] { 0x6000, 0x7FFE }, BRANCH_TARGET_OUT_OF_RANGE);
-        addDataItem(" BRA -$8000", new short[] { 0x6000, 0x7FFE }, M68KArchitecture.MC68020, BRANCH_TARGET_OUT_OF_RANGE);
+        addDataItem(" BRA $8002", new short[] { 0x6000, -0x8000 }, RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_WORD_HIGH);
+        addDataItem(" BRA $8002", new short[] { 0x6000, -0x8000 }, M68KArchitecture.MC68020,
+                RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_WORD_HIGH);
+        addDataItem(" BRA -$8000", new short[] { 0x6000, 0x7FFE }, RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_WORD_LOW);
+        addDataItem(" BRA -$8000", new short[] { 0x6000, 0x7FFE }, M68KArchitecture.MC68020,
+                RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_WORD_LOW);
         addDataItem(" BRA -$7FFE", new short[] { 0x6000, -0x8000 });
         addDataItem(" BRA -$7FFC", new short[] { 0x6000, -0x7FFE });
         addDataItem("SELF: BRA SELF", new short[] { 0x6000, -2 });
@@ -465,8 +467,8 @@ public class InstructionsTest extends BaseInstructionsTest {
         addDataItem(" BRA.B 1", new short[] { 0x60FE }, M68KArchitecture.MC68020, new MinusOneDistanceShortBranchErrorMessage());
         addDataItem(" BRA.B 2", new short[] { 0x60FE }, new ZeroDistanceShortBranchErrorMessage());
         addDataItem(" BRA.B 128", new short[] { 0x607E });
-        addDataItem(" BRA.B 130", new short[] { 0x6080 }, BRANCH_TARGET_OUT_OF_RANGE);
-        addDataItem(" BRA.B -128", new short[] { 0x607E }, BRANCH_TARGET_OUT_OF_RANGE);
+        addDataItem(" BRA.B 130", new short[] { 0x6080 }, RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_BYTE_HIGH);
+        addDataItem(" BRA.B -128", new short[] { 0x607E }, RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_BYTE_LOW);
         addDataItem(" BRA.B -126", new short[] { 0x6080 });
         addDataItem(" BRA.S 0", new short[] { 0x60FE });
         addDataItem(" BRA.W 0", new short[] { 0x6000, -2 });
@@ -474,16 +476,18 @@ public class InstructionsTest extends BaseInstructionsTest {
         addDataItem(" BRA.W 1", new short[] { 0x6000, -1 }, M68KArchitecture.MC68020);
         addDataItem(" BRA.W 2", new short[] { 0x6000, 0 });
         addDataItem(" BRA.W $8000", new short[] { 0x6000, 0x7FFE });
-        addDataItem(" BRA.W $8002", new short[] { 0x6000, -0x8000 }, BRANCH_TARGET_OUT_OF_RANGE);
-        addDataItem(" BRA.W -$8000", new short[] { 0x6000, 0x7FFE }, BRANCH_TARGET_OUT_OF_RANGE);
+        addDataItem(" BRA.W $8002", new short[] { 0x6000, -0x8000 }, RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_WORD_HIGH);
+        addDataItem(" BRA.W -$8000", new short[] { 0x6000, 0x7FFE }, RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_WORD_LOW);
         addDataItem(" BRA.W -$7FFE", new short[] { 0x6000, -0x8000 });
         addDataItem(" BRA.L 0", new short[] { 0x60FF, -1, -2 }, NOT_SUPPORTED_ON_ARCHITECTURE);
         addDataItem(" BRA.L 0", new short[] { 0x60FF, -1, -2 }, M68KArchitecture.MC68020);
         addDataItem(" BRA.L 1", new short[] { 0x60FF, -1, -1 }, M68KArchitecture.MC68020);
         addDataItem(" BRA.L 2", new short[] { 0x60FF, 0, 0 }, M68KArchitecture.MC68020);
         addDataItem(" BRA.L $80000000", new short[] { 0x60FF, 0x7FFF, -2 }, M68KArchitecture.MC68020);
-        addDataItem(" BRA.L $80000002", new short[] { 0x60FF, -0x8000, 0 }, M68KArchitecture.MC68020, BRANCH_TARGET_OUT_OF_RANGE);
-        addDataItem(" BRA.L -$80000000", new short[] { 0x60FF, 0x7FFF, -2 }, M68KArchitecture.MC68020, BRANCH_TARGET_OUT_OF_RANGE);
+        addDataItem(" BRA.L $80000002", new short[] { 0x60FF, -0x8000, 0 }, M68KArchitecture.MC68020,
+                RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_LONG_HIGH);
+        addDataItem(" BRA.L -$80000000", new short[] { 0x60FF, 0x7FFF, -2 }, M68KArchitecture.MC68020,
+                RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_LONG_LOW);
         addDataItem(" BRA.L -$7FFFFFFE", new short[] { 0x60FF, -0x8000, 0 }, M68KArchitecture.MC68020);
         addDataItem(" BRA.Z 0", new short[] { 0x6000, -2 }, INVALID_SIZE_ATTRIBUTE_Z);
         // --> see also OptimizeUnsizedBranchesTest for tests with the "optimizeUnsizedBranches" option enabled
@@ -620,10 +624,12 @@ public class InstructionsTest extends BaseInstructionsTest {
         addDataItem(" DBF D0,0-", new short[] { 0x51C8, 0 }, new InvalidExpressionErrorMessage("0-"));
         addDataItem(" DBF D0,0a", new short[] { 0x51C8, 0 }, new InvalidExpressionErrorMessage("0a"));
         addDataItem(" DBF D0,$8000", new short[] { 0x51C8, 0x7FFE });
-        addDataItem(" DBF D0,$8002", new short[] { 0x51C8, -0x8000 }, BRANCH_TARGET_OUT_OF_RANGE);
-        addDataItem(" DBF D0,$8002", new short[] { 0x51C8, -0x8000 }, M68KArchitecture.MC68020, BRANCH_TARGET_OUT_OF_RANGE);
-        addDataItem(" DBF D0,-$8000", new short[] { 0x51C8, 0x7FFE }, BRANCH_TARGET_OUT_OF_RANGE);
-        addDataItem(" DBF D0,-$8000", new short[] { 0x51C8, 0x7FFE }, M68KArchitecture.MC68020, BRANCH_TARGET_OUT_OF_RANGE);
+        addDataItem(" DBF D0,$8002", new short[] { 0x51C8, -0x8000 }, RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_WORD_HIGH);
+        addDataItem(" DBF D0,$8002", new short[] { 0x51C8, -0x8000 }, M68KArchitecture.MC68020,
+                RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_WORD_HIGH);
+        addDataItem(" DBF D0,-$8000", new short[] { 0x51C8, 0x7FFE }, RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_WORD_LOW);
+        addDataItem(" DBF D0,-$8000", new short[] { 0x51C8, 0x7FFE }, M68KArchitecture.MC68020,
+                RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_WORD_LOW);
         addDataItem(" DBF D0,-$7FFE", new short[] { 0x51C8, -0x8000 });
         addDataItem(" DBF D0,-$7FFC", new short[] { 0x51C8, -0x7FFE });
         addDataItem("SELF: DBF D0,SELF", new short[] { 0x51C8, -2 });
@@ -641,8 +647,8 @@ public class InstructionsTest extends BaseInstructionsTest {
         addDataItem(" DBF.W D0,1", new short[] { 0x51C8, -1 });
         addDataItem(" DBF.W D0,2", new short[] { 0x51C8, 0 });
         addDataItem(" DBF.W D0,$8000", new short[] { 0x51C8, 0x7FFE });
-        addDataItem(" DBF.W D0,$8002", new short[] { 0x51C8, -0x8000 }, BRANCH_TARGET_OUT_OF_RANGE);
-        addDataItem(" DBF.W D0,-$8000", new short[] { 0x51C8, 0x7FFE }, BRANCH_TARGET_OUT_OF_RANGE);
+        addDataItem(" DBF.W D0,$8002", new short[] { 0x51C8, -0x8000 }, RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_WORD_HIGH);
+        addDataItem(" DBF.W D0,-$8000", new short[] { 0x51C8, 0x7FFE }, RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_WORD_LOW);
         addDataItem(" DBF.W D0,-$7FFE", new short[] { 0x51C8, -0x8000 });
         addDataItem(" DBF.L D0,0", new short[] { 0x51C8, -2 }, INVALID_SIZE_ATTRIBUTE_L);
         addDataItem(" DBF.Z D0,0", new short[] { 0x51C8, -2 }, INVALID_SIZE_ATTRIBUTE_Z);

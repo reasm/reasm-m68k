@@ -5,8 +5,8 @@ import javax.annotation.Nonnull;
 
 import org.reasm.AssemblyMessage;
 import org.reasm.commons.messages.AddressingModeNotAllowedHereErrorMessage;
+import org.reasm.commons.messages.RelativeBranchTargetOutOfRangeErrorMessage;
 import org.reasm.m68k.M68KArchitecture;
-import org.reasm.m68k.messages.BranchTargetOutOfRangeErrorMessage;
 import org.reasm.m68k.messages.BreakpointNumberOutOfRangeErrorMessage;
 import org.reasm.m68k.messages.LabelExpectedErrorMessage;
 import org.reasm.m68k.messages.TrapVectorOutOfRangeErrorMessage;
@@ -25,9 +25,25 @@ public abstract class BaseInstructionsTest extends BaseProgramsTest {
     @Nonnull
     static final AssemblyMessage BREAKPOINT_NUMBER_OUT_OF_RANGE = new BreakpointNumberOutOfRangeErrorMessage();
     @Nonnull
-    static final AssemblyMessage BRANCH_TARGET_OUT_OF_RANGE = new BranchTargetOutOfRangeErrorMessage();
-    @Nonnull
     static final AssemblyMessage LABEL_EXPECTED = new LabelExpectedErrorMessage();
+    @Nonnull
+    static final AssemblyMessage RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_LONG_LOW = new RelativeBranchTargetOutOfRangeErrorMessage(
+            -0x80000002L);
+    @Nonnull
+    static final AssemblyMessage RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_LONG_HIGH = new RelativeBranchTargetOutOfRangeErrorMessage(
+            0x80000000L);
+    @Nonnull
+    static final AssemblyMessage RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_BYTE_LOW = new RelativeBranchTargetOutOfRangeErrorMessage(
+            -0x82);
+    @Nonnull
+    static final AssemblyMessage RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_BYTE_HIGH = new RelativeBranchTargetOutOfRangeErrorMessage(
+            0x80);
+    @Nonnull
+    static final AssemblyMessage RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_WORD_LOW = new RelativeBranchTargetOutOfRangeErrorMessage(
+            -0x8002);
+    @Nonnull
+    static final AssemblyMessage RELATIVE_BRANCH_TARGET_OUT_OF_RANGE_WORD_HIGH = new RelativeBranchTargetOutOfRangeErrorMessage(
+            0x8000);
     @Nonnull
     static final AssemblyMessage TRAP_VECTOR_OUT_OF_RANGE = new TrapVectorOutOfRangeErrorMessage();
 

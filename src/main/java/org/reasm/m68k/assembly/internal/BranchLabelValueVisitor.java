@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 
 import org.reasm.Function;
 import org.reasm.ValueVisitor;
-import org.reasm.m68k.messages.BranchTargetOutOfRangeErrorMessage;
+import org.reasm.commons.messages.RelativeBranchTargetOutOfRangeErrorMessage;
 import org.reasm.m68k.messages.LabelExpectedErrorMessage;
 
 final class BranchLabelValueVisitor implements ValueVisitor<Void> {
@@ -41,7 +41,7 @@ final class BranchLabelValueVisitor implements ValueVisitor<Void> {
         switch (this.size) {
         case BYTE:
             if (!(value >= -0x80 && value <= 0x7F)) {
-                this.context.addTentativeMessage(new BranchTargetOutOfRangeErrorMessage());
+                this.context.addTentativeMessage(new RelativeBranchTargetOutOfRangeErrorMessage(value));
             }
 
             break;
@@ -57,14 +57,14 @@ final class BranchLabelValueVisitor implements ValueVisitor<Void> {
                     final boolean fitsInWord = value >= -0x8000 && value <= 0x7FFF;
                     if (!InstructionSetCheck.MC68020_OR_LATER.isSupported(this.context.instructionSet) || fitsInWord) {
                         if (!fitsInWord) {
-                            this.context.addTentativeMessage(new BranchTargetOutOfRangeErrorMessage());
+                            this.context.addTentativeMessage(new RelativeBranchTargetOutOfRangeErrorMessage(value));
                         }
 
                         // word size
                         outputSize = InstructionSize.WORD;
                     } else {
                         if (!(value >= -0x80000000 && value <= 0x7FFFFFFF)) {
-                            this.context.addTentativeMessage(new BranchTargetOutOfRangeErrorMessage());
+                            this.context.addTentativeMessage(new RelativeBranchTargetOutOfRangeErrorMessage(value));
                         }
 
                         // long size
@@ -80,14 +80,14 @@ final class BranchLabelValueVisitor implements ValueVisitor<Void> {
 
         case WORD:
             if (!(value >= -0x8000 && value <= 0x7FFF)) {
-                this.context.addTentativeMessage(new BranchTargetOutOfRangeErrorMessage());
+                this.context.addTentativeMessage(new RelativeBranchTargetOutOfRangeErrorMessage(value));
             }
 
             break;
 
         case LONG:
             if (!(value >= -0x80000000 && value <= 0x7FFFFFFF)) {
-                this.context.addTentativeMessage(new BranchTargetOutOfRangeErrorMessage());
+                this.context.addTentativeMessage(new RelativeBranchTargetOutOfRangeErrorMessage(value));
             }
 
             break;
