@@ -351,7 +351,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
     @Override
     GeneralPurposeRegister getRegisterAliasByName(String name) {
         final Symbol symbol = this.builder.resolveSymbolReference(REGISTER_ALIAS_LOOKUP_CONTEXTS, name,
-                M68KArchitecture.isLocalName(name), false, null, null).getSymbol();
+                M68KArchitecture.isLocalName(name), null, null).getSymbol();
 
         if (symbol != null && symbol.getValue() instanceof GeneralPurposeRegister) {
             return (GeneralPurposeRegister) symbol.getValue();
@@ -363,7 +363,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
     @CheckForNull
     Symbol getRegisterAliasOrRegisterListAliasSymbolByName(@Nonnull String name) {
         final Symbol symbol = this.builder.resolveSymbolReference(REGISTER_LIST_ALIAS_LOOKUP_CONTEXTS, name,
-                M68KArchitecture.isLocalName(name), false, null, null).getSymbol();
+                M68KArchitecture.isLocalName(name), null, null).getSymbol();
 
         if (symbol != null && ((UserSymbol) symbol).getContext() != SymbolContext.VALUE) {
             return symbol;
@@ -499,7 +499,7 @@ final class M68KAssemblyContext extends M68KBasicAssemblyContext implements Cons
     @CheckForNull
     private <TValue> Symbol getSymbolByContextAndName(@Nonnull SymbolContext<TValue> context, @Nonnull String name,
             @Nonnull SymbolResolutionFallback symbolResolutionFallback) {
-        return this.builder.resolveSymbolReference(context, name, M68KArchitecture.isLocalName(name), false, null,
+        return this.builder.resolveSymbolReference(context, name, M68KArchitecture.isLocalName(name), null,
                 symbolResolutionFallback).getSymbol();
     }
 

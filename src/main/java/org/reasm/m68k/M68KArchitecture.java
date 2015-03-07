@@ -101,7 +101,7 @@ public final class M68KArchitecture extends Architecture {
             @Override
             public Symbol getSymbol(String name) {
                 final SymbolReference symbolReference = assembly.resolveSymbolReference(SymbolContext.VALUE, name,
-                        M68KArchitecture.isLocalName(name), false, null, null);
+                        M68KArchitecture.isLocalName(name), null, null);
 
                 if (symbolReferenceConsumer != null) {
                     symbolReferenceConsumer.accept(symbolReference);

@@ -109,8 +109,7 @@ public class UserFunctionTest extends ObjectHashCodeEqualsContract {
 
     @Nonnull
     private static Object getFunction(@Nonnull Assembly assembly, @Nonnull String symbolName) {
-        final Object symbolValue = assembly.resolveSymbolReference(SymbolContext.VALUE, symbolName, false, false, null, null)
-                .getValue();
+        final Object symbolValue = assembly.resolveSymbolReference(SymbolContext.VALUE, symbolName, false, null, null).getValue();
         assertThat(symbolValue, HasType.hasType(FunctionValue.class));
 
         return Value.accept((FunctionValue) symbolValue, new ValueVisitorAdapter<Function>() {

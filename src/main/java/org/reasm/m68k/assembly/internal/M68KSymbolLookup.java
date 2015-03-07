@@ -56,7 +56,7 @@ final class M68KSymbolLookup implements SymbolLookup {
 
     @Override
     public final Symbol getSymbol(String name) {
-        return this.context.builder.resolveSymbolReference(SymbolContext.VALUE, name, M68KArchitecture.isLocalName(name), false,
+        return this.context.builder.resolveSymbolReference(SymbolContext.VALUE, name, M68KArchitecture.isLocalName(name),
                 this.symbolLookupContext, this.context).getSymbol();
     }
 
