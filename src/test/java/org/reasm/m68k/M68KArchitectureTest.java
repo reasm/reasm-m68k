@@ -39,6 +39,22 @@ public class M68KArchitectureTest {
     private static final UnsignedIntValue TWENTY = new UnsignedIntValue(20);
 
     @Nonnull
+    private static final Consumer<AssemblyMessage> FAILING_ASSEMBLY_MESSAGE_CONSUMER = new Consumer<AssemblyMessage>() {
+        @Override
+        public void accept(AssemblyMessage message) {
+            fail();
+        }
+    };
+
+    @Nonnull
+    private static final Consumer<SymbolReference> FAILING_SYMBOL_REFERENCE_CONSUMER = new Consumer<SymbolReference>() {
+        @Override
+        public void accept(SymbolReference reference) {
+            fail();
+        }
+    };
+
+    @Nonnull
     private static Assembly createAssembly1() {
         final PredefinedSymbol fooSymbol = new PredefinedSymbol(SymbolContext.VALUE, "foo", SymbolType.CONSTANT, ONE_HUNDRED);
         final PredefinedSymbol barSymbol = new PredefinedSymbol(SymbolContext.VALUE, "bar", SymbolType.CONSTANT, TWENTY);
@@ -77,14 +93,8 @@ public class M68KArchitectureTest {
     public void evaluateExpressionNullSymbolReferenceConsumer() {
         final Assembly assembly = createAssembly1();
 
-        final Consumer<AssemblyMessage> assemblyMessageConsumer = new Consumer<AssemblyMessage>() {
-            @Override
-            public void accept(AssemblyMessage assemblyMessage) {
-                fail();
-            }
-        };
-
-        final Value value = M68KArchitecture.MC68000.evaluateExpression("foo+bar+3", assembly, null, assemblyMessageConsumer);
+        final Value value = M68KArchitecture.MC68000.evaluateExpression("foo+bar+3", assembly, null,
+                FAILING_ASSEMBLY_MESSAGE_CONSUMER);
         assertThat(value, is((Value) new UnsignedIntValue(123)));
     }
 
@@ -95,23 +105,8 @@ public class M68KArchitectureTest {
     @Test
     public void evaluateExpressionSimple() {
         final Assembly assembly = createAssembly1();
-
-        final Consumer<SymbolReference> symbolReferenceConsumer = new Consumer<SymbolReference>() {
-            @Override
-            public void accept(SymbolReference symbolReference) {
-                fail();
-            }
-        };
-
-        final Consumer<AssemblyMessage> assemblyMessageConsumer = new Consumer<AssemblyMessage>() {
-            @Override
-            public void accept(AssemblyMessage assemblyMessage) {
-                fail();
-            }
-        };
-
-        final Value value = M68KArchitecture.MC68000.evaluateExpression("2+7*3", assembly, symbolReferenceConsumer,
-                assemblyMessageConsumer);
+        final Value value = M68KArchitecture.MC68000.evaluateExpression("2+7*3", assembly, FAILING_SYMBOL_REFERENCE_CONSUMER,
+                FAILING_ASSEMBLY_MESSAGE_CONSUMER);
         assertThat(value, is((Value) new UnsignedIntValue(23)));
     }
 
@@ -131,15 +126,8 @@ public class M68KArchitectureTest {
             }
         };
 
-        final Consumer<AssemblyMessage> assemblyMessageConsumer = new Consumer<AssemblyMessage>() {
-            @Override
-            public void accept(AssemblyMessage assemblyMessage) {
-                fail();
-            }
-        };
-
         final Value value = M68KArchitecture.MC68000.evaluateExpression("foo+bar+3", assembly, symbolReferenceConsumer,
-                assemblyMessageConsumer);
+                FAILING_ASSEMBLY_MESSAGE_CONSUMER);
         assertThat(value, is((Value) new UnsignedIntValue(123)));
 
         assertThat(symbolReferences.size(), is(2));
