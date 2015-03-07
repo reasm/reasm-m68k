@@ -24,7 +24,12 @@ import org.reasm.m68k.expressions.internal.ExpressionParser;
 import org.reasm.m68k.expressions.internal.InvalidTokenException;
 import org.reasm.m68k.expressions.internal.TokenType;
 import org.reasm.m68k.expressions.internal.Tokenizer;
-import org.reasm.m68k.messages.*;
+import org.reasm.m68k.messages.AddressingModeNotSupportedErrorMessage;
+import org.reasm.m68k.messages.BaseDisplacementOutOfRangeErrorMessage;
+import org.reasm.m68k.messages.EndOfExpressionExpectedErrorMessage;
+import org.reasm.m68k.messages.ExpressionExpectedErrorMessage;
+import org.reasm.m68k.messages.InvalidScaleValueErrorMessage;
+import org.reasm.m68k.messages.ScaleSpecificationNotSupportedErrorMessage;
 
 import ca.fragag.Consumer;
 
