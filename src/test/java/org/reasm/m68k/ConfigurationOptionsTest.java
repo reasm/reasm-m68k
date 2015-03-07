@@ -22,7 +22,7 @@ import ca.fragag.Consumer;
  */
 public class ConfigurationOptionsTest {
 
-    private final class InvalidEntriesConsumer implements Consumer<Map.Entry<String, Object>> {
+    private static final class InvalidEntriesConsumer implements Consumer<Map.Entry<String, Object>> {
 
         private boolean gotExpectedEntry;
         @Nonnull
