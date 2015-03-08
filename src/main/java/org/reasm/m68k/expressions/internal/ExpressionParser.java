@@ -28,6 +28,10 @@ public final class ExpressionParser {
     @Nonnull
     private static final Expression[] NO_ARGUMENTS = new Expression[0];
 
+    // The SymbolLookup of this IdentifierExpression is irrelevant, since that expression is never evaluated.
+    @Nonnull
+    private static final IdentifierExpression EMPTY_IDENTIFIER = new IdentifierExpression("", null);
+
     /**
      * Parses an expression from the tokens emitted by the specified tokenizer.
      *
@@ -286,9 +290,21 @@ public final class ExpressionParser {
             tokenizer.breakSequence();
         }
 
+        if (tokenizer.getTokenType() == TokenType.PERIOD) {
+            // Treat the period operator as a unary operator too.
+            final Tokenizer tokenizer1 = tokenizer.duplicateAndAdvance();
+            final Expression expression1 = parseLevel1(tokenizer1, symbolLookup, assemblyMessageConsumer);
+            if (expression1 != null) {
+                tokenizer.copyFrom(tokenizer1);
+                return new PeriodExpression(EMPTY_IDENTIFIER, expression1, symbolLookup);
+            }
+
+            return null;
+        }
+
         if (tokenizer.getTokenType() == TokenType.OPERATOR && tokenizer.getTokenLength() == 1) {
             UnaryOperator operator = null;
-            // Check if the operator is an unary operator.
+            // Check if the operator is a unary operator.
             switch (tokenizer.tokenCharAt(0)) {
             case '!':
                 operator = UnaryOperator.LOGICAL_NOT;
@@ -308,8 +324,8 @@ public final class ExpressionParser {
             }
 
             if (operator != null) {
-                Tokenizer tokenizer1 = tokenizer.duplicateAndAdvance();
-                Expression expression1 = parseLevel1(tokenizer1, symbolLookup, assemblyMessageConsumer);
+                final Tokenizer tokenizer1 = tokenizer.duplicateAndAdvance();
+                final Expression expression1 = parseLevel1(tokenizer1, symbolLookup, assemblyMessageConsumer);
                 if (expression1 != null) {
                     tokenizer.copyFrom(tokenizer1);
                     return new UnaryOperatorExpression(operator, expression1);

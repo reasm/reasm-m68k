@@ -349,6 +349,10 @@ public class ExpressionParserTest {
             // An identifier containing a period
             { new DataItem("abc.def", 7, new IdentifierExpression("abc.def", DummySymbolLookup.DEFAULT)) },
 
+            // The unary period operator
+            { new DataItem(".a", 2, new PeriodExpression(new IdentifierExpression("", null), IDENTIFIER_A,
+                    DummySymbolLookup.DEFAULT)) },
+
             // The unary plus operator
             { new DataItem("+a", 2, new UnaryOperatorExpression(UnaryOperator.UNARY_PLUS, IDENTIFIER_A)) },
 
@@ -366,6 +370,9 @@ public class ExpressionParserTest {
 
             // The unary plus operator surrounded with spaces
             { new DataItem(" + a", 4, new UnaryOperatorExpression(UnaryOperator.UNARY_PLUS, IDENTIFIER_A)) },
+
+            // An invalid expression
+            { new DataItem(".", 0, null) },
 
             // An invalid expression
             { new DataItem("~", 0, null) },
