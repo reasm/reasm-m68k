@@ -146,7 +146,7 @@ class Macro extends Mnemonic {
                 if (inString == -1) {
                     if (codePoint == '\'' || codePoint == '"') {
                         inString = codePoint;
-                    } else if (M68KParser.SYNTAX.isValidIdentifierCodePoint(codePoint)) {
+                    } else if (M68KParser.SYNTAX.isValidIdentifierInitialCodePoint(codePoint)) {
                         boolean startsWithDigit = Syntax.isDigit(codePoint);
 
                         // Read an identifier.

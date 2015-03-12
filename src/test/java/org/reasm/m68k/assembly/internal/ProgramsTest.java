@@ -227,6 +227,7 @@ public class ProgramsTest extends BaseProgramsTest {
         addDataItem("A MACRO\n DC.B NARG\n ENDM\n A 0,0,0,0,0,0,0,0,0,0,0,0,0", 7, new byte[] { 13 });
         addDataItem("A MACRO Z\n DC.B Z\n ENDM\n A", 7, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
         addDataItem("A MACRO Z\n DC.B Z\n ENDM\n A $7F", 7, new byte[] { 0x7F });
+        addDataItem("A MACRO Z\n MOVE.B #Z,D0\n ENDM\n A $7F", 7, new byte[] { 0x10, 0x3C, 0x00, 0x7F });
         addDataItem("A MACRO Z\n DC.B \\\n ENDM\n A $7F", 7, new byte[] { 0 }, new InvalidExpressionErrorMessage("\\"));
         addDataItem("A MACRO Z\n DC.B \\*\n ENDM\n A $7F", 7, NO_DATA, WRONG_NUMBER_OF_OPERANDS);
         addDataItem("A MACRO Z\n DC.B \\*\n ENDM\nL A $7F\nL:", 16, new byte[] { 1 });
