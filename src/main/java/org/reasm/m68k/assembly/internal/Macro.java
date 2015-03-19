@@ -25,9 +25,11 @@ class Macro extends Mnemonic {
     @Immutable
     private static final class Substitution {
 
+        // ATTRIBUTE is -1 to allow \0 to refer to the attribute by subtracting 1 from 0.
         static final int ATTRIBUTE = -1;
         static final int LABEL = -2;
-        static final int NARG = -3;
+        static final int COUNTER = -3;
+        static final int NARG = -4;
 
         final int offset;
         final int length;
@@ -64,6 +66,7 @@ class Macro extends Mnemonic {
         // - \{xyz}   if xyz is an integer, gets substituted to the nth operand (\0 is the attribute); otherwise, if xyz matches the
         //            name of an operand, gets substituted with the corresponding operand in a macro invocation
         // - \*       gets substituted with the last label on the macro invocation line
+        // - \@       gets substituted with an increasing counter value, prefixed with an underscore (the counter is global to the assembly)
         //
         // The following patterns are matched outside of string literals only:
         // - xyz      if xyz is an identifier that matches the name of an operand, gets substituted with the corresponding operand
@@ -116,6 +119,13 @@ class Macro extends Mnemonic {
                     reader.advance();
                     substitutions.add(new Substitution(startPosition, reader.getCurrentPosition() - startPosition,
                             Substitution.LABEL));
+                    continue;
+                }
+
+                if (codePoint == '@') {
+                    reader.advance();
+                    substitutions.add(new Substitution(startPosition, reader.getCurrentPosition() - startPosition,
+                            Substitution.COUNTER));
                     continue;
                 }
 
@@ -243,12 +253,18 @@ class Macro extends Mnemonic {
         MacroInstantiation result = new MacroInstantiation(this.body);
         int correction = 0;
 
+        int macroCounter = context.builder.incrementMacroCounter();
+
         for (Substitution substitution : this.substitutions) {
             String substitutedText = "";
 
             switch (substitution.operandIndex) {
             case Substitution.NARG:
                 substitutedText = Integer.toString(context.numberOfOperands);
+                break;
+
+            case Substitution.COUNTER:
+                substitutedText = "_" + macroCounter;
                 break;
 
             case Substitution.LABEL:
