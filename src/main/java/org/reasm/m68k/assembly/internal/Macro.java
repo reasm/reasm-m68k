@@ -363,24 +363,26 @@ class Macro extends Mnemonic {
                         }
 
                         continue;
-                    } else if (M68KParser.SYNTAX.isValidIdentifierInitialCodePoint(codePoint)) {
+                    } else {
                         boolean startsWithDigit = Syntax.isDigit(codePoint);
+                        if (startsWithDigit || M68KParser.SYNTAX.isValidIdentifierInitialCodePoint(codePoint)) {
+                            // Read an identifier.
+                            do {
+                                reader.advance();
+                            } while (M68KParser.SYNTAX.isValidIdentifierCodePoint(reader.getCurrentCodePoint()));
 
-                        // Read an identifier.
-                        do {
-                            reader.advance();
-                        } while (M68KParser.SYNTAX.isValidIdentifierCodePoint(reader.getCurrentCodePoint()));
+                            if (!startsWithDigit) {
+                                final int endPosition = reader.getCurrentPosition();
+                                reader.setCurrentPosition(startPosition);
+                                final String identifier = reader.readSubstring(endPosition - startPosition);
 
-                        if (!startsWithDigit) {
-                            final int endPosition = reader.getCurrentPosition();
-                            reader.setCurrentPosition(startPosition);
-                            final String identifier = reader.readSubstring(endPosition - startPosition);
+                                // Check if the identifier matches the name of an operand.
+                                findNamedSubstitution(operands, packOperandIndex, identifier, startPosition, endPosition,
+                                        substitutions);
+                            }
 
-                            // Check if the identifier matches the name of an operand.
-                            findNamedSubstitution(operands, packOperandIndex, identifier, startPosition, endPosition, substitutions);
+                            continue;
                         }
-
-                        continue;
                     }
                 } else if (inString == codePoint) {
                     inString = -1;
