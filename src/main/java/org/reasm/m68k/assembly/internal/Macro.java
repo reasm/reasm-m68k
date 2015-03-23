@@ -3,10 +3,13 @@ package org.reasm.m68k.assembly.internal;
 import java.util.ArrayList;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
+import javax.annotation.meta.When;
 
 import org.reasm.commons.source.Syntax;
+import org.reasm.m68k.messages.MultipleOperandPacksInMacroDefinitionErrorMessage;
 import org.reasm.m68k.source.M68KParser;
 import org.reasm.source.MacroInstantiation;
 import org.reasm.source.SourceLocation;
@@ -23,55 +26,247 @@ import ca.fragag.text.RangedCharSequenceReader;
 class Macro extends Mnemonic {
 
     @Immutable
-    private static final class Substitution {
+    private static class OperandFromEndSubstitutionSource extends SubstitutionSource {
 
-        // ATTRIBUTE is -1 to allow \0 to refer to the attribute by subtracting 1 from 0.
-        static final int ATTRIBUTE = -1;
-        static final int LABEL = -2;
-        static final int COUNTER = -3;
-        static final int NARG = -4;
+        private static final int MAX_CACHE_SIZE = 256;
+        @Nonnull
+        private static final ArrayList<OperandFromEndSubstitutionSource> CACHE = new ArrayList<>();
 
-        final int offset;
-        final int length;
-        final int operandIndex;
+        @Nonnull
+        static OperandFromEndSubstitutionSource get(int operandIndex) {
+            int cacheIndex = ~operandIndex;
+            if (cacheIndex >= MAX_CACHE_SIZE) {
+                return new OperandFromEndSubstitutionSource(operandIndex);
+            }
 
-        Substitution(int offset, int length, int operandIndex) {
-            this.offset = offset;
-            this.length = length;
+            while (cacheIndex >= CACHE.size()) {
+                CACHE.add(new OperandFromEndSubstitutionSource(~CACHE.size()));
+            }
+
+            return CACHE.get(cacheIndex);
+        }
+
+        // operandIndex is always a negative value.
+        // -1 means the last operand, -2 means the second to last operand, etc.
+        @Nonnegative(when = When.NEVER)
+        private final int operandIndex;
+
+        private OperandFromEndSubstitutionSource(@Nonnegative(when = When.NEVER) int operandIndex) {
             this.operandIndex = operandIndex;
+        }
+
+        @Override
+        String substitute(M68KAssemblyContext context, int macroCounter, Macro macro) {
+            final int realOperandIndex = context.numberOfOperands + this.operandIndex;
+            if (realOperandIndex >= 0) {
+                return context.getOperandText(realOperandIndex);
+            }
+
+            return "";
         }
 
     }
 
-    private static void findNamedSubstitution(@Nonnull String[] operands, @Nonnull String name, int startPosition, int endPosition,
-            @Nonnull ArrayList<Substitution> substitutions) {
+    @Immutable
+    private static final class OperandSubstitutionSource extends SubstitutionSource {
+
+        private static final int MAX_CACHE_SIZE = 256;
+        @Nonnull
+        private static final ArrayList<OperandSubstitutionSource> CACHE = new ArrayList<>();
+
+        @Nonnull
+        static OperandSubstitutionSource get(int operandIndex) {
+            if (operandIndex >= MAX_CACHE_SIZE) {
+                return new OperandSubstitutionSource(operandIndex);
+            }
+
+            while (operandIndex >= CACHE.size()) {
+                CACHE.add(new OperandSubstitutionSource(CACHE.size()));
+            }
+
+            return CACHE.get(operandIndex);
+        }
+
+        private final int operandIndex;
+
+        private OperandSubstitutionSource(int operandIndex) {
+            this.operandIndex = operandIndex;
+        }
+
+        @Override
+        String substitute(M68KAssemblyContext context, int macroCounter, Macro macro) {
+            if (this.operandIndex < context.numberOfOperands) {
+                return context.getOperandText(this.operandIndex);
+            }
+
+            return "";
+        }
+
+    }
+
+    @Immutable
+    private static final class Substitution {
+
+        final int offset;
+        final int length;
+        @Nonnull
+        final SubstitutionSource source;
+
+        Substitution(int offset, int length, @Nonnull SubstitutionSource source) {
+            this.offset = offset;
+            this.length = length;
+            this.source = source;
+        }
+
+    }
+
+    @Immutable
+    private static abstract class SubstitutionSource {
+
+        /** Expands to the attribute on the macro invocation. */
+        @Nonnull
+        static final SubstitutionSource ATTRIBUTE = new SubstitutionSource() {
+            @Override
+            String substitute(M68KAssemblyContext context, int macroCounter, Macro macro) {
+                if (context.attribute != null) {
+                    return context.attribute;
+                }
+
+                return "";
+            }
+        };
+
+        /** Expands to the last label on the macro invocation. */
+        @Nonnull
+        static final SubstitutionSource LABEL = new SubstitutionSource() {
+            @Override
+            String substitute(M68KAssemblyContext context, int macroCounter, Macro macro) {
+                if (context.numberOfLabels > 0) {
+                    return context.getLabelText(context.numberOfLabels - 1);
+                }
+
+                return "";
+            }
+        };
+
+        /** Expands to the macro counter for the current macro invocation. */
+        @Nonnull
+        static final SubstitutionSource COUNTER = new SubstitutionSource() {
+            @Override
+            String substitute(M68KAssemblyContext context, int macroCounter, Macro macro) {
+                return "_" + macroCounter;
+            }
+        };
+
+        /** Expands to the number of operands on the macro invocation. */
+        @Nonnull
+        static final SubstitutionSource NARG = new SubstitutionSource() {
+            @Override
+            String substitute(M68KAssemblyContext context, int macroCounter, Macro macro) {
+                return Integer.toString(context.numberOfOperands);
+            }
+        };
+
+        /** Expands to the operands that are in the operand pack. */
+        @Nonnull
+        static final SubstitutionSource PACK = new SubstitutionSource() {
+            @Override
+            String substitute(M68KAssemblyContext context, int macroCounter, Macro macro) {
+                final StringBuilder sb = new StringBuilder();
+
+                // On the macro definition, if the operand pack is preceded by x operands and followed by y operands,
+                // then the pack includes all operands except the first x ones and the last y ones.
+
+                // macro.numberOfNamedOperands also counts the pack operand.
+                for (int i = 0; i <= context.numberOfOperands - macro.numberOfNamedOperands; i++) {
+                    if (i > 0) {
+                        sb.append(',');
+                    }
+
+                    sb.append(context.getOperandText(macro.packOperandIndex + i));
+                }
+
+                return sb.toString();
+            }
+        };
+
+        SubstitutionSource() {
+        }
+
+        @Nonnull
+        abstract String substitute(@Nonnull M68KAssemblyContext context, int macroCounter, @Nonnull Macro macro);
+
+    }
+
+    private static void addPositionalSubstitution(@Nonnull ArrayList<Substitution> substitutions, int startPosition,
+            int endPosition, int i) {
+        final SubstitutionSource source;
+        if (i == 0) {
+            source = SubstitutionSource.ATTRIBUTE;
+        } else {
+            source = OperandSubstitutionSource.get(i - 1);
+        }
+
+        substitutions.add(new Substitution(startPosition, endPosition - startPosition, source));
+    }
+
+    private static void findNamedSubstitution(@Nonnull String[] operands, int packOperandIndex, @Nonnull String name,
+            int startPosition, int endPosition, @Nonnull ArrayList<Substitution> substitutions) {
         if ("NARG".equalsIgnoreCase(name)) {
-            substitutions.add(new Substitution(startPosition, endPosition - startPosition, Substitution.NARG));
+            substitutions.add(new Substitution(startPosition, endPosition - startPosition, SubstitutionSource.NARG));
             return;
         }
 
         for (int i = 0; i < operands.length; i++) {
             if (operands[i].equalsIgnoreCase(name)) {
-                substitutions.add(new Substitution(startPosition, endPosition - startPosition, i));
+                final SubstitutionSource source;
+                if (i == packOperandIndex) {
+                    source = SubstitutionSource.PACK;
+                } else if (packOperandIndex != -1 && i > packOperandIndex) {
+                    source = OperandFromEndSubstitutionSource.get(i - operands.length);
+                } else {
+                    source = OperandSubstitutionSource.get(i);
+                }
+
+                substitutions.add(new Substitution(startPosition, endPosition - startPosition, source));
                 break;
             }
         }
     }
 
+    private static int findPackOperand(@Nonnull M68KAssemblyContext context, @Nonnull String[] operands) {
+        int result = -1;
+        for (int i = 0; i < operands.length; i++) {
+            if (operands[i].equals("...")) {
+                if (result == -1) {
+                    result = i;
+                } else {
+                    context.addMessage(new MultipleOperandPacksInMacroDefinitionErrorMessage());
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
     @Nonnull
-    private static ArrayList<Substitution> identifySubstitutions(@Nonnull String[] operands, @Nonnull SourceLocation body) {
+    private static ArrayList<Substitution> identifySubstitutions(@Nonnull String[] operands, int packOperandIndex,
+            @Nonnull SourceLocation body) {
         // There are a few patterns that will get substituted in macros.
         //
         // The following patterns are matched anywhere in the macro body:
-        // - \{xyz}   if xyz is an integer, gets substituted to the nth operand (\0 is the attribute); otherwise, if xyz matches the
-        //            name of an operand, gets substituted with the corresponding operand in a macro invocation
+        // - \{xyz}   - if xyz is an integer, gets substituted to the nth operand (\0 is the attribute);
+        //            - if xyz matches the name of an operand, gets substituted with the corresponding operand in a macro invocation
+        //            - if xyz is ..., gets substituted with the operands that are included in the operand pack
         // - \*       gets substituted with the last label on the macro invocation line
         // - \@       gets substituted with an increasing counter value, prefixed with an underscore (the counter is global to the assembly)
         //
         // The following patterns are matched outside of string literals only:
         // - xyz      if xyz is an identifier that matches the name of an operand, gets substituted with the corresponding operand
         //            in a macro invocation
-        // - \xyz     if xyz is an integer, gets substituted to the nth operand (\0 is the attribute)
+        // - \xyz     if xyz is an integer, gets substituted with the nth operand (\0 is the attribute)
+        // - ...      gets substituted with the operands that are included in the operand pack
 
         final ArrayList<Substitution> substitutions = new ArrayList<>();
         final RangedCharSequenceReader reader = new RangedCharSequenceReader(new DocumentReader(body.getFile().getText()),
@@ -104,11 +299,10 @@ class Macro extends Mnemonic {
 
                         final Integer i = tryParseInt(name);
                         if (i != null) {
-                            // NOTE: i - 1 is ATTRIBUTE when i == 0
-                            substitutions.add(new Substitution(startPosition, endPosition - startPosition, i - 1));
+                            addPositionalSubstitution(substitutions, startPosition, endPosition, i);
                         } else {
                             // Check if the text between the braces matches the name of an operand.
-                            findNamedSubstitution(operands, name, startPosition, endPosition, substitutions);
+                            findNamedSubstitution(operands, packOperandIndex, name, startPosition, endPosition, substitutions);
                         }
                     }
 
@@ -118,14 +312,14 @@ class Macro extends Mnemonic {
                 if (codePoint == '*') {
                     reader.advance();
                     substitutions.add(new Substitution(startPosition, reader.getCurrentPosition() - startPosition,
-                            Substitution.LABEL));
+                            SubstitutionSource.LABEL));
                     continue;
                 }
 
                 if (codePoint == '@') {
                     reader.advance();
                     substitutions.add(new Substitution(startPosition, reader.getCurrentPosition() - startPosition,
-                            Substitution.COUNTER));
+                            SubstitutionSource.COUNTER));
                     continue;
                 }
 
@@ -142,8 +336,7 @@ class Macro extends Mnemonic {
 
                         final Integer i = tryParseInt(name);
                         if (i != null) {
-                            // NOTE: i - 1 is ATTRIBUTE when i == 0
-                            substitutions.add(new Substitution(startPosition, endPosition - startPosition, i - 1));
+                            addPositionalSubstitution(substitutions, startPosition, endPosition, i);
                         }
 
                         continue;
@@ -156,6 +349,20 @@ class Macro extends Mnemonic {
                 if (inString == -1) {
                     if (codePoint == '\'' || codePoint == '"') {
                         inString = codePoint;
+                    } else if (codePoint == '.') {
+                        reader.advance();
+                        if (reader.getCurrentCodePoint() == '.') {
+                            reader.advance();
+                            if (reader.getCurrentCodePoint() == '.') {
+                                reader.advance();
+                                if (packOperandIndex != -1) {
+                                    substitutions.add(new Substitution(startPosition, reader.getCurrentPosition() - startPosition,
+                                            SubstitutionSource.PACK));
+                                }
+                            }
+                        }
+
+                        continue;
                     } else if (M68KParser.SYNTAX.isValidIdentifierInitialCodePoint(codePoint)) {
                         boolean startsWithDigit = Syntax.isDigit(codePoint);
 
@@ -170,7 +377,7 @@ class Macro extends Mnemonic {
                             final String identifier = reader.readSubstring(endPosition - startPosition);
 
                             // Check if the identifier matches the name of an operand.
-                            findNamedSubstitution(operands, identifier, startPosition, endPosition, substitutions);
+                            findNamedSubstitution(operands, packOperandIndex, identifier, startPosition, endPosition, substitutions);
                         }
 
                         continue;
@@ -211,6 +418,8 @@ class Macro extends Mnemonic {
         return (int) result;
     }
 
+    final int numberOfNamedOperands;
+    final int packOperandIndex;
     @Nonnull
     private final SourceLocation body;
     @Nonnull
@@ -218,13 +427,16 @@ class Macro extends Mnemonic {
     @Nonnull
     private final boolean hasLabelSubstitutions;
 
-    Macro(@Nonnull String[] operands, @Nonnull SourceLocation body) {
+    Macro(@Nonnull M68KAssemblyContext context, @Nonnull String[] operands, @Nonnull SourceLocation body) {
+        this.numberOfNamedOperands = operands.length;
+        this.packOperandIndex = findPackOperand(context, operands);
+
         this.body = body;
-        this.substitutions = identifySubstitutions(operands, body);
+        this.substitutions = identifySubstitutions(operands, this.packOperandIndex, body);
         boolean hasLabelSubstitutions = false;
 
         for (Substitution substitution : this.substitutions) {
-            if (substitution.operandIndex == Substitution.LABEL) {
+            if (substitution.source == SubstitutionSource.LABEL) {
                 hasLabelSubstitutions = true;
                 break;
             }
@@ -256,39 +468,7 @@ class Macro extends Mnemonic {
         int macroCounter = context.builder.incrementMacroCounter();
 
         for (Substitution substitution : this.substitutions) {
-            String substitutedText = "";
-
-            switch (substitution.operandIndex) {
-            case Substitution.NARG:
-                substitutedText = Integer.toString(context.numberOfOperands);
-                break;
-
-            case Substitution.COUNTER:
-                substitutedText = "_" + macroCounter;
-                break;
-
-            case Substitution.LABEL:
-                if (context.numberOfLabels > 0) {
-                    substitutedText = context.getLabelText(context.numberOfLabels - 1);
-                }
-
-                break;
-
-            case Substitution.ATTRIBUTE:
-                if (context.attribute != null) {
-                    substitutedText = context.attribute;
-                }
-
-                break;
-
-            default:
-                if (substitution.operandIndex < context.numberOfOperands) {
-                    substitutedText = context.getOperandText(substitution.operandIndex);
-                }
-
-                break;
-            }
-
+            final String substitutedText = substitution.source.substitute(context, macroCounter, this);
             result = result.replaceText(substitution.offset + correction, substitution.length, substitutedText);
             correction += substitutedText.length() - substitution.length;
         }

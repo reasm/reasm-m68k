@@ -57,7 +57,7 @@ class MacroDirective extends Mnemonic {
         final AssemblyStepLocation stepLocation = context.step.getLocation();
         Macro macro = context.macrosByDefinitionLocation.get(stepLocation);
         if (macro == null) {
-            macro = new Macro(operands, macroBody);
+            macro = new Macro(context, operands, macroBody);
             context.macrosByDefinitionLocation.put(stepLocation, macro);
         }
 
